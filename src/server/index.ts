@@ -22,16 +22,30 @@ export type ServerOptions = {
   insecureCookie?: boolean;
   origin?: string;
   openTTL?: number;
+  leaseClock?: Clock;
+  exit?: (code: number) => void;
 };
 export function startServer(options: ServerOptions = {}) {
   const store = new Store(options.db);
   let tables: Tables;
+  let failed = false;
+  let exitTimer: ReturnType<typeof setTimeout> | undefined;
+  const demote = () => {
+    failed = true;
+    // Queue initialization failures too; the server and socket hub exist by then.
+    queueMicrotask(() => {
+      sockets.closeAll();
+      // Allow the 1012 frames to flush before terminating this fenced process.
+      exitTimer = setTimeout(() => (options.exit ?? process.exit)(1), 100);
+    });
+  };
   try {
     tables = new Tables(
       store,
       options.clock,
       options.timing ?? timing(),
       options.openTTL,
+      { clock: options.leaseClock, lost: demote },
     );
   } catch (error) {
     store.close();
@@ -44,6 +58,7 @@ export function startServer(options: ServerOptions = {}) {
     );
   const sockets = new SessionSockets(tables);
   let stopping = false;
+  let stopPromise: Promise<void> | undefined;
   const pending = new Set<Promise<unknown>>();
   const serve = handler(
     store,
@@ -60,7 +75,10 @@ export function startServer(options: ServerOptions = {}) {
       maxRequestBodySize: 4096,
       error: serverError,
       fetch(request, server) {
-        if (stopping && new URL(request.url).pathname !== "/healthz")
+        if (
+          failed ||
+          (stopping && new URL(request.url).pathname !== "/healthz")
+        )
           return Response.json(
             { code: "unavailable", message: "unavailable" },
             { status: 503 },
@@ -82,17 +100,21 @@ export function startServer(options: ServerOptions = {}) {
     store,
     tables,
     sessions,
-    async stop() {
-      if (stopping) return;
+    stop() {
+      if (stopPromise) return stopPromise;
       stopping = true;
       tables.lifecycle.closed = true;
-      await Promise.allSettled([...pending]);
-      sockets.closeAll();
-      tables.stop();
-      await server.stop(true);
-      // Closing sockets can invoke disconnect handlers; cancel their holds too.
-      tables.stop();
-      store.close();
+      stopPromise = (async () => {
+        await Promise.allSettled([...pending]);
+        sockets.closeAll();
+        tables.stop();
+        await server.stop(true);
+        // Closing sockets can invoke disconnect handlers; cancel their holds too.
+        tables.stop();
+        clearTimeout(exitTimer);
+        store.close();
+      })();
+      return stopPromise;
     },
   };
 }

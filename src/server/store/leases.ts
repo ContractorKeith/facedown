@@ -20,8 +20,7 @@ export class LeaseStore {
       )
       .get(holder, now - 20000);
   }
-  heartbeat(holder: string): boolean {
-    const now = Date.now();
+  heartbeat(holder: string, now = Date.now()): boolean {
     return (
       this.db.run(
         "UPDATE leases SET heartbeat_at=? WHERE name='tables' AND holder=? AND heartbeat_at>?",
@@ -29,10 +28,10 @@ export class LeaseStore {
       ).changes === 1
     );
   }
-  run<T>(holder: string, action: () => T): T {
+  run<T>(holder: string, action: () => T, now = Date.now()): T {
     return this.db
       .transaction(() => {
-        if (!this.owns(holder)) throw new Fault("unavailable");
+        if (!this.owns(holder, now)) throw new Fault("unavailable");
         return action();
       })
       .immediate();

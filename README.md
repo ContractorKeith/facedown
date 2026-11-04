@@ -38,7 +38,8 @@ hoist apps:create facedown --domain facedown.contractorkeith.com --health-path /
 hoist config:set facedown FACEDOWN_DB=/data/facedown.db FACEDOWN_ORIGIN=https://facedown.contractorkeith.com PORT=8080
 ```
 
-**Persistent storage prerequisite:** current hoist has no volume verb or mount option.
+**Persistent storage prerequisite:** current hoist has no volume verb or mount option
+([hoist#40](https://github.com/ContractorKeith/hoist/issues/40)).
 Its Docker adapter does not attach persistent volumes. Before pushing, hoist must
 support mounting one persistent Docker volume at `/data` in every facedown release,
 including restart and rollback, writable by the image's `bun` user (UID 1000).
@@ -60,10 +61,13 @@ hoist rollback facedown v1
 Do not set `FACEDOWN_INSECURE_COOKIE` in production. Hoist health-checks `/healthz`
 before cutover, then stops the old container. The standby returns 503 for table
 traffic until it acquires the SQLite lease; sockets close with 1012 and reconnect.
+After SIGKILL, clients may show “reconnecting” for up to 20 seconds while the lease
+expires.
 The image honors `PORT` (8080 by default). Back up `/data`, including SQLite WAL
 safely with SQLite-aware tooling. Rollback restores an image and config, not database
 contents; use a compatible release and retain the same volume.
 
 For a local container handoff check, run `bun run test:container` with Docker access.
 It creates and removes only its own `facedown-test-*` containers and volume, and
-builds `facedown-test-image:latest` (under 200 MB). Without Docker it prints a skip message.
+builds `facedown-test-image:latest` (under 200 MB). Without opt-in it skips; explicitly
+opting in requires Docker and fails if unavailable.

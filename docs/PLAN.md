@@ -53,7 +53,7 @@ published before the game began.
 | 19 | Replay, profile, leaderboard APIs | v1 | M4 | |
 | 20 | Client: lobby + table, phone portrait first, own SVG art | v1 | M5 | Svelte SPA |
 | 21 | Client: login, replay viewer with seed check, profile, leaderboard, spectate | v1 | M6 | replay re-runs the engine in the browser |
-| 22 | Deploy through hoist: Dockerfile, health, single-writer lease | v1 | M7 | |
+| 22 | Deploy through hoist: Dockerfile, health, single-writer lease | v1 | M7 | Live push needs persistent-volume support: [hoist#40](https://github.com/ContractorKeith/hoist/issues/40) |
 | 23 | Hearts, Euchre | Later | | another `Game` each |
 | 24 | Per-table rule options | Later | | Ruleset is already a config object; UI only |
 | 25 | Matchmaking queue, tournaments | Later | | |

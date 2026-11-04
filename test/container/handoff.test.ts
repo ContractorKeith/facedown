@@ -1,15 +1,9 @@
 import { expect, test } from "bun:test";
 import { Client } from "../e2e/helpers";
+import { requireDocker } from "./guard";
 
 const enabled = process.env.FACEDOWN_CONTAINER === "1";
-const available =
-  enabled &&
-  Bun.spawnSync(["docker", "info"], { stdout: "ignore", stderr: "ignore" })
-    .exitCode === 0;
-if (!available)
-  console.log(
-    "container: skipped (opt in with bun run test:container; Docker daemon access required)",
-  );
+requireDocker(enabled);
 const docker = async (...args: string[]) => {
   const child = Bun.spawn(["docker", ...args], {
     stdout: "pipe",
@@ -23,8 +17,7 @@ const Socket = WebSocket as unknown as new (
   url: string,
   options: Bun.WebSocketOptions,
 ) => WebSocket;
-
-test.skipIf(!available)(
+test.skipIf(!enabled)(
   "container SIGTERM hands the persisted game to a healthy standby",
   async () => {
     const prefix = `facedown-test-${crypto.randomUUID()}`;
@@ -141,6 +134,17 @@ test.skipIf(!available)(
       const originB = await run(b);
       expect((await request(originB, "/api/tables", host)).status).toBe(503);
       expect((await request(originB, "/ws", host)).status).toBe(503);
+      let health = "";
+      for (let i = 0; i < 100 && health !== "healthy"; i++) {
+        health = await docker(
+          "inspect",
+          b,
+          "--format",
+          "{{.State.Health.Status}}",
+        );
+        if (health !== "healthy") await Bun.sleep(100);
+      }
+      expect(health).toBe("healthy");
       const closed = new Promise<number>((resolve) =>
         players[0]?.ws.addEventListener(
           "close",
@@ -168,7 +172,6 @@ test.skipIf(!available)(
       const spectator = await connect(originB, host, id);
       await spectator.view(1, true);
       for (const c of resumed) await c.close();
-      // Disconnected seats become bots; keep the real move log and rating finish path.
       for (let i = 0; i < 600; i++) {
         if (spectator.messages.some((m) => m.t === "over")) break;
         await Bun.sleep(100);

@@ -51,7 +51,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - Only `src/server/store` touches SQLite.
 - Containers run as bun, with writable persistent data mounted at `/data`; image default is `/data/facedown.db`.
 - `/healthz` is healthy during standby. The `tables` SQLite lease gates table traffic and rebuild (5 s heartbeat, 20 s expiry, 250 ms poll).
-- SIGTERM rejects moves with `unavailable`, drains writes, closes WS with 1012 and releases the lease; exit deadline is 9 s.
+- SIGTERM rejects moves with `unavailable`, drains writes, closes WS with 1012 and releases the lease; exit deadline is 9 s. Confirmed lease loss closes sockets, fails health, and exits 1 for replacement.
 - `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
 - `FACEDOWN_ORIGIN` pins the exact mutation/WS Origin in production; unset uses the request origin.
 - `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.

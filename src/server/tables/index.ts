@@ -28,6 +28,7 @@ export class Tables {
     time: Clock = clock,
     delays: Timing = timing(),
     ttl = openTTL(),
+    leaseOptions: { clock?: Clock; lost?: () => void } = {},
   ) {
     this.lifecycle = new Lifecycle(store, time, delays, (table) =>
       this.retention.changed(table),
@@ -46,16 +47,25 @@ export class Tables {
     );
     this.lease = new TableLease(
       store,
-      () => {
-        rebuild(store, this.tables);
-        for (const table of this.tables.values()) {
-          this.lifecycle.schedule(table);
-          table.seats.forEach((_, seat) => {
-            this.lifecycle.hold(table, seat);
-          });
-        }
+      (guard) => {
+        const schedule = () => {
+          if (this.lifecycle.closed) return;
+          for (const table of this.tables.values()) {
+            this.lifecycle.schedule(table);
+            table.seats.forEach((_, seat) => {
+              this.lifecycle.hold(table, seat);
+            });
+          }
+        };
+        const rebuilding = rebuild(store, this.tables, guard);
+        if (rebuilding) return rebuilding.then(schedule);
+        schedule();
       },
-      () => this.stop(),
+      () => {
+        this.stop();
+        leaseOptions.lost?.();
+      },
+      leaseOptions.clock,
     );
     this.lifecycle.guard = (action) => this.lease.run(action);
   }

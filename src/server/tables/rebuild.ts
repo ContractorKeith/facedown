@@ -1,10 +1,30 @@
-import { fold } from "../../engine/core/fold";
 import { registry } from "../../engine/registry";
+import type { LeaseGuard } from "../lease";
 import type { Store } from "../store";
 import type { Table } from "./types";
 
-export function rebuild(store: Store, tables: Map<string, Table>): void {
+// Small logs finish synchronously; large replays yield so heartbeats and health run.
+export function rebuild(
+  store: Store,
+  tables: Map<string, Table>,
+  guard: LeaseGuard,
+): void | Promise<void> {
+  const steps = rebuildSteps(store, tables, guard);
+  if (steps.next().done) return;
+  return (async () => {
+    do {
+      await Bun.sleep(0);
+    } while (!steps.next().done);
+  })();
+}
+function* rebuildSteps(
+  store: Store,
+  tables: Map<string, Table>,
+  guard: LeaseGuard,
+) {
+  let yieldedAt = performance.now();
   for (const id of store.listLiveIds()) {
+    guard(() => {});
     try {
       const record = store.loadGame(id);
       if (!record) throw new Error("Missing live game");
@@ -14,8 +34,17 @@ export function rebuild(store: Store, tables: Map<string, Table>): void {
         JSON.stringify(game.ruleset) !== JSON.stringify(record.ruleset)
       )
         throw new Error("Unsupported saved ruleset");
-      const rebuilt = fold(game, record.seed, record.moves);
-      if (!rebuilt.ok) throw new Error(`Corrupt move log: ${record.id}`);
+      let state = game.init(record.seed, game.ruleset);
+      for (const envelope of record.moves) {
+        const result = game.apply(state, envelope);
+        if (!result.ok) throw new Error(`Corrupt move log: ${record.id}`);
+        state = result.state;
+        if (performance.now() - yieldedAt >= 50) {
+          yield;
+          guard(() => {});
+          yieldedAt = performance.now();
+        }
+      }
       const table: Table = {
         id: record.id,
         type: record.type,
@@ -26,7 +55,7 @@ export function rebuild(store: Store, tables: Map<string, Table>): void {
         game,
         seed: record.seed,
         commitment: record.commitment,
-        state: rebuilt.state,
+        state,
         seq: record.moves.length,
         status: "live",
         deadline: null,
@@ -40,8 +69,12 @@ export function rebuild(store: Store, tables: Map<string, Table>): void {
         })),
       };
       tables.set(table.id, table);
+      if (performance.now() - yieldedAt >= 50) {
+        yield;
+        yieldedAt = performance.now();
+      }
     } catch {
-      store.abandon(id);
+      guard(() => store.abandon(id));
       console.warn(`Abandoned corrupt game: ${id}`);
     }
   }
