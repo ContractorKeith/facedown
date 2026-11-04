@@ -1,3 +1,4 @@
+import { checkEnvelope, isPlainObject } from "../core/envelope";
 import { type Game, nextSeat } from "../core/types";
 import { bot } from "./bot";
 import { finishDeal, gameWinner, summaryView } from "./scoring";
@@ -55,24 +56,24 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
         : [{ pass: true }];
   },
   apply(state, envelope) {
+    const envelopeError = checkEnvelope(envelope);
+    if (envelopeError) return { ok: false, error: envelopeError };
     const reject = (code: "game_over" | "not_your_turn" | "illegal_move") =>
       ({ ok: false, error: { code, message: code } }) as const;
     if (state.turn === null) return reject("game_over");
     if (envelope.seat !== state.turn) return reject("not_your_turn");
     const legal = dominoes.legalMoves(state, envelope.seat);
-    const move =
+    const move: unknown =
       "timeout" in envelope
         ? bot(dominoes.view(state, { seat: envelope.seat }), legal)
         : envelope.move;
     // Match the full move shape, rejecting extra fields and malformed values.
     const candidate = legal.find(
       (item) =>
-        move !== null &&
-        typeof move === "object" &&
-        Object.keys(item).length === Object.keys(move).length &&
+        isPlainObject(move) &&
+        Object.keys(item).length === Reflect.ownKeys(move).length &&
         Object.entries(item).every(
-          ([key, value]) =>
-            (move as unknown as Record<string, unknown>)[key] === value,
+          ([key, value]) => Object.hasOwn(move, key) && move[key] === value,
         ),
     );
     if (!candidate) return reject("illegal_move");
