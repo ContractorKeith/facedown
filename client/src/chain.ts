@@ -24,7 +24,9 @@ export function checkChain(
     !!anchor?.tampered || !!(anchor && anchor.commitment !== next.commitment);
   if (!previous && saved?.seq === next.seq && saved.logHash)
     tampered ||= saved.logHash !== next.logHash;
-  let unbroken = previous?.unbroken ?? (next.seq === 0 && !saved);
+  let unbroken =
+    (previous?.unbroken ?? (next.seq === 0 && !saved)) &&
+    next.lastMove !== undefined;
   if (previous) {
     if (next.seq === previous.seq) {
       tampered ||= next.logHash !== previous.logHash;

@@ -37,6 +37,9 @@ test("a changed hash, commitment or same-seq update is sticky tampering", () => 
 test("gaps, reloads and missing envelopes cannot earn Verified", () => {
   const zero = checkChain(undefined, start);
   expect(
+    checkChain(undefined, { ...start, lastMove: undefined }).unbroken,
+  ).toBe(false);
+  expect(
     checkChain(zero, { ...start, seq: 2, logHash: hash, lastMove }).unbroken,
   ).toBe(false);
   expect(
