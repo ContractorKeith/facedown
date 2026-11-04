@@ -53,13 +53,19 @@ export class Client {
       this.waiters.add(wake);
     });
   }
-  view(seq: number) {
+  view(seq: number, started = false) {
     const message = this.messages.findLast(
-      (m) => m.t === "view" && m.seq === seq,
+      (m) =>
+        m.t === "view" && m.seq === seq && (!started || m.status !== "open"),
     );
     return message
       ? Promise.resolve(message)
-      : this.next((m) => m.t === "view" && m.seq === seq);
+      : this.next(
+          (m) =>
+            m.t === "view" &&
+            m.seq === seq &&
+            (!started || m.status !== "open"),
+        );
   }
   error(code: string) {
     return this.next((m) => m.t === "error" && m.code === code);
@@ -149,7 +155,11 @@ export function fixture(overrides: Partial<ServerOptions> = {}) {
     expect((await request(`/api/tables/${id}/start`, host, {})).status).toBe(
       200,
     );
-    await spectator.view(0);
+    await Promise.all(
+      [...players, spectator].map((c) =>
+        c.next((m) => m.t === "view" && m.status === "live"),
+      ),
+    );
     return { id, host, cookies, players, spectator };
   }
   async function play(
@@ -160,17 +170,17 @@ export function fixture(overrides: Partial<ServerOptions> = {}) {
     for (let count = 0; !until(); count++) {
       if (count > 15000) throw new Error("Game did not finish");
       const table = app.tables.get(id);
-      const current = await (players[0] as Client).view(table.seq);
+      const current = await (players[0] as Client).view(table.seq, true);
       const seat = current.toAct as Seat;
       const client = players[seat] as Client;
-      const message = await client.view(table.seq);
+      const message = await client.view(table.seq, true);
       const move = table.game.bot(
         message.view,
         legalMovesFromView(table.type, message.view),
       );
       clock.advance(201); // Keep real per-connection rate limits enabled.
       client.send({ t: "move", table: id, seq: table.seq, move });
-      await client.view(table.seq + 1);
+      await client.view(table.seq + 1, true);
     }
   }
   return {

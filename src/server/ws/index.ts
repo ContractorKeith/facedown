@@ -3,17 +3,28 @@ import type { Session, SessionResolver } from "../http/sessions";
 import type { Tables } from "../tables";
 import { Fault, type Peer, seatNumber } from "../tables/types";
 import { Budget } from "./budget";
+import type { SessionSockets } from "./sessions";
 
 export type SocketData = { session: Session; peer?: Peer; budget?: Budget };
-export function websocket(tables: Tables, sessions: SessionResolver) {
+export function websocket(
+  tables: Tables,
+  sessions: SessionResolver,
+  sockets: SessionSockets,
+) {
   return {
     maxPayloadLength: 4096,
     open(ws: ServerWebSocket<SocketData>) {
+      if (!sessions.active(ws.data.session)) {
+        ws.close(1008, "Session expired");
+        return;
+      }
+      sockets.add(ws);
       ws.data.budget = new Budget();
       ws.data.peer = {
         session: ws.data.session,
         send: (message) => {
-          ws.send(JSON.stringify(message));
+          if (sessions.active(ws.data.session))
+            ws.send(JSON.stringify(message));
         },
       };
     },
@@ -107,6 +118,7 @@ export function websocket(tables: Tables, sessions: SessionResolver) {
       }
     },
     close(ws: ServerWebSocket<SocketData>) {
+      sockets.remove(ws);
       if (ws.data.peer) tables.disconnect(ws.data.peer);
     },
   };

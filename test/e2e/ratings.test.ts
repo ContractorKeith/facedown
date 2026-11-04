@@ -113,12 +113,16 @@ for (const reclaim of [false, true])
     f.app.tables.lifecycle.schedule(t);
     f.clock.advance(30000);
     expect(t.seats[leaver]?.bot).toBe(true);
-    if (reclaim)
-      g.players[leaver] = await f.connect(
-        g.cookies[leaver] as string,
-        { seat: leaver },
-        g.id,
-      );
+    if (reclaim) {
+      const login = await f.request("/api/login", "", {
+        username: `player_${leaver}`,
+        password: "correct horse",
+      });
+      expect(login.status).toBe(200);
+      const fresh = login.headers.get("set-cookie")?.split(";")[0] as string;
+      expect(fresh).not.toBe(g.cookies[leaver]);
+      g.players[leaver] = await f.connect(fresh, { seat: leaver }, g.id);
+    }
     const seq = t.seq;
     observer.send({
       t: "move",

@@ -1,7 +1,13 @@
 import type { Envelope } from "../../engine/core/types";
 import type { Clock, Timing } from "../clock";
 import type { Store } from "../store";
-import { Fault, type Peer, publicSeats, type Table } from "./types";
+import {
+  Fault,
+  type Peer,
+  publicSeats,
+  ratedIfStarted,
+  type Table,
+} from "./types";
 
 export class Lifecycle {
   closed = false;
@@ -43,7 +49,11 @@ export class Lifecycle {
     if (!viewer) return;
     peer.send({
       t: "view",
-      rated: table.rated ?? false,
+      status: table.status,
+      rated:
+        table.status === "open"
+          ? ratedIfStarted(table)
+          : (table.rated ?? false),
       table: table.id,
       seq: table.seq,
       view: table.game.view(table.state, viewer),
@@ -141,18 +151,22 @@ export class Lifecycle {
       const occupant = table.seats[viewer.seat];
       occupant?.sockets.delete(peer);
       if (table.status === "open" && occupant && !occupant.sockets.size) {
-        table.seats[viewer.seat] = null;
-        if (table.host === occupant.session) {
-          table.host = "";
-          for (let offset = 1; offset <= 4; offset++) {
-            const next = table.seats[(viewer.seat + offset) % 4]?.session;
-            if (next) {
-              table.host = next;
-              break;
-            }
-          }
-        }
+        this.releaseOpen(table, viewer.seat);
       } else this.hold(table, viewer.seat);
+    }
+  }
+  releaseOpen(table: Table, seat: number): void {
+    const occupant = table.seats[seat];
+    if (table.status !== "open" || !occupant) return;
+    table.seats[seat] = null;
+    if (table.host !== occupant.session) return;
+    table.host = "";
+    for (let offset = 1; offset <= 4; offset++) {
+      const next = table.seats[(seat + offset) % 4]?.session;
+      if (next) {
+        table.host = next;
+        break;
+      }
     }
   }
   stop(table: Table): void {

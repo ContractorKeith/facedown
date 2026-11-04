@@ -55,7 +55,6 @@ test("accounts validate, case-fold, authenticate, expire, revoke and enforce ori
     client.ws.addEventListener("close", resolve, { once: true }),
   );
   expect((await f.request("/api/logout", cookie, {})).status).toBe(204);
-  client.send({ t: "join", table: created.id, seat: 0 });
   expect((await closed).code).toBe(1008);
   expect((await f.request("/api/me", cookie)).status).toBe(401);
   const login = await f.request("/api/login", "", {

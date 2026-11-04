@@ -16,6 +16,7 @@ export interface SessionResolver {
   active(session: Session): boolean;
   account?(accountId: string): { session: Session; cookie: string };
   logout?(session: Session): string;
+  headers?(cookie: string): Headers;
   guest(): { session: Session; cookie: string };
 }
 const lifetime = 30 * 86400000;
@@ -26,6 +27,7 @@ export class GuestSessions implements SessionResolver {
     private now = () => Date.now(),
   ) {}
   resolve(request: Request): Session | null {
+    // Accept only the configured name, and only its first occurrence.
     const name = this.insecure ? "fd" : "__Host-fd";
     const token = (request.headers.get("cookie") ?? "")
       .split(";")
@@ -45,6 +47,16 @@ export class GuestSessions implements SessionResolver {
   }
   private cookie(token: string, age: number): string {
     return `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${this.insecure ? "" : "; Secure"}`;
+  }
+  headers(cookie: string): Headers {
+    const headers = new Headers();
+    headers.append("set-cookie", cookie);
+    const other = this.insecure ? "__Host-fd" : "fd";
+    headers.append(
+      "set-cookie",
+      `${other}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${other === "__Host-fd" ? "; Secure" : ""}`,
+    );
+    return headers;
   }
   account(accountId: string) {
     const token = randomHex(),
@@ -75,7 +87,7 @@ export class GuestSessions implements SessionResolver {
         continue;
       return {
         session,
-        cookie: `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${lifetime / 1000}${this.insecure ? "" : "; Secure"}`,
+        cookie: this.cookie(token, lifetime / 1000),
       };
     }
   }

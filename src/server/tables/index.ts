@@ -8,7 +8,14 @@ import { Creation } from "./creation";
 import { Lifecycle } from "./lifecycle";
 import { Membership } from "./membership";
 import { Retention } from "./retention";
-import { Fault, type Peer, publicSeats, type Table } from "./types";
+import {
+  Fault,
+  owns,
+  type Peer,
+  publicSeats,
+  ratedIfStarted,
+  type Table,
+} from "./types";
 
 export class Tables {
   private tables = new Map<string, Table>();
@@ -109,7 +116,11 @@ export class Tables {
   }
   private hosted(id: string, session: Session): Table {
     const table = this.get(id);
-    if (table.host !== session.id) throw new Fault("forbidden");
+    if (
+      table.host !== session.id &&
+      !table.seats.some((s) => s?.session === table.host && owns(s, session))
+    )
+      throw new Fault("forbidden");
     if (table.status !== "open") throw new Fault("bad_request");
     return table;
   }
@@ -123,11 +134,7 @@ export class Tables {
   start(id: string, host: Session): void {
     const table = this.hosted(id, host);
     if (table.seats.some((s) => !s)) throw new Fault("bad_request");
-    const accounts = table.seats.map((s) => s?.accountId);
-    const rated =
-      !table.casual &&
-      table.seats.every((s) => s?.accountId && !s.bot) &&
-      new Set(accounts).size === 4;
+    const rated = ratedIfStarted(table);
     this.lifecycle.store.createGame({
       rated,
       id: table.id,
@@ -155,6 +162,9 @@ export class Tables {
       this.lifecycle.hold(table, seat);
     });
     this.lifecycle.broadcast(table);
+  }
+  releaseGuest(session: Session): void {
+    this.membership.releaseGuest(session);
   }
   join(id: string, seat: Seat, peer: Peer) {
     this.membership.join(id, seat, peer);

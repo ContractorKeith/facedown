@@ -2,7 +2,8 @@ import type { Server } from "bun";
 import type { Store } from "../store";
 import { Fault } from "../tables/types";
 import type { SocketData } from "../ws";
-import { randomHex, type SessionResolver } from "./sessions";
+import { AuthLimits } from "./auth-limits";
+import { randomHex, type Session, type SessionResolver } from "./sessions";
 
 export const identity = (session: {
   name: string;
@@ -18,11 +19,16 @@ export function clientIP(request: Request, server: Server<SocketData>): string {
       : undefined;
   return forwarded || server.requestIP(request)?.address || "unknown";
 }
+// A fixed hash uses the same cost as real accounts for unknown usernames.
+const dummyHash =
+  "$argon2id$v=19$m=19456,t=2,p=1$fXeJfJOjW02UaAsc2i9SS14StxPbveT8RF+Ezc+BX2g$px3D/odeLzb0hdIQXaT/wyf5TfpsELhO2GP4FJ1wX3g";
 export class Auth {
-  private failures = new Map<string, { count: number; until: number }>();
+  private limits = new AuthLimits();
   constructor(
     private store: Store,
     private sessions: SessionResolver,
+    private retiredGuest: (session: Session) => void = () => {},
+    private now = () => Date.now(),
   ) {}
   async handle(
     path: string,
@@ -35,11 +41,8 @@ export class Auth {
     )
       return null;
     const ip = clientIP(request, server),
-      now = Date.now();
-    for (const [key, value] of this.failures)
-      if (value.until <= now) this.failures.delete(key);
-    if (path === "/api/login" && (this.failures.get(ip)?.count ?? 0) >= 5)
-      throw new Fault("rate_limited");
+      now = this.now();
+    const previous = this.sessions.resolve(request);
     const body = await request.json();
     if (
       !body ||
@@ -58,31 +61,41 @@ export class Auth {
       throw new Fault("bad_request");
     let account = this.store.accounts.find(username);
     if (path === "/api/register") {
+      this.limits.register(ip, now);
       if (account) throw new Fault("conflict");
-      const hash = await Bun.password.hash(password, { algorithm: "argon2id" });
+      const hash = await Bun.password.hash(password, {
+        algorithm: "argon2id",
+        memoryCost: 19456,
+        timeCost: 2,
+      });
       if (!this.store.accounts.create(randomHex(), username, hash, now))
         throw new Fault("conflict");
       account = this.store.accounts.find(username);
     } else {
-      // Reserve a failure before awaiting verification so parallel attempts cannot bypass the limit.
-      const failure = this.failures.get(ip) ?? {
-        count: 0,
-        until: now + 15 * 60000,
-      };
-      failure.count++;
-      this.failures.set(ip, failure);
-      if (
-        !account ||
-        !(await Bun.password.verify(password, account.password_hash))
-      )
-        throw new Fault("unauthorized");
-      this.failures.delete(ip);
+      const settle = this.limits.login(ip, username, now);
+      let success = false;
+      try {
+        const verified = await Bun.password.verify(
+          password,
+          account?.password_hash ?? dummyHash,
+        );
+        success = !!account && verified;
+      } finally {
+        settle(success);
+      }
+      if (!success) throw new Fault("unauthorized");
     }
     if (!account || !this.sessions.account) throw new Fault("unavailable");
     const issued = this.sessions.account(account.id);
+    if (previous && !previous.accountId && this.sessions.logout) {
+      this.sessions.logout(previous);
+      this.retiredGuest(previous);
+    }
     return Response.json(identity(issued.session), {
       status: path === "/api/register" ? 201 : 200,
-      headers: { "set-cookie": issued.cookie },
+      headers: this.sessions.headers?.(issued.cookie) ?? {
+        "set-cookie": issued.cookie,
+      },
     });
   }
 }

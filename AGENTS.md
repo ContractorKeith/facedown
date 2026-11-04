@@ -39,7 +39,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 
 - `src/engine` is pure: imports only from `src/engine`; no `Bun`, `process`, `Date`,
   `Math.random`, `crypto`, timers, `fetch` or DOM. A test enforces it. The browser replay
-  viewer runs the same engine.
+  viewer runs the same engine. `Math.exp`/`Math.log` are allowed only in `src/engine/rating`.
 - Only `view(state, viewer)` output reaches a client. Bots and timeout auto-play decide
   from a seat's view and legal moves, never from full state.
 - State is always `fold(init(seed), moves)`; in-memory state and snapshots are caches.

@@ -3,6 +3,7 @@ import type { Store } from "../store";
 import type { Tables } from "../tables";
 import { Fault } from "../tables/types";
 import type { SocketData } from "../ws";
+import type { SessionSockets } from "../ws/sessions";
 import { Auth, identity } from "./auth";
 import type { SessionResolver } from "./sessions";
 
@@ -13,8 +14,17 @@ export function handler(
   tables: Tables,
   sessions: SessionResolver,
   origin?: string,
+  sockets?: SessionSockets,
 ) {
-  const auth = new Auth(store, sessions);
+  const auth = new Auth(
+    store,
+    sessions,
+    (session) => {
+      sockets?.revoke(session.id);
+      tables.releaseGuest(session);
+    },
+    () => tables.lifecycle.clock.now(),
+  );
   return async (
     request: Request,
     server: Server<SocketData>,
@@ -31,9 +41,11 @@ export function handler(
         return new Response("ok");
       if (path === "/api/guest" && request.method === "POST") {
         const guest = sessions.guest();
-        return json({ name: guest.session.name, guest: true }, 200, {
-          "set-cookie": guest.cookie,
-        });
+        return json(
+          { name: guest.session.name, guest: true },
+          200,
+          sessions.headers?.(guest.cookie) ?? { "set-cookie": guest.cookie },
+        );
       }
       const authenticated = await auth.handle(path, request, server);
       if (authenticated) return authenticated;
@@ -57,9 +69,11 @@ export function handler(
       }
       if (path === "/api/logout" && request.method === "POST") {
         if (!session || !sessions.logout) throw new Fault("unauthorized");
+        const cookie = sessions.logout(session);
+        sockets?.revoke(session.id);
         return new Response(null, {
           status: 204,
-          headers: { "set-cookie": sessions.logout(session) },
+          headers: sessions.headers?.(cookie) ?? { "set-cookie": cookie },
         });
       }
       const player = /^\/api\/players\/([a-zA-Z0-9_]{3,20})$/.exec(path);

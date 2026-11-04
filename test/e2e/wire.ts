@@ -55,6 +55,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
         expect(message.commitment).toBe(record.commitment);
         expect(Object.keys(message).sort()).toEqual(
           [
+            "status",
             "rated",
             "t",
             "table",
