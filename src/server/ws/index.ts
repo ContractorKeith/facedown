@@ -14,6 +14,10 @@ export function websocket(
   return {
     maxPayloadLength: 4096,
     open(ws: ServerWebSocket<SocketData>) {
+      if (!tables.ready) {
+        ws.close(1012, "Service restart");
+        return;
+      }
       if (!sessions.active(ws.data.session)) {
         ws.close(1008, "Session expired");
         return;
@@ -56,6 +60,7 @@ export function websocket(
         return;
       }
       try {
+        if (!tables.ready) throw new Fault("unavailable");
         const message: unknown = JSON.parse(
           typeof raw === "string" ? raw : raw.toString(),
         );

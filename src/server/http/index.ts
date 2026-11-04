@@ -41,6 +41,8 @@ export function handler(
         throw new Fault("forbidden");
       if (path === "/healthz" && request.method === "GET")
         return new Response("ok");
+      if ((path === "/ws" || path.startsWith("/api/tables")) && !tables.ready)
+        throw new Fault("unavailable");
       if (path === "/api/guest" && request.method === "POST") {
         const guest = sessions.guest();
         return json(

@@ -14,6 +14,10 @@ export class SessionSockets {
     sockets?.delete(ws);
     if (!sockets?.size) this.sessions.delete(ws.data.session.id);
   }
+  closeAll(): void {
+    for (const sockets of this.sessions.values())
+      for (const ws of sockets) ws.close(1012, "Service restart");
+  }
   revoke(id: string): void {
     const sockets = this.sessions.get(id);
     this.sessions.delete(id);

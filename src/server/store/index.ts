@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite";
 import type { Envelope, Outcome, Seat } from "../../engine/core/types";
 import { AccountStore } from "./accounts";
 import { GuestStore } from "./guests";
+import { LeaseStore } from "./leases";
 import { migrate } from "./migrate";
 import { RatingStore } from "./ratings";
 import type { GameRecord, Row } from "./types";
@@ -10,11 +11,13 @@ export type { GameRecord, StoredSeat } from "./types";
 
 export class Store {
   private db: Database;
+  readonly leases: LeaseStore;
   readonly guests: GuestStore;
   readonly accounts: AccountStore;
   readonly ratings: RatingStore;
   constructor(path = process.env.FACEDOWN_DB ?? "./facedown.db") {
     this.db = new Database(path, { create: true, strict: true });
+    this.leases = new LeaseStore(this.db);
     this.guests = new GuestStore(this.db);
     this.accounts = new AccountStore(this.db);
     this.ratings = new RatingStore(this.db);

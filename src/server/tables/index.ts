@@ -1,12 +1,12 @@
-import { fold } from "../../engine/core/fold";
 import type { GameType, Seat } from "../../engine/core/types";
-import { registry } from "../../engine/registry";
 import { type Clock, clock, openTTL, type Timing, timing } from "../clock";
 import type { Session } from "../http/sessions";
+import { TableLease } from "../lease";
 import type { Store } from "../store";
 import { Creation } from "./creation";
 import { Lifecycle } from "./lifecycle";
 import { Membership } from "./membership";
+import { rebuild } from "./rebuild";
 import { Retention } from "./retention";
 import {
   Fault,
@@ -28,6 +28,7 @@ export class Tables {
     time: Clock = clock,
     delays: Timing = timing(),
     ttl = openTTL(),
+    leaseOptions: { clock?: Clock; lost?: () => void } = {},
   ) {
     this.lifecycle = new Lifecycle(store, time, delays, (table) =>
       this.retention.changed(table),
@@ -44,61 +45,47 @@ export class Tables {
         else this.retention.changed(table);
       },
     );
-    for (const id of store.listLiveIds()) {
-      try {
-        const record = store.loadGame(id);
-        if (!record) throw new Error("Missing live game");
-        const game = registry.get(record.type);
-        if (
-          !game ||
-          JSON.stringify(game.ruleset) !== JSON.stringify(record.ruleset)
-        )
-          throw new Error("Unsupported saved ruleset");
-        const rebuilt = fold(game, record.seed, record.moves);
-        if (!rebuilt.ok) throw new Error(`Corrupt move log: ${record.id}`);
-        const table: Table = {
-          id: record.id,
-          type: record.type,
-          host: record.host,
-          casual: record.casual,
-          rated: record.rated,
-          overSent: new Set(),
-          game,
-          seed: record.seed,
-          commitment: record.commitment,
-          state: rebuilt.state,
-          seq: record.moves.length,
-          status: "live",
-          deadline: null,
-          viewers: new Map(),
-          seats: record.seats.map((s) => ({
-            session: s.session,
-            accountId: s.accountId,
-            name: s.name ?? "bot",
-            bot: s.bot,
-            sockets: new Set(),
-          })),
+    this.lease = new TableLease(
+      store,
+      (guard) => {
+        const schedule = () => {
+          if (this.lifecycle.closed) return;
+          for (const table of this.tables.values()) {
+            this.lifecycle.schedule(table);
+            table.seats.forEach((_, seat) => {
+              this.lifecycle.hold(table, seat);
+            });
+          }
         };
-        this.tables.set(table.id, table);
-      } catch {
-        store.abandon(id);
-        console.warn(`Abandoned corrupt game: ${id}`);
-      }
-    }
-    for (const table of this.tables.values()) {
-      this.lifecycle.schedule(table);
-      table.seats.forEach((_, seat) => {
-        this.lifecycle.hold(table, seat);
-      });
-    }
+        const rebuilding = rebuild(store, this.tables, guard);
+        if (rebuilding) return rebuilding.then(schedule);
+        schedule();
+      },
+      () => {
+        this.stop();
+        leaseOptions.lost?.();
+      },
+      leaseOptions.clock,
+    );
+    this.lifecycle.guard = (action) => this.lease.run(action);
   }
+  readonly lease: TableLease;
+  get ready() {
+    return !this.lifecycle.closed && this.lease.ready;
+  }
+  private available() {
+    if (!this.ready) throw new Fault("unavailable");
+  }
+
   get(id: string): Table {
+    this.available();
     const table = this.tables.get(id);
     if (!table) throw new Fault("not_found");
     if (table.status === "unavailable") throw new Fault("unavailable");
     return table;
   }
   list() {
+    this.available();
     return [...this.tables.values()]
       .filter((t) => t.status === "open" || t.status === "live")
       .map((t) => ({
@@ -109,10 +96,16 @@ export class Tables {
       }));
   }
   create(type: GameType, host: Session, casual = false): Table {
+    this.available();
     return this.creation.create(type, host, casual);
   }
   createFromJSON(host: Session, read: () => Promise<unknown>): Promise<Table> {
-    return this.creation.fromJSON(host, read);
+    this.available();
+    return this.creation.fromJSON(host, async () => {
+      const body = await read();
+      this.available();
+      return body;
+    });
   }
   private hosted(id: string, session: Session): Table {
     const table = this.get(id);
@@ -135,25 +128,27 @@ export class Tables {
     const table = this.hosted(id, host);
     if (table.seats.some((s) => !s)) throw new Fault("bad_request");
     const rated = ratedIfStarted(table);
-    this.lifecycle.store.createGame({
-      rated,
-      id: table.id,
-      type: table.type,
-      ruleset: table.game.ruleset,
-      seed: table.seed,
-      commitment: table.commitment,
-      host: table.host,
-      casual: table.casual,
-      created: this.lifecycle.clock.now(),
-      seats: table.seats.map((s, seat) => ({
-        seat: seat as Seat,
-        session: s?.session ?? null,
-        accountId: s?.accountId ?? null,
-        name: s?.name ?? null,
-        bot: !!s?.bot,
-        leaver: false,
-      })),
-    });
+    this.lease.run(() =>
+      this.lifecycle.store.createGame({
+        rated,
+        id: table.id,
+        type: table.type,
+        ruleset: table.game.ruleset,
+        seed: table.seed,
+        commitment: table.commitment,
+        host: table.host,
+        casual: table.casual,
+        created: this.lifecycle.clock.now(),
+        seats: table.seats.map((s, seat) => ({
+          seat: seat as Seat,
+          session: s?.session ?? null,
+          accountId: s?.accountId ?? null,
+          name: s?.name ?? null,
+          bot: !!s?.bot,
+          leaver: false,
+        })),
+      }),
+    );
     table.rated = rated;
     table.status = "live";
     this.retention.changed(table);
@@ -186,6 +181,7 @@ export class Tables {
   }
   stop(): void {
     this.lifecycle.closed = true;
+    this.lease?.stop();
     for (const table of this.tables.values()) this.lifecycle.stop(table);
   }
 }
