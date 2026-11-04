@@ -18,6 +18,8 @@ export type ViewMessage = {
   seats: Seat[];
   commitment: string;
   host: boolean;
+  status: "open" | "live" | "finished" | "unavailable";
+  rated: boolean;
 };
 class ApiError extends Error {
   constructor(

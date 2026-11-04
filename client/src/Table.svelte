@@ -86,7 +86,6 @@ function subscribe(next: number | null) {
 async function control(action: string) {
   try {
     await api(`/tables/${id}/${action}`, {});
-    if (action === "start" && table) table.status = "live";
   } catch (e) {
     error = (e as Error).message;
   }
@@ -146,7 +145,7 @@ onMount(() => {
   </header>
   <div class="game-heading">
     <h1>{table?.type === "dominoes" ? "Dominoes" : "Spades"}</h1>
-    <small>CASUAL · {id}</small>
+    <small>{message?.rated ? "RATED" : "CASUAL"} · {id}</small>
   </div>
   {#if !up && table}
     <p class="banner" role="status">Reconnecting…</p>
@@ -163,7 +162,7 @@ onMount(() => {
     {/if}
     {#if over}
       <p class="banner">Game over · Final scores {view.scores.join(" / ")}</p>
-    {:else if table?.status === "open" && !message.deadline}
+    {:else if message.status === "open"}
       <div class="controls">
         {#if message.host}
           <button onclick={() => control("bots")}>Fill bots</button>

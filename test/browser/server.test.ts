@@ -53,3 +53,29 @@ test("host identity follows the receiving session across tabs and spectator view
     await f.stop();
   }
 });
+
+test("the account that owns the host seat keeps controls on another session", async () => {
+  const f = fixture();
+  try {
+    const credentials = {
+      username: "host_account",
+      password: "test-password-123",
+    };
+    const registered = await f.request("/api/register", "", credentials);
+    const host = registered.headers.get("set-cookie")?.split(";")[0] as string;
+    const { id } = await (
+      await f.request("/api/tables", host, { type: "spades" })
+    ).json();
+    await f.connect(host, { seat: 0 }, id);
+    const loggedIn = await f.request("/api/login", "", credentials);
+    const cookie = loggedIn.headers.get("set-cookie")?.split(";")[0] as string;
+    expect(cookie).not.toBe(host);
+    const second = await f.connect(cookie, { seat: 0 }, id);
+    expect((await second.view(0)).host).toBe(true);
+    expect((await f.request(`/api/tables/${id}/bots`, cookie, {})).status).toBe(
+      200,
+    );
+  } finally {
+    await f.stop();
+  }
+});

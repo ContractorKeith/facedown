@@ -112,4 +112,37 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       ),
     ).toBe(true);
   });
+  test("M4 logout closes the socket and recovers without reloading", async ({
+    page,
+    context,
+    origin,
+  }) => {
+    const registered = await context.request.post(`${origin}/api/register`, {
+      headers: { origin },
+      data: { username: "logout_tester", password: "test-password-123" },
+    });
+    expect(registered.status()).toBe(201);
+    await page.goto(origin);
+    await page.getByRole("button", { name: /Spades.*Open a table/ }).click();
+    await page.getByRole("button", { name: "Fill bots" }).click();
+    await page.getByRole("button", { name: "Start game" }).click();
+    const before = await page.evaluate(() => performance.timeOrigin);
+    expect(
+      await page.evaluate(() =>
+        fetch("/api/logout", { method: "POST" }).then((r) => r.status),
+      ),
+    ).toBe(204);
+    await expect(
+      page.getByText("You were signed out of this seat. You are spectating.", {
+        exact: true,
+      }),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(page.locator(".turn")).toContainText("Spectating");
+    await expect(page.getByText("Reconnecting…", { exact: true })).toBeHidden();
+    await expect(page.locator(".piece")).toHaveCount(0);
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(before);
+    await page.getByRole("link", { name: "facedown♠" }).click();
+    await page.getByRole("button", { name: /Dominoes.*Open a table/ }).click();
+    await expect(page.getByRole("button", { name: "Fill bots" })).toBeVisible();
+  });
 }
