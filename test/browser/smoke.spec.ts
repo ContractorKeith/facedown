@@ -102,6 +102,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
           await page.screenshot({
             path: `test-results/${type.toLowerCase()}-phone.png`,
             fullPage: true,
+            animations: "disabled",
           });
           captured = true;
         }
@@ -111,6 +112,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         await page.screenshot({
           path: `test-results/${type.toLowerCase()}-phone.png`,
           fullPage: true,
+          animations: "disabled",
         });
       await expect(scoring).toBeVisible();
       expect(moves).toBeGreaterThan(0);
