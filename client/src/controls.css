@@ -36,9 +36,11 @@
 .piece:disabled {
   opacity: 0.8;
 }
-.piece:hover {
-  background: transparent;
-  transform: translateY(-12px);
+@media (hover: hover) {
+  .piece:not(:disabled):hover {
+    background: transparent;
+    transform: translateY(-12px);
+  }
 }
 .dominoes {
   justify-content: flex-start;
@@ -135,5 +137,39 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .hand:not(.dominoes) {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+    overflow: visible;
+    padding: 10px 0;
+  }
+  .hand:not(.dominoes) .piece {
+    margin: 0;
+    min-width: 0;
+    min-height: 64px;
+  }
+  .hand:not(.dominoes) .card {
+    width: 100%;
+    height: auto;
+  }
+  .game:has(.bids) .board {
+    height: 200px;
+  }
+  .game:has(.bids) .west,
+  .game:has(.bids) .east {
+    top: 70px;
+  }
+  .game:has(.bids) .table-mark {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .game:has(.bids) .table-center {
+    top: 65px;
+    bottom: 65px;
   }
 }

@@ -15,7 +15,7 @@ jobs:
         with:
           bun-version: 1.4.3
       - run: bun install --frozen-lockfile
-      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright install --with-deps chromium webkit
       - name: Acceptance and nonzero playout guard
         shell: bash
         run: |

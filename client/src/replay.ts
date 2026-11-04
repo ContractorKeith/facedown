@@ -27,8 +27,16 @@ export function verifyReplay(value: unknown, local?: LiveRecord) {
   if (logHash !== record.logHash) failures.push("Move log hash check failed");
   if (local && local.commitment !== record.commitment)
     failures.push("Saved commitment check failed");
-  if (local?.logHash && local.logHash !== record.logHash)
+  const observedHash =
+    local?.seq === undefined
+      ? record.logHash
+      : moveLogHash(record.commitment, record.moves.slice(0, local.seq));
+  if (
+    local?.logHash &&
+    (local.logHash !== observedHash || (local.seq ?? 0) > record.moves.length)
+  )
     failures.push("Saved move log hash check failed");
+  if (local?.tampered) failures.push("Live move log changed unexpectedly");
   let state = game.init(record.seed, game.ruleset);
   const frames: Frame[] = [];
   const capture = () =>
@@ -63,6 +71,10 @@ export function verifyReplay(value: unknown, local?: LiveRecord) {
   return {
     failures,
     frames,
-    verified: !!local?.logHash && failures.length === 0,
+    verified:
+      local?.unbroken === true &&
+      !!local?.logHash &&
+      (local.seq === undefined || local.seq === record.moves.length) &&
+      failures.length === 0,
   };
 }

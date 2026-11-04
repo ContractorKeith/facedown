@@ -34,7 +34,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         .getByRole("button", { name: "Join seat 2", exact: true })
         .click();
       await expect(invitee.locator(".south strong")).toContainText("guest-");
-      await expect(invitee.locator(".hand")).toHaveCount(0);
+      await expect(invitee.locator(".hand, .piece")).toHaveCount(0);
       await expect(
         invitee.getByText("Waiting to start", { exact: true }),
       ).toBeVisible();

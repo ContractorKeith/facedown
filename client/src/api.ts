@@ -14,13 +14,13 @@ export type ViewMessage = {
   table: string;
   seq: number;
   view: SpadesView | DominoView | null;
+  you: number | null;
+  lastMove?: Envelope<unknown> | null;
   toAct: number | null;
   deadline: number | null;
   seats: Seat[];
   commitment: string | null;
   logHash: string | null;
-  you?: number | null;
-  lastMove?: Envelope<unknown> | null;
   host: boolean;
   status: "open" | "live" | "finished" | "unavailable";
   rated: boolean;

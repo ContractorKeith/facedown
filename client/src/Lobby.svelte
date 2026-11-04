@@ -30,6 +30,7 @@ async function create(type: GameType) {
       type,
       casual: guest || casual,
     });
+    sessionStorage.setItem(`seat:${result.id}`, "0");
     navigate(result.inviteUrl);
   } catch (e) {
     error = (e as Error).message;

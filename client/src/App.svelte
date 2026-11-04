@@ -74,7 +74,7 @@ async function logout() {
   {#key path}<Leaderboard type={path.split("/")[2]!} />{/key}
 {:else if /^\/tables\/[a-z2-7]{10}$/.test(path)}
   {#key path}
-    <Table id={path.split("/")[2]!} {name} {navigate} {refreshSession} />
+    <Table id={path.split("/")[2]!} {navigate} {refreshSession} />
   {/key}
 {:else}
   <Lobby {name} {guest} {navigate} />

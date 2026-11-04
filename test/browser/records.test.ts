@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseProfile } from "../../client/src/records";
 import { verifyReplay } from "../../client/src/replay";
+import { moveLogHash } from "../../src/engine/core/log-hash";
 import { legalTamper, replayFixture } from "./replay-fixture";
 
 test("a legal changed move with the same outcome fails the hash chain", () => {
@@ -29,4 +30,20 @@ test("profile rejects malformed outcomes, arrays and ratings before rendering", 
     },
   ])
     expect(() => parseProfile(value)).toThrow("Malformed player profile");
+});
+
+test("a browser that left before game over checks its observed prefix without claiming Verified", () => {
+  const record = replayFixture();
+  const anchor = {
+    commitment: record.commitment,
+    seq: 2,
+    logHash: moveLogHash(record.commitment, record.moves.slice(0, 2)),
+    unbroken: true,
+  };
+  const result = verifyReplay(record, anchor);
+  expect(result.failures).toEqual([]);
+  expect(result.verified).toBe(false);
+  expect(
+    verifyReplay(record, { ...anchor, logHash: "00".repeat(32) }).failures,
+  ).toContain("Saved move log hash check failed");
 });

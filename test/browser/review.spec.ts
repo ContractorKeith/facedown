@@ -38,7 +38,17 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await second.getByRole("button", { name: "Start game" }).click();
     await expect(page.locator(".turn")).toBeVisible();
     await expect(second.locator(".turn")).toBeVisible();
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await second.evaluate(() => {
+      let copied = "";
+      Object.defineProperty(navigator, "clipboard", {
+        value: {
+          writeText: async (text: string) => {
+            copied = text;
+          },
+          readText: async () => copied,
+        },
+      });
+    });
     await second.getByRole("button", { name: "Copy invite" }).click();
     expect(await second.evaluate(() => navigator.clipboard.readText())).toBe(
       second.url(),
@@ -54,7 +64,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await page.getByRole("button", { name: /Spades.*Open a table/ }).click();
     await page.getByRole("button", { name: "Fill bots" }).click();
     await page.getByRole("button", { name: "Start game" }).click();
-    const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+    await page.evaluate(() => Reflect.set(window, "noReload", "still here"));
     await context.clearCookies();
     await page.evaluate(() =>
       (window as unknown as { gameSocket: WebSocket }).gameSocket.close(),
@@ -67,7 +77,9 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(page.locator(".turn")).toContainText("Spectating");
     await expect(page.getByText("Reconnecting…", { exact: true })).toBeHidden();
     await expect(page.locator(".piece")).toHaveCount(0);
-    expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin);
+    expect(await page.evaluate(() => Reflect.get(window, "noReload"))).toBe(
+      "still here",
+    );
     await page.getByRole("link", { name: "facedown♠" }).click();
     await page.getByRole("button", { name: /Dominoes.*Open a table/ }).click();
     await expect(page.getByRole("button", { name: "Fill bots" })).toBeVisible();
@@ -126,7 +138,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await page.getByRole("button", { name: /Spades.*Open a table/ }).click();
     await page.getByRole("button", { name: "Fill bots" }).click();
     await page.getByRole("button", { name: "Start game" }).click();
-    const before = await page.evaluate(() => performance.timeOrigin);
+    await page.evaluate(() => Reflect.set(window, "noReload", "still here"));
     expect(
       await page.evaluate(() =>
         fetch("/api/logout", { method: "POST" }).then((r) => r.status),
@@ -140,7 +152,9 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(page.locator(".turn")).toContainText("Spectating");
     await expect(page.getByText("Reconnecting…", { exact: true })).toBeHidden();
     await expect(page.locator(".piece")).toHaveCount(0);
-    expect(await page.evaluate(() => performance.timeOrigin)).toBe(before);
+    expect(await page.evaluate(() => Reflect.get(window, "noReload"))).toBe(
+      "still here",
+    );
     await page.getByRole("link", { name: "facedown♠" }).click();
     await page.getByRole("button", { name: /Dominoes.*Open a table/ }).click();
     await expect(page.getByRole("button", { name: "Fill bots" })).toBeVisible();
