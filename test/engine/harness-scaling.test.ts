@@ -10,7 +10,7 @@ test("a registered game must have a test-only invariants entry", () => {
   const registered = new Map([
     ["spades" as const, { ...highcard, type: "spades" as const }],
   ]);
-  expect(() => registeredGames(registered)).toThrow(
+  expect(() => registeredGames(registered, new Map())).toThrow(
     "Missing invariants for registered game: spades",
   );
   const entries = registeredGames(
