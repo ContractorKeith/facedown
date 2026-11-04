@@ -43,6 +43,7 @@ export class Lifecycle {
     if (!viewer) return;
     peer.send({
       t: "view",
+      rated: table.rated ?? false,
       table: table.id,
       seq: table.seq,
       view: table.game.view(table.state, viewer),

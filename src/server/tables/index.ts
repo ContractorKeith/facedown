@@ -54,6 +54,7 @@ export class Tables {
           type: record.type,
           host: record.host,
           casual: record.casual,
+          rated: record.rated,
           overSent: new Set(),
           game,
           seed: record.seed,
@@ -65,6 +66,7 @@ export class Tables {
           viewers: new Map(),
           seats: record.seats.map((s) => ({
             session: s.session,
+            accountId: s.accountId,
             name: s.name ?? "bot",
             bot: s.bot,
             sockets: new Set(),
@@ -121,7 +123,13 @@ export class Tables {
   start(id: string, host: Session): void {
     const table = this.hosted(id, host);
     if (table.seats.some((s) => !s)) throw new Fault("bad_request");
+    const accounts = table.seats.map((s) => s?.accountId);
+    const rated =
+      !table.casual &&
+      table.seats.every((s) => s?.accountId && !s.bot) &&
+      new Set(accounts).size === 4;
     this.lifecycle.store.createGame({
+      rated,
       id: table.id,
       type: table.type,
       ruleset: table.game.ruleset,
@@ -133,11 +141,13 @@ export class Tables {
       seats: table.seats.map((s, seat) => ({
         seat: seat as Seat,
         session: s?.session ?? null,
+        accountId: s?.accountId ?? null,
         name: s?.name ?? null,
         bot: !!s?.bot,
         leaver: false,
       })),
     });
+    table.rated = rated;
     table.status = "live";
     this.retention.changed(table);
     this.lifecycle.schedule(table);

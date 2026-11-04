@@ -3,6 +3,7 @@ import type { Session } from "../http/sessions";
 export type Engine = Game<unknown, unknown, unknown, unknown>;
 export type Occupant = {
   session: string | null;
+  accountId?: string | null;
   name: string;
   bot: boolean;
   sockets: Set<Peer>;
@@ -15,6 +16,7 @@ export type Table = {
   type: GameType;
   host: string;
   casual: boolean;
+  rated?: boolean;
   game: Engine;
   seed: string;
   commitment: string;

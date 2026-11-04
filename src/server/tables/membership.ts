@@ -19,7 +19,11 @@ export class Membership {
       throw new Fault("forbidden");
     if (
       table.seats.some(
-        (s, index) => index !== seat && s?.session === peer.session.id,
+        (s, index) =>
+          index !== seat &&
+          (s?.session === peer.session.id ||
+            (!!peer.session.accountId &&
+              s?.accountId === peer.session.accountId)),
       )
     )
       throw new Fault("forbidden");
@@ -29,6 +33,7 @@ export class Membership {
     const next = occupant ?? {
       session: peer.session.id,
       name: peer.session.name,
+      accountId: peer.session.accountId,
       bot: false,
       sockets: new Set<Peer>(),
     };

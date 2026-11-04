@@ -1,7 +1,9 @@
 import { Database } from "bun:sqlite";
 import type { Envelope, Outcome, Seat } from "../../engine/core/types";
+import { AccountStore } from "./accounts";
 import { GuestStore } from "./guests";
-import { migrations } from "./migrations";
+import { migrate } from "./migrate";
+import { RatingStore } from "./ratings";
 import type { GameRecord, Row } from "./types";
 
 export type { GameRecord, StoredSeat } from "./types";
@@ -9,38 +11,32 @@ export type { GameRecord, StoredSeat } from "./types";
 export class Store {
   private db: Database;
   readonly guests: GuestStore;
+  readonly accounts: AccountStore;
+  readonly ratings: RatingStore;
   constructor(path = process.env.FACEDOWN_DB ?? "./facedown.db") {
     this.db = new Database(path, { create: true, strict: true });
     this.guests = new GuestStore(this.db);
+    this.accounts = new AccountStore(this.db);
+    this.ratings = new RatingStore(this.db);
     try {
       this.db.exec(
         "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;",
       );
-      this.db
-        .transaction(() => {
-          const version =
-            this.db
-              .query<{ user_version: number }, []>("PRAGMA user_version")
-              .get()?.user_version ?? 0;
-          if (version > migrations.length)
-            throw new Error("Database is newer than server");
-          for (const [index, sql] of migrations.entries()) {
-            if (index < version) continue;
-            this.db.exec(sql);
-            this.db.exec(`PRAGMA user_version=${index + 1}`);
-          }
-        })
-        .immediate();
+      migrate(this.db);
     } catch (error) {
       this.db.close();
       throw error;
     }
   }
-  createGame(record: Omit<GameRecord, "moves" | "outcome" | "status">): void {
+  createGame(
+    record: Omit<GameRecord, "moves" | "outcome" | "status" | "rated"> & {
+      rated?: boolean;
+    },
+  ): void {
     this.db
       .transaction(() => {
         this.db.run(
-          "INSERT INTO games(id,type,ruleset_json,seed,commitment,status,created_at,host_session,casual) VALUES (?,?,?,?,?,'live',?,?,?)",
+          "INSERT INTO games(id,type,ruleset_json,seed,commitment,status,created_at,host_session,casual,rated) VALUES (?,?,?,?,?,'live',?,?,?,?)",
           [
             record.id,
             record.type,
@@ -50,18 +46,20 @@ export class Store {
             record.created,
             record.host,
             Number(record.casual),
+            Number(record.rated ?? false),
           ],
         );
         for (const seat of record.seats)
           this.db.run(
-            "INSERT INTO game_seats(game_id,seat,guest_name,bot_at_start,leaver,session_hash) VALUES (?,?,?,?,?,?)",
+            "INSERT INTO game_seats(game_id,seat,guest_name,bot_at_start,leaver,session_hash,account_id) VALUES (?,?,?,?,?,?,?)",
             [
               record.id,
               seat.seat,
-              seat.name,
+              seat.accountId ? null : seat.name,
               Number(seat.bot),
               Number(seat.leaver),
               seat.session,
+              seat.accountId ?? null,
             ],
           );
       })
@@ -95,10 +93,18 @@ export class Store {
   ): void {
     this.db
       .transaction(() => {
+        const game = this.db
+          .query<
+            { type: GameRecord["type"]; rated: number; status: string },
+            [string]
+          >("SELECT type,rated,status FROM games WHERE id=?")
+          .get(id);
+        if (game?.status !== "live") throw new Error("Game is not live");
         this.db.run(
           "UPDATE games SET status='finished',outcome_json=?,finished_at=? WHERE id=?",
           [JSON.stringify(outcome), at, id],
         );
+        if (game.rated) this.ratings.finish(id, game.type, outcome, leavers);
         leavers.forEach((leaver, seat) => {
           this.db.run(
             "UPDATE game_seats SET leaver=? WHERE game_id=? AND seat=?",
@@ -117,16 +123,20 @@ export class Store {
       .query<
         {
           seat: Seat;
+          account_id: string | null;
           session_hash: string | null;
           guest_name: string | null;
           bot_at_start: number;
           leaver: number;
         },
         [string]
-      >("SELECT * FROM game_seats WHERE game_id=? ORDER BY seat")
+      >(
+        `SELECT s.*,COALESCE(a.username,s.guest_name) AS guest_name FROM game_seats s LEFT JOIN accounts a ON a.id=s.account_id WHERE s.game_id=? ORDER BY s.seat`,
+      )
       .all(id)
       .map((s) => ({
         seat: s.seat,
+        accountId: s.account_id,
         session: s.session_hash,
         name: s.guest_name,
         bot: !!s.bot_at_start,
@@ -144,6 +154,7 @@ export class Store {
     return {
       id,
       casual: !!row.casual,
+      rated: !!row.rated,
       type: row.type,
       ruleset: JSON.parse(row.ruleset_json),
       seed: row.seed,

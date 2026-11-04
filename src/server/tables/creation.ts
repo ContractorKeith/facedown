@@ -54,7 +54,13 @@ export class Creation {
       deadline: null,
       viewers: new Map(),
       seats: [
-        { session: host.id, name: host.name, bot: false, sockets: new Set() },
+        {
+          session: host.id,
+          name: host.name,
+          accountId: host.accountId,
+          bot: false,
+          sockets: new Set(),
+        },
         null,
         null,
         null,

@@ -10,10 +10,12 @@ export const randomId = (length: number) =>
     crypto.getRandomValues(new Uint8Array(length)),
     (b) => "abcdefghijklmnopqrstuvwxyz234567"[b % 32],
   ).join("");
-export type Session = { id: string; name: string };
+export type Session = { id: string; name: string; accountId?: string | null };
 export interface SessionResolver {
   resolve(request: Request): Session | null;
   active(session: Session): boolean;
+  account?(accountId: string): { session: Session; cookie: string };
+  logout?(session: Session): string;
   guest(): { session: Session; cookie: string };
 }
 const lifetime = 30 * 86400000;
@@ -31,11 +33,36 @@ export class GuestSessions implements SessionResolver {
       .find((s) => s.startsWith(`${name}=`))
       ?.slice(name.length + 1);
     return token && /^[0-9a-f]{64}$/.test(token)
-      ? this.store.guests.find(commitment(token), this.now())
+      ? (this.store.accounts.resolve(commitment(token), this.now()) ??
+          this.store.guests.find(commitment(token), this.now()))
       : null;
   }
   active(session: Session): boolean {
-    return !!this.store.guests.find(session.id, this.now());
+    return !!(
+      this.store.accounts.resolve(session.id, this.now()) ??
+      this.store.guests.find(session.id, this.now())
+    );
+  }
+  private cookie(token: string, age: number): string {
+    return `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${this.insecure ? "" : "; Secure"}`;
+  }
+  account(accountId: string) {
+    const token = randomHex(),
+      now = this.now(),
+      age = 7 * 86400;
+    this.store.accounts.issue(
+      commitment(token),
+      accountId,
+      now + age * 1000,
+      now,
+    );
+    const session = this.store.accounts.resolve(commitment(token), now);
+    if (!session) throw new Error("Missing issued session");
+    return { session, cookie: this.cookie(token, age) };
+  }
+  logout(session: Session): string {
+    this.store.accounts.revoke(session.id);
+    return this.cookie("", 0);
   }
   guest() {
     for (;;) {
