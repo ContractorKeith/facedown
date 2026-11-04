@@ -42,6 +42,7 @@ export class Auth {
       return null;
     const ip = clientIP(request, server),
       now = this.now();
+    if (path === "/api/register") this.limits.register(ip, now);
     const previous = this.sessions.resolve(request);
     const body = await request.json();
     if (
@@ -54,6 +55,12 @@ export class Auth {
     const username = body.username.toLowerCase(),
       password = body.password;
     if (
+      path === "/api/register" &&
+      (["bot", "bots", "spectator", "system", "admin"].includes(username) ||
+        username.startsWith("guest"))
+    )
+      throw new Fault("reserved");
+    if (
       !/^[a-z0-9_]{3,20}$/.test(username) ||
       (path === "/api/register" && password.length < 8) ||
       password.length > 200
@@ -61,7 +68,6 @@ export class Auth {
       throw new Fault("bad_request");
     let account = this.store.accounts.find(username);
     if (path === "/api/register") {
-      this.limits.register(ip, now);
       if (account) throw new Fault("conflict");
       const hash = await Bun.password.hash(password, {
         algorithm: "argon2id",

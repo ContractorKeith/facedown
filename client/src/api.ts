@@ -1,3 +1,4 @@
+import type { Envelope } from "../../src/engine/core/types";
 import type { View as DominoView } from "../../src/engine/dominoes";
 import type { View as SpadesView } from "../../src/engine/spades";
 export type GameType = "spades" | "dominoes";
@@ -12,12 +13,14 @@ export type ViewMessage = {
   t: "view";
   table: string;
   seq: number;
-  view: SpadesView | DominoView;
+  view: SpadesView | DominoView | null;
   toAct: number | null;
   deadline: number | null;
   seats: Seat[];
-  commitment: string;
-  logHash: string;
+  commitment: string | null;
+  logHash: string | null;
+  you?: number | null;
+  lastMove?: Envelope<unknown> | null;
   host: boolean;
   status: "open" | "live" | "finished" | "unavailable";
   rated: boolean;

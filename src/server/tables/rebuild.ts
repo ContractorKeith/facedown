@@ -1,3 +1,4 @@
+import { canonicalJSON, moveLogHash } from "../../engine/core/log-hash";
 import { registry } from "../../engine/registry";
 import type { LeaseGuard } from "../lease";
 import type { Store } from "../store";
@@ -31,7 +32,7 @@ function* rebuildSteps(
       const game = registry.get(record.type);
       if (
         !game ||
-        JSON.stringify(game.ruleset) !== JSON.stringify(record.ruleset)
+        canonicalJSON(game.ruleset) !== canonicalJSON(record.ruleset)
       )
         throw new Error("Unsupported saved ruleset");
       let state = game.init(record.seed, game.ruleset);
@@ -47,6 +48,7 @@ function* rebuildSteps(
       }
       const table: Table = {
         id: record.id,
+        created: record.created,
         type: record.type,
         host: record.host,
         casual: record.casual,
@@ -55,6 +57,8 @@ function* rebuildSteps(
         game,
         seed: record.seed,
         commitment: record.commitment,
+        logHash: moveLogHash(record.commitment, record.moves),
+        lastMove: record.moves.at(-1) ?? null,
         state,
         seq: record.moves.length,
         status: "live",
@@ -64,7 +68,7 @@ function* rebuildSteps(
           session: s.session,
           accountId: s.accountId,
           name: s.name ?? "bot",
-          bot: s.bot,
+          bot: s.botNow ?? s.bot,
           sockets: new Set(),
         })),
       };

@@ -1,7 +1,6 @@
-import { commitment } from "../../engine/core/random";
 import type { GameType } from "../../engine/core/types";
 import { registry } from "../../engine/registry";
-import { randomHex, randomId, type Session } from "../http/sessions";
+import { randomId, type Session } from "../http/sessions";
 import type { Lifecycle } from "./lifecycle";
 import type { Retention } from "./retention";
 import { Fault, type Table } from "./types";
@@ -39,17 +38,23 @@ export class Creation {
     do {
       id = randomId(10);
     } while (this.tables.has(id) || this.lifecycle.store.gameStatus(id));
-    const seed = randomHex();
+    if (
+      [...this.tables.values()].filter((t) => t.status === "open").length >= 200
+    )
+      throw new Fault("busy");
     const table: Table = {
       id,
+      created: this.lifecycle.clock.now(),
       type,
       host: host.id,
       casual,
       overSent: new Set(),
       game,
-      seed,
-      commitment: commitment(seed),
-      state: game.init(seed, game.ruleset),
+      seed: null,
+      commitment: null,
+      logHash: null,
+      lastMove: null,
+      state: null,
       seq: 0,
       status: "open",
       deadline: null,

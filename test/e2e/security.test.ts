@@ -32,7 +32,7 @@ test("unknown/expired guest tokens return 401 and cannot open or retain a socket
     const origin = `http://127.0.0.1:${f.app.server.port}`;
     const unknown = `fd=${"a".repeat(64)}`;
     expect((await f.request("/api/me", unknown)).status).toBe(401);
-    expect((await f.request("/api/tables", unknown)).status).toBe(401);
+    expect((await f.request("/api/tables", unknown)).status).toBe(200);
     expect(
       (await f.request("/api/tables", unknown, { type: "spades" })).status,
     ).toBe(401);

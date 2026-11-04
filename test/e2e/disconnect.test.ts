@@ -22,6 +22,7 @@ test("disconnect holds seat, records timeouts, takes over with a bot, then recla
     });
     f.clock.advance(20000);
     expect(table.seats[1]?.bot).toBe(true);
+    expect(f.app.store.loadGame(g.id)?.seats[1]?.botNow).toBe(true);
     // Play seat 0; the held seat's bot must now make a persisted move.
     const seq = table.seq,
       client = g.players[0];
@@ -42,6 +43,7 @@ test("disconnect holds seat, records timeouts, takes over with a bot, then recla
     const returned = await f.connect(g.cookies[1] as string, { seat: 1 }, g.id);
     g.players[1] = returned;
     expect(table.seats[1]?.bot).toBe(false);
+    expect(f.app.store.loadGame(g.id)?.seats[1]?.botNow).toBe(false);
     await f.play(g.id, g.players, () => table.seq >= seq + 8);
     expect(table.seats[1]?.sockets.size).toBe(1);
     const record = f.app.store.loadGame(g.id);

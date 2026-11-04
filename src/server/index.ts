@@ -71,7 +71,7 @@ export function startServer(options: ServerOptions = {}) {
   try {
     server = Bun.serve<SocketData>({
       port: options.port ?? Number(process.env.PORT ?? 8080),
-      hostname: options.hostname ?? "0.0.0.0",
+      hostname: options.hostname ?? process.env.HOST ?? "127.0.0.1",
       maxRequestBodySize: 4096,
       error: serverError,
       fetch(request, server) {
@@ -95,6 +95,11 @@ export function startServer(options: ServerOptions = {}) {
     store.close();
     throw error;
   }
+  const ping = setInterval(
+    () => sockets.ping(),
+    Number(process.env.FACEDOWN_PING_MS || 20000),
+  );
+  ping.unref();
   return {
     server,
     store,
@@ -103,6 +108,7 @@ export function startServer(options: ServerOptions = {}) {
     stop() {
       if (stopPromise) return stopPromise;
       stopping = true;
+      clearInterval(ping);
       tables.lifecycle.closed = true;
       stopPromise = (async () => {
         await Promise.allSettled([...pending]);

@@ -46,4 +46,6 @@ export const migrations = [
   CREATE INDEX sessions_expiry ON sessions(expires_at);
   CREATE INDEX player_games ON game_seats(account_id,game_id);`,
   `CREATE TABLE leases (name TEXT PRIMARY KEY, holder TEXT NOT NULL, heartbeat_at INTEGER NOT NULL);`,
+  `ALTER TABLE game_seats ADD COLUMN bot_now INTEGER NOT NULL DEFAULT 0;
+  UPDATE game_seats SET bot_now=bot_at_start;`,
 ] as const;

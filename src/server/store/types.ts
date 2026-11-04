@@ -10,6 +10,7 @@ export type StoredSeat = {
   session: string | null;
   name: string | null;
   bot: boolean;
+  botNow?: boolean;
   leaver: boolean;
 };
 export type GameRecord = {

@@ -9,7 +9,7 @@ import { parseReplay } from "./records";
 export type { ReplayRecord } from "./records";
 
 export type Frame = {
-  view: ViewMessage["view"];
+  view: NonNullable<ViewMessage["view"]>;
   hands: string[][];
   toAct: Seat | null;
 };

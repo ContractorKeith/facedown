@@ -81,3 +81,29 @@ export function sessionHashes(path: string): string[] {
     db.close();
   }
 }
+
+// Immutable v3 schema used by c4be160, before bot_now existed.
+export function versionThree(
+  path: string,
+  game: { ruleset: unknown; seed: string; commitment: string },
+): void {
+  const db = new Database(path);
+  try {
+    for (const migration of migrations.slice(0, 3)) db.exec(migration);
+    db.exec("PRAGMA user_version=3");
+    db.run(
+      "INSERT INTO games(id,type,ruleset_json,seed,commitment,status,created_at,host_session) VALUES ('old','spades',?,?,?,'live',1,'host')",
+      [JSON.stringify(game.ruleset), game.seed, game.commitment],
+    );
+    for (let seat = 0; seat < 4; seat++)
+      db.run("INSERT INTO game_seats VALUES (?, ?, NULL, ?, ?, 0, ?)", [
+        "old",
+        seat,
+        `guest-${seat}`,
+        Number(seat > 0),
+        seat === 0 ? "host" : null,
+      ]);
+  } finally {
+    db.close();
+  }
+}

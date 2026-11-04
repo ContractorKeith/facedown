@@ -20,6 +20,9 @@ export class AuthLimits {
       throw new Fault("rate_limited");
     return entry;
   }
+  guest(ip: string, now: number): void {
+    this.entry(`guest:${ip}`, 30, 3600000, now).failures++;
+  }
   register(ip: string, now: number): void {
     this.entry(`register:${ip}`, 5, 3600000, now).failures++;
   }

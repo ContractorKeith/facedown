@@ -1,4 +1,4 @@
-import { moveLogHash } from "../../engine/core/log-hash";
+import { hashMove } from "../../engine/core/log-hash";
 import type { Envelope } from "../../engine/core/types";
 import type { Clock, Timing } from "../clock";
 import type { Store } from "../store";
@@ -13,7 +13,6 @@ import {
 
 export class Lifecycle {
   closed = false;
-  private hashes = new WeakMap<Table, { seq: number; value: string }>();
   guard: <T>(action: () => T) => T = (action) => action();
   constructor(
     readonly store: Store,
@@ -52,23 +51,9 @@ export class Lifecycle {
   send(table: Table, peer: Peer): void {
     const viewer = table.viewers.get(peer);
     if (!viewer) return;
-    let cached = this.hashes.get(table);
-    if (!cached || cached.seq !== table.seq) {
-      const moves = table.seq ? this.store.loadGame(table.id)?.moves : [];
-      if (!moves || moves.length !== table.seq)
-        throw new Error("Move log sequence mismatch");
-      cached = {
-        seq: table.seq,
-        value: moveLogHash(
-          cached?.value ?? table.commitment,
-          moves.slice(cached?.seq ?? 0),
-        ),
-      };
-      this.hashes.set(table, cached);
-    }
     peer.send({
       t: "view",
-      logHash: cached.value,
+      logHash: table.logHash,
       status: table.status,
       rated:
         table.status === "open"
@@ -81,7 +66,10 @@ export class Lifecycle {
         table.seats.some(
           (s) => s?.session === table.host && owns(s, peer.session),
         ),
-      view: table.game.view(table.state, viewer),
+      you: "seat" in viewer ? viewer.seat : null,
+      lastMove: table.lastMove,
+      view:
+        table.status === "open" ? null : table.game.view(table.state, viewer),
       toAct: table.status === "open" ? null : table.game.toAct(table.state),
       deadline: table.deadline,
       seats: publicSeats(table),
@@ -91,7 +79,7 @@ export class Lifecycle {
       table.overSent.add(peer);
       peer.send({
         t: "over",
-        logHash: cached.value,
+        logHash: table.logHash,
         table: table.id,
         outcome: table.game.outcome(table.state),
         seed: table.seed,
@@ -149,6 +137,8 @@ export class Lifecycle {
     );
     table.state = result.state;
     table.seq++;
+    table.logHash = hashMove(table.logHash as string, envelope);
+    table.lastMove = envelope;
     if (outcome) {
       table.status = "finished";
       for (const occupant of table.seats) occupant?.cancelHold?.();
@@ -169,6 +159,7 @@ export class Lifecycle {
       return;
     occupant.cancelHold?.();
     occupant.cancelHold = this.after(table, this.timing.hold, () => {
+      this.guard(() => this.store.setBot(table.id, seat, true));
       occupant.bot = true;
       if (table.game.toAct(table.state) === seat) this.schedule(table);
       this.broadcast(table);

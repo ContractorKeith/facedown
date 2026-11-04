@@ -11,7 +11,7 @@ browser — sees a card it shouldn't.
 - Drop out and a bot holds your seat until you come back.
 - Glicko-2 ratings per game, rated on 2v2 results.
 
-Status: M0–M5 complete; M6 client and verified replays implemented; deployment is next. See [`docs/PLAN.md`](docs/PLAN.md).
+Status: M0–M7 merged; skeptic round 1 fixes in progress. See [`docs/PLAN.md`](docs/PLAN.md).
 
 MIT licensed.
 
@@ -26,6 +26,17 @@ and final move-log hash seen live, so the replay can be compared with those loca
 With local records → "Verified: matches the commitment and move log your browser saw during the game".
 Without → "Consistent: the seed matches the published commitment and the log replays to the stored result (this browser didn't watch this game live)".
 Mismatch stays Mismatch and tells you which check failed.
+
+## Run it locally
+
+```sh
+bun install
+bun run build
+bun run dev
+```
+
+Open http://localhost:8080. `dev` sets `FACEDOWN_INSECURE_COOKIE=1` for local HTTP,
+including Safari. The default bind is `127.0.0.1`; override it with `HOST`.
 
 ## Deploy with hoist
 
@@ -63,7 +74,14 @@ before cutover, then stops the old container. The standby returns 503 for table
 traffic until it acquires the SQLite lease; sockets close with 1012 and reconnect.
 After SIGKILL, clients may show “reconnecting” for up to 20 seconds while the lease
 expires.
-The image honors `PORT` (8080 by default). Back up `/data`, including SQLite WAL
+The image sets `HOST=0.0.0.0` and honors `PORT` (8080 by default).
+It sets `FACEDOWN_TRUST_PROXY=1`: limits use the last `X-Forwarded-For` hop,
+which Caddy appends. Only expose this image behind hoist’s proxy. Outside the
+image, proxy trust is off and limits use the socket address; enable it only
+behind a trusted proxy. Registrations count all attempts (5/IP/hour), guests
+allow 30/IP/hour, and sessions allow 8 sockets. The lobby returns the newest
+50 open plus 50 live tables, with at most 200 open tables globally.
+Sockets receive `{t:"ping"}` every 20 seconds (`FACEDOWN_PING_MS`). Back up `/data`, including SQLite WAL
 safely with SQLite-aware tooling. Rollback restores an image and config, not database
 contents; use a compatible release and retain the same volume.
 

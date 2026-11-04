@@ -1,6 +1,7 @@
+import { commitment } from "../../engine/core/random";
 import type { GameType, Seat } from "../../engine/core/types";
 import { type Clock, clock, openTTL, type Timing, timing } from "../clock";
-import type { Session } from "../http/sessions";
+import { randomHex, type Session } from "../http/sessions";
 import { TableLease } from "../lease";
 import type { Store } from "../store";
 import { Creation } from "./creation";
@@ -86,14 +87,18 @@ export class Tables {
   }
   list() {
     this.available();
-    return [...this.tables.values()]
-      .filter((t) => t.status === "open" || t.status === "live")
-      .map((t) => ({
-        id: t.id,
-        type: t.type,
-        status: t.status,
-        seats: publicSeats(t),
-      }));
+    const recent = [...this.tables.values()]
+      .reverse()
+      .sort((a, b) => b.created - a.created);
+    return [
+      ...recent.filter((t) => t.status === "open").slice(0, 50),
+      ...recent.filter((t) => t.status === "live").slice(0, 50),
+    ].map((t) => ({
+      id: t.id,
+      type: t.type,
+      status: t.status,
+      seats: publicSeats(t),
+    }));
   }
   create(type: GameType, host: Session, casual = false): Table {
     this.available();
@@ -128,17 +133,20 @@ export class Tables {
     const table = this.hosted(id, host);
     if (table.seats.some((s) => !s)) throw new Fault("bad_request");
     const rated = ratedIfStarted(table);
+    const seed = randomHex();
+    const committed = commitment(seed);
+    const state = table.game.init(seed, table.game.ruleset);
     this.lease.run(() =>
       this.lifecycle.store.createGame({
         rated,
         id: table.id,
         type: table.type,
         ruleset: table.game.ruleset,
-        seed: table.seed,
-        commitment: table.commitment,
+        seed,
+        commitment: committed,
         host: table.host,
         casual: table.casual,
-        created: this.lifecycle.clock.now(),
+        created: table.created,
         seats: table.seats.map((s, seat) => ({
           seat: seat as Seat,
           session: s?.session ?? null,
@@ -149,6 +157,10 @@ export class Tables {
         })),
       }),
     );
+    table.seed = seed;
+    table.commitment = committed;
+    table.logHash = committed;
+    table.state = state;
     table.rated = rated;
     table.status = "live";
     this.retention.changed(table);
