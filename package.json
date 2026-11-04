@@ -7,7 +7,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "bun test",
-    "replay:record": "bun scripts/replay-record.ts"
+    "replay:record": "bun scripts/replay-record.ts",
+    "start": "bun src/server/main.ts",
+    "dev": "bun --watch src/server/main.ts",
+    "test:e2e": "bun test test/e2e"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.4",

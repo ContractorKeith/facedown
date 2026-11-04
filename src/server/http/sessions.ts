@@ -1,0 +1,55 @@
+import { commitment } from "../../engine/core/random";
+import type { Store } from "../store";
+
+export const randomHex = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
+    b.toString(16).padStart(2, "0"),
+  ).join("");
+export const randomId = (length: number) =>
+  Array.from(
+    crypto.getRandomValues(new Uint8Array(length)),
+    (b) => "abcdefghijklmnopqrstuvwxyz234567"[b % 32],
+  ).join("");
+export type Session = { id: string; name: string };
+export interface SessionResolver {
+  resolve(request: Request): Session | null;
+  active(session: Session): boolean;
+  guest(): { session: Session; cookie: string };
+}
+const lifetime = 30 * 86400000;
+export class GuestSessions implements SessionResolver {
+  constructor(
+    private store: Store,
+    private insecure = process.env.FACEDOWN_INSECURE_COOKIE === "1",
+    private now = () => Date.now(),
+  ) {}
+  resolve(request: Request): Session | null {
+    const name = this.insecure ? "fd" : "__Host-fd";
+    const token = (request.headers.get("cookie") ?? "")
+      .split(";")
+      .map((s) => s.trim())
+      .find((s) => s.startsWith(`${name}=`))
+      ?.slice(name.length + 1);
+    return token && /^[0-9a-f]{64}$/.test(token)
+      ? this.store.guests.find(commitment(token), this.now())
+      : null;
+  }
+  active(session: Session): boolean {
+    return !!this.store.guests.find(session.id, this.now());
+  }
+  guest() {
+    for (;;) {
+      const token = randomHex(),
+        session = { id: commitment(token), name: `guest-${randomId(5)}` };
+      const now = this.now();
+      if (
+        !this.store.guests.issue(session.id, session.name, now, now + lifetime)
+      )
+        continue;
+      return {
+        session,
+        cookie: `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${lifetime / 1000}${this.insecure ? "" : "; Secure"}`,
+      };
+    }
+  }
+}

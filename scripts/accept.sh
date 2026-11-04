@@ -16,7 +16,7 @@ echo "== unit and engine"
 FACEDOWN_PLAYOUTS="${FACEDOWN_PLAYOUTS:-2000}" bun test
 
 echo "== e2e"
-# M3 adds: bun run test:e2e
+bun run test:e2e
 
 echo "== build"
 # M5 adds: bun run build
