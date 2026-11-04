@@ -10,10 +10,13 @@ export const randomId = (length: number) =>
     crypto.getRandomValues(new Uint8Array(length)),
     (b) => "abcdefghijklmnopqrstuvwxyz234567"[b % 32],
   ).join("");
-export type Session = { id: string; name: string };
+export type Session = { id: string; name: string; accountId?: string | null };
 export interface SessionResolver {
   resolve(request: Request): Session | null;
   active(session: Session): boolean;
+  account?(accountId: string): { session: Session; cookie: string };
+  logout?(session: Session): string;
+  headers?(cookie: string): Headers;
   guest(): { session: Session; cookie: string };
 }
 const lifetime = 30 * 86400000;
@@ -24,6 +27,7 @@ export class GuestSessions implements SessionResolver {
     private now = () => Date.now(),
   ) {}
   resolve(request: Request): Session | null {
+    // Accept only the configured name, and only its first occurrence.
     const name = this.insecure ? "fd" : "__Host-fd";
     const token = (request.headers.get("cookie") ?? "")
       .split(";")
@@ -31,11 +35,46 @@ export class GuestSessions implements SessionResolver {
       .find((s) => s.startsWith(`${name}=`))
       ?.slice(name.length + 1);
     return token && /^[0-9a-f]{64}$/.test(token)
-      ? this.store.guests.find(commitment(token), this.now())
+      ? (this.store.accounts.resolve(commitment(token), this.now()) ??
+          this.store.guests.find(commitment(token), this.now()))
       : null;
   }
   active(session: Session): boolean {
-    return !!this.store.guests.find(session.id, this.now());
+    return !!(
+      this.store.accounts.resolve(session.id, this.now()) ??
+      this.store.guests.find(session.id, this.now())
+    );
+  }
+  private cookie(token: string, age: number): string {
+    return `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${this.insecure ? "" : "; Secure"}`;
+  }
+  headers(cookie: string): Headers {
+    const headers = new Headers();
+    headers.append("set-cookie", cookie);
+    const other = this.insecure ? "__Host-fd" : "fd";
+    headers.append(
+      "set-cookie",
+      `${other}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${other === "__Host-fd" ? "; Secure" : ""}`,
+    );
+    return headers;
+  }
+  account(accountId: string) {
+    const token = randomHex(),
+      now = this.now(),
+      age = 7 * 86400;
+    this.store.accounts.issue(
+      commitment(token),
+      accountId,
+      now + age * 1000,
+      now,
+    );
+    const session = this.store.accounts.resolve(commitment(token), now);
+    if (!session) throw new Error("Missing issued session");
+    return { session, cookie: this.cookie(token, age) };
+  }
+  logout(session: Session): string {
+    this.store.accounts.revoke(session.id);
+    return this.cookie("", 0);
   }
   guest() {
     for (;;) {
@@ -48,7 +87,7 @@ export class GuestSessions implements SessionResolver {
         continue;
       return {
         session,
-        cookie: `${this.insecure ? "fd" : "__Host-fd"}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${lifetime / 1000}${this.insecure ? "" : "; Secure"}`,
+        cookie: this.cookie(token, lifetime / 1000),
       };
     }
   }

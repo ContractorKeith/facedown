@@ -3,6 +3,8 @@ import type { Store } from "../store";
 import type { Tables } from "../tables";
 import { Fault } from "../tables/types";
 import type { SocketData } from "../ws";
+import type { SessionSockets } from "../ws/sessions";
+import { Auth, identity } from "./auth";
 import type { SessionResolver } from "./sessions";
 
 const json = (value: unknown, status = 200, headers?: HeadersInit) =>
@@ -12,7 +14,17 @@ export function handler(
   tables: Tables,
   sessions: SessionResolver,
   origin?: string,
+  sockets?: SessionSockets,
 ) {
+  const auth = new Auth(
+    store,
+    sessions,
+    (session) => {
+      sockets?.revoke(session.id);
+      tables.releaseGuest(session);
+    },
+    () => tables.lifecycle.clock.now(),
+  );
   return async (
     request: Request,
     server: Server<SocketData>,
@@ -29,10 +41,14 @@ export function handler(
         return new Response("ok");
       if (path === "/api/guest" && request.method === "POST") {
         const guest = sessions.guest();
-        return json({ name: guest.session.name, guest: true }, 200, {
-          "set-cookie": guest.cookie,
-        });
+        return json(
+          { name: guest.session.name, guest: true },
+          200,
+          sessions.headers?.(guest.cookie) ?? { "set-cookie": guest.cookie },
+        );
       }
+      const authenticated = await auth.handle(path, request, server);
+      if (authenticated) return authenticated;
       const session = sessions.resolve(request);
       if (
         !session &&
@@ -49,8 +65,33 @@ export function handler(
       }
       if (path === "/api/me" && request.method === "GET") {
         if (!session) throw new Fault("unauthorized");
-        return json({ name: session.name, guest: true });
+        return json(identity(session));
       }
+      if (path === "/api/logout" && request.method === "POST") {
+        if (!session || !sessions.logout) throw new Fault("unauthorized");
+        const cookie = sessions.logout(session);
+        sockets?.revoke(session.id);
+        return new Response(null, {
+          status: 204,
+          headers: sessions.headers?.(cookie) ?? { "set-cookie": cookie },
+        });
+      }
+      const player = /^\/api\/players\/([a-zA-Z0-9_]{3,20})$/.exec(path);
+      if (player && request.method === "GET") {
+        const account = store.accounts.find(
+          (player[1] as string).toLowerCase(),
+        );
+        if (!account) throw new Fault("not_found");
+        return json({
+          username: account.username,
+          ...store.ratings.profile(account.id),
+        });
+      }
+      const leaderboard = /^\/api\/leaderboard\/(spades|dominoes)$/.exec(path);
+      if (leaderboard && request.method === "GET")
+        return json(
+          store.ratings.leaderboard(leaderboard[1] as "spades" | "dominoes"),
+        );
       if (path === "/api/tables") {
         if (request.method === "GET") return json(tables.list());
         if (request.method === "POST") {
@@ -78,11 +119,14 @@ export function handler(
         const record = store.loadGame(id);
         if (record?.status !== "finished") throw new Fault("not_found");
         return json({
+          rated: record.rated,
+          rating_changes: store.ratings.changes(id),
           type: record.type,
           ruleset: record.ruleset,
           seats: record.seats.map((s) => ({
             seat: s.seat,
-            guest_name: s.name,
+            name: s.name,
+            guest_name: s.accountId ? null : s.name,
             bot_at_start: s.bot,
             leaver: s.leaver,
           })),

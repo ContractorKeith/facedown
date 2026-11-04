@@ -26,4 +26,23 @@ export const migrations = [
     SELECT CASE WHEN (SELECT status FROM games WHERE id=NEW.game_id) <> 'live'
       THEN RAISE(ABORT, 'game is finished') END;
   END;`,
+  `CREATE TABLE accounts (
+    id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  );
+  CREATE TABLE sessions (
+    token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id), expires_at INTEGER NOT NULL
+  );
+  CREATE TABLE ratings (
+    account_id TEXT NOT NULL REFERENCES accounts(id), type TEXT NOT NULL,
+    rating REAL NOT NULL, rd REAL NOT NULL, volatility REAL NOT NULL, games INTEGER NOT NULL,
+    PRIMARY KEY(account_id,type)
+  );
+  CREATE TABLE rating_changes (
+    game_id TEXT NOT NULL REFERENCES games(id), account_id TEXT NOT NULL REFERENCES accounts(id),
+    type TEXT NOT NULL, before REAL NOT NULL, after REAL NOT NULL,
+    PRIMARY KEY(game_id,account_id)
+  );
+  CREATE INDEX sessions_expiry ON sessions(expires_at);
+  CREATE INDEX player_games ON game_seats(account_id,game_id);`,
 ] as const;

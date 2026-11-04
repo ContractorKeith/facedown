@@ -35,6 +35,8 @@ const mathMembers = new Set([
   "imul",
   "pow",
   "round",
+  "sqrt",
+  "PI",
 ]);
 function propertyName(node: ts.Identifier, parent: ts.Node): boolean {
   if (ts.isPropertyAccessExpression(parent)) return parent.name === node;
@@ -58,6 +60,7 @@ export async function purityViolations(
   root: string,
 ): Promise<string[]> {
   const problems: string[] = [];
+  const inRating = resolve(file).startsWith(`${resolve(root, "rating")}${sep}`);
   const tree = await parseSource(source);
   const checkImport = (node: ts.Node | undefined) => {
     if (
@@ -82,7 +85,8 @@ export async function purityViolations(
         node.text === "Math" &&
         ts.isPropertyAccessExpression(parent) &&
         parent.expression === node &&
-        mathMembers.has(parent.name.text);
+        (mathMembers.has(parent.name.text) ||
+          (inRating && ["exp", "log"].includes(parent.name.text)));
       if (!allowedMath) problems.push(`Forbidden identifier: ${node.text}`);
     }
     if (

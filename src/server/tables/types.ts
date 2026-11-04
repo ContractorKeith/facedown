@@ -3,6 +3,7 @@ import type { Session } from "../http/sessions";
 export type Engine = Game<unknown, unknown, unknown, unknown>;
 export type Occupant = {
   session: string | null;
+  accountId?: string | null;
   name: string;
   bot: boolean;
   sockets: Set<Peer>;
@@ -15,6 +16,7 @@ export type Table = {
   type: GameType;
   host: string;
   casual: boolean;
+  rated?: boolean;
   game: Engine;
   seed: string;
   commitment: string;
@@ -51,3 +53,19 @@ export const publicSeats = (table: Table) =>
   table.seats.map((s) =>
     s ? { name: s.name, bot: s.bot, connected: s.sockets.size > 0 } : null,
   );
+
+export const owns = (
+  occupant: Occupant | null | undefined,
+  session: Session,
+): boolean =>
+  occupant?.accountId
+    ? occupant.accountId === session.accountId
+    : occupant?.session === session.id;
+export const ratedIfStarted = (table: Table): boolean => {
+  const accounts = table.seats.map((s) => s?.accountId);
+  return (
+    !table.casual &&
+    table.seats.every((s) => s?.accountId && !s.bot) &&
+    new Set(accounts).size === 4
+  );
+};

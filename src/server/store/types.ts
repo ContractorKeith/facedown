@@ -6,6 +6,7 @@ import type {
 } from "../../engine/core/types";
 export type StoredSeat = {
   seat: Seat;
+  accountId?: string | null;
   session: string | null;
   name: string | null;
   bot: boolean;
@@ -21,6 +22,7 @@ export type GameRecord = {
   created: number;
   status: "live" | "finished" | "abandoned";
   casual: boolean;
+  rated: boolean;
   seats: StoredSeat[];
   moves: Envelope<unknown>[];
   outcome: Outcome | null;
@@ -30,6 +32,7 @@ export type Row = {
   type: GameType;
   ruleset_json: string;
   casual: number;
+  rated: number;
   seed: string;
   commitment: string;
   host_session: string;

@@ -56,6 +56,23 @@ test.each([
   "const object = { Date: 1, Bun: 2, fetch() { return 1; } }; object.Date;",
   "const { Date: safe } = object;",
   "Math.floor(1.2); Math?.ceil(1.2); Math.imul(2,3)",
+  "Math.sqrt(4); Math.PI",
 ])("purity accepts %s", async (source) => {
   expect(await check(source)).toEqual([]);
 });
+
+for (const member of ["exp", "log"])
+  test(`Math.${member} is restricted to the rating directory`, async () => {
+    const source = `Math.${member}(1)`;
+    expect(await check(source)).not.toEqual([]);
+    expect(
+      await purityViolations(source, join(root, "rating", "glicko.ts"), root),
+    ).toEqual([]);
+    expect(
+      await purityViolations(
+        source,
+        join(root, "rating-other", "game.ts"),
+        root,
+      ),
+    ).not.toEqual([]);
+  });

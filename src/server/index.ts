@@ -4,6 +4,7 @@ import { GuestSessions, type SessionResolver } from "./http/sessions";
 import { Store } from "./store";
 import { Tables } from "./tables";
 import { type SocketData, websocket } from "./ws";
+import { SessionSockets } from "./ws/sessions";
 
 export type ServerOptions = {
   port?: number;
@@ -35,6 +36,7 @@ export function startServer(options: ServerOptions = {}) {
     new GuestSessions(store, options.insecureCookie, () =>
       (options.clock ?? clock).now(),
     );
+  const sockets = new SessionSockets(tables);
   let server: ReturnType<typeof Bun.serve<SocketData>>;
   try {
     server = Bun.serve<SocketData>({
@@ -46,8 +48,9 @@ export function startServer(options: ServerOptions = {}) {
         tables,
         sessions,
         options.origin ?? process.env.FACEDOWN_ORIGIN,
+        sockets,
       ),
-      websocket: websocket(tables, sessions),
+      websocket: websocket(tables, sessions, sockets),
     });
   } catch (error) {
     tables.stop();

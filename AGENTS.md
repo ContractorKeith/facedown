@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M2 complete; M3 game server implemented in this PR.
+M0–M3 complete; M4 accounts, ratings and replay APIs implemented in this PR.
 
 ## Commands
 
@@ -39,7 +39,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 
 - `src/engine` is pure: imports only from `src/engine`; no `Bun`, `process`, `Date`,
   `Math.random`, `crypto`, timers, `fetch` or DOM. A test enforces it. The browser replay
-  viewer runs the same engine.
+  viewer runs the same engine. `Math.exp`/`Math.log` are allowed only in `src/engine/rating`.
 - Only `view(state, viewer)` output reaches a client. Bots and timeout auto-play decide
   from a seat's view and legal moves, never from full state.
 - State is always `fold(init(seed), moves)`; in-memory state and snapshots are caches.
@@ -50,6 +50,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.
 - `FACEDOWN_TURN_MS` / `FACEDOWN_HOLD_MS` / `FACEDOWN_BOT_MS`: 30000 / 180000 / 600 ms.
 - Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
+- Rated games require four distinct accounts at start and no casual flag; bot-held seats at finish score a loss, reclaim clears it.
 - Tooling is Bun, `tsc --noEmit`, Biome. No ESLint, Prettier, Vitest or ORM.
 - Commits: `<type>: <description>`, author @ContractorKeith only.
 
