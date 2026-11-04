@@ -1,0 +1,859 @@
+{
+  "type": "dominoes",
+  "ruleset": {
+    "maxPip": 6,
+    "handSize": 5,
+    "target": 100
+  },
+  "seed": "0000000000000000000000000000000000000000000000000000000000000002",
+  "moves": [
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "3-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "3-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "2-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "4-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "3-3",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "4-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "0-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "0-1",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-2",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "5-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "5-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "3-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "0-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "5-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "2-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "2-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "6-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "4-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "0-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "0-3",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "3-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-3",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 0,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "3-3",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "pass": true
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "4-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "5-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "4-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "1-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "3-3",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-2",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "2-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-3",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "5-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-1",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "1-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "0-1",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "0-3",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "4-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "2-3",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "2-2",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-3",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "2-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-2",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "1-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "0-2",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "6-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "5-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "3-4",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "5-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "0-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "pass": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "pass": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "0-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "4-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "5-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "3-5",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "3-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "1-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "1-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "1-6",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "1-2",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-2",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "0-5",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "play": "6-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "0-1",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "4-6",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "draw": true
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "pass": true
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "play": "3-3",
+        "end": "right"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "play": "4-4",
+        "end": "left"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "play": "0-4",
+        "end": "left"
+      }
+    }
+  ],
+  "expectedOutcome": {
+    "scores": [129, 7],
+    "winner": 0
+  },
+  "expectedFinalStateHash": "8a1860af337dfee429ed7534e238a25d3ce81ed38602b0d9346095399d927375"
+}

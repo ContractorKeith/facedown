@@ -1,5 +1,6 @@
 import type { Game, GameType } from "../../src/engine/core/types";
 import { registry } from "../../src/engine/registry";
+import { dominoesInvariants } from "./dominoes/invariants";
 import { highcardEntry } from "./highcard";
 import type { GameEntry, GameInvariants } from "./invariants";
 import { spadesInvariants } from "./spades-invariants";
@@ -7,6 +8,7 @@ import { spadesInvariants } from "./spades-invariants";
 // M1/M2 add their game-specific checks here, separate from the shipped registry.
 const invariants = new Map<GameType, GameInvariants>([
   ["spades", spadesInvariants],
+  ["dominoes", dominoesInvariants],
 ]);
 export function registeredGames(
   registered: ReadonlyMap<GameType, Game<unknown, unknown, unknown, unknown>>,

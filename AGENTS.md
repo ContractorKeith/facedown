@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0 complete; M1 Spades engine and bot implemented in this PR.
+M0 and M1 complete; M2 Dominoes engine and bot implemented in this PR.
 
 ## Commands
 
