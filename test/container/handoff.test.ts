@@ -169,6 +169,7 @@ test.skipIf(!enabled)(
       const after = await (resumed[0] as Client).view(1, true);
       expect(after.view).toEqual(before.view);
       expect(after.commitment).toBe(before.commitment);
+      expect(after.logHash).toBe(before.logHash);
       const spectator = await connect(originB, host, id);
       await spectator.view(1, true);
       for (const c of resumed) await c.close();
