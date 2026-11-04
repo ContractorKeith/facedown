@@ -39,7 +39,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         ({ id, commitment, logHash }) =>
           localStorage.setItem(
             `fd:game:${id}`,
-            JSON.stringify({ commitment, logHash }),
+            JSON.stringify({ commitment, logHash, unbroken: true }),
           ),
         { id, commitment: original.commitment, logHash: original.logHash },
       );
@@ -63,7 +63,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(page.getByText("Consistent", { exact: true })).toBeVisible();
     await expect(
       page.getByText(
-        "Consistent: the seed matches the published commitment and the log replays to the stored result (this browser didn't watch this game live)",
+        "Consistent: the seed matches the published commitment and the log replays to the stored result (this browser did not verify an unbroken live move log)",
         { exact: true },
       ),
     ).toBeVisible();
@@ -71,7 +71,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       ({ id, commitment, logHash }) =>
         localStorage.setItem(
           `fd:game:${id}`,
-          JSON.stringify({ commitment, logHash }),
+          JSON.stringify({ commitment, logHash, unbroken: true }),
         ),
       { id, commitment: original.commitment, logHash: original.logHash },
     );

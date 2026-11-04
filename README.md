@@ -20,8 +20,9 @@ MIT licensed.
 Open a finished game’s replay to see every hand and step through its moves. Before the
 first deal, the server publishes a seed commitment (the SHA-256 of its secret seed).
 After the game, it reveals the seed. Your browser checks the standard ruleset, seed,
-move-log hash chain, and stored final scores and winner. It saves the first commitment
-and final move-log hash seen live, so the replay can be compared with those local records.
+move-log hash chain, and stored final scores and winner. It checks each live move against
+the previous hash and saves the latest anchor, so Verified requires a matching, unbroken
+chain from the commitment through the final move.
 
 With local records → "Verified: matches the commitment and move log your browser saw during the game".
 Without → "Consistent: the seed matches the published commitment and the log replays to the stored result (this browser didn't watch this game live)".

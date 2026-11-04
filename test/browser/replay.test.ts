@@ -48,12 +48,30 @@ for (const type of ["spades", "dominoes"] as const) {
       verifyReplay(record, {
         commitment: record.commitment,
         logHash: record.logHash,
+        unbroken: true,
       }).verified,
     ).toBe(true);
+    for (const unbroken of [false, undefined])
+      expect(
+        verifyReplay(record, {
+          commitment: record.commitment,
+          logHash: record.logHash,
+          unbroken,
+        }).verified,
+      ).toBe(false);
+    expect(
+      verifyReplay(record, {
+        commitment: record.commitment,
+        logHash: record.logHash,
+        unbroken: true,
+        tampered: true,
+      }).failures,
+    ).toContain("Live move log changed unexpectedly");
     expect(
       verifyReplay(record, {
         commitment: "00".repeat(32),
         logHash: record.logHash,
+        unbroken: true,
       }).failures,
     ).toContain("Saved commitment check failed");
     expect(

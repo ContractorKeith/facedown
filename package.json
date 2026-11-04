@@ -13,7 +13,7 @@
     "test:e2e": "bun test test/e2e",
     "build": "vite build",
     "dev:client": "vite",
-    "test:browser": "FACEDOWN_BROWSER=1 playwright test",
+    "test:browser": "bun run build && FACEDOWN_BROWSER=1 playwright test",
     "test:container": "FACEDOWN_CONTAINER=1 bun test test/container"
   },
   "devDependencies": {

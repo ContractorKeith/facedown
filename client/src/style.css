@@ -33,10 +33,12 @@ button {
     transform 0.18s,
     background 0.18s;
 }
-button:hover {
-  background: #f7dda4;
+@media (hover: hover) {
+  button:not(:disabled):hover {
+    background: #f7dda4;
+  }
 }
-button:active {
+button:not(:disabled):active {
   transform: translateY(2px);
 }
 button:disabled {
@@ -44,6 +46,7 @@ button:disabled {
   opacity: 0.45;
 }
 button:focus-visible,
+.hand:focus-visible,
 a:focus-visible {
   outline: 3px solid #fff1be;
   outline-offset: 3px;
@@ -125,8 +128,10 @@ main {
   align-items: flex-start;
   gap: 8px;
 }
-.create button:hover {
-  background: #2c5e4e;
+@media (hover: hover) {
+  .create button:not(:disabled):hover {
+    background: #2c5e4e;
+  }
 }
 .game-icon {
   font-size: 2.6rem;

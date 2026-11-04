@@ -4,9 +4,8 @@ import { test as base } from "@playwright/test";
 export { expect } from "@playwright/test";
 export const test = base.extend<Record<never, never>, { origin: string }>({
   origin: [
-    async ({ browserName }, use) => {
-      if (browserName !== "chromium")
-        throw new Error("The smoke uses Chromium");
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright requires destructured fixture dependencies.
+    async ({}, use) => {
       const server = spawn("bun", ["test/browser/server.ts"], {
         stdio: ["ignore", "pipe", "inherit"],
       });

@@ -1,82 +1,7 @@
-import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { expect, mock, test } from "bun:test";
 import { connect } from "../../client/src/socket";
+import { current, retry, Socket, timers } from "./socket-fixture";
 
-class Socket {
-  static OPEN = 1;
-  static all: Socket[] = [];
-  readyState = 0;
-  sent: Record<string, unknown>[] = [];
-  onopen: (() => void) | null = null;
-  onmessage: ((event: { data: string }) => void) | null = null;
-  onclose: ((event: { code: number }) => void | Promise<void>) | null = null;
-  onerror: (() => void) | null = null;
-  constructor(_url: string) {
-    Socket.all.push(this);
-  }
-  open() {
-    this.readyState = 1;
-    this.onopen?.();
-  }
-  send(value: string) {
-    this.sent.push(JSON.parse(value));
-  }
-  close() {
-    this.readyState = 3;
-  }
-  shutdown(code: number) {
-    this.close();
-    return this.onclose?.({ code });
-  }
-  frame(value: object) {
-    this.onmessage?.({ data: JSON.stringify(value) });
-  }
-}
-const originalSocket = globalThis.WebSocket;
-const locationDescriptor = Object.getOwnPropertyDescriptor(
-  globalThis,
-  "location",
-);
-const originalTimeout = globalThis.setTimeout;
-const originalClear = globalThis.clearTimeout;
-const timers = new Map<number, { callback: () => void; ms: number }>();
-let nextId = 0;
-beforeEach(() => {
-  Socket.all = [];
-  timers.clear();
-  nextId = 0;
-  globalThis.WebSocket = Socket as unknown as typeof WebSocket;
-  Object.defineProperty(globalThis, "location", {
-    configurable: true,
-    value: { protocol: "http:", host: "localhost" },
-  });
-  globalThis.setTimeout = ((callback: () => void, ms: number) => {
-    const id = ++nextId;
-    timers.set(id, { callback, ms });
-    return id;
-  }) as unknown as typeof setTimeout;
-  globalThis.clearTimeout = ((id: number) =>
-    timers.delete(id)) as unknown as typeof clearTimeout;
-});
-afterEach(() => {
-  globalThis.WebSocket = originalSocket;
-  globalThis.setTimeout = originalTimeout;
-  globalThis.clearTimeout = originalClear;
-  if (locationDescriptor)
-    Object.defineProperty(globalThis, "location", locationDescriptor);
-  else Reflect.deleteProperty(globalThis, "location");
-});
-function current() {
-  const socket = Socket.all.at(-1);
-  if (!socket) throw new Error("No socket");
-  return socket;
-}
-function retry(ms: number) {
-  const job = timers.entries().next().value;
-  if (!job) throw new Error("No retry");
-  expect(job[1].ms).toBe(ms);
-  timers.delete(job[0]);
-  job[1].callback();
-}
 test("accept-then-close backs off until a view arrives; three failures refresh the session", async () => {
   const refresh = mock(async () => "guest");
   const connection = connect(
@@ -107,7 +32,7 @@ test("accept-then-close backs off until a view arrives; three failures refresh t
     await current().shutdown(1006);
     retry(8000);
     current().open();
-    current().frame({ t: "view" });
+    current().frame({ t: "view", you: 0 });
     await current().shutdown(1000);
     retry(500);
   } finally {
@@ -121,7 +46,7 @@ test("1008 refreshes immediately; a forbidden saved seat becomes a spectator sub
   const connection = connect("table", 2, receive, status, refresh);
   try {
     current().open();
-    current().frame({ t: "view" });
+    current().frame({ t: "view", you: 2 });
     await current().shutdown(1008);
     expect(refresh).toHaveBeenCalledTimes(1);
     retry(500);
@@ -134,7 +59,7 @@ test("1008 refreshes immediately; a forbidden saved seat becomes a spectator sub
     current().frame({ t: "error", code: "forbidden" });
     expect(current().sent.at(-1)).toEqual({ t: "spectate", table: "table" });
     expect(receive).toHaveBeenCalledWith({ t: "signed_out" });
-    current().frame({ t: "view", view: { hand: [] } });
+    current().frame({ t: "view", you: null, view: { hand: [] } });
     expect(status).toHaveBeenLastCalledWith(true);
   } finally {
     connection.stop();
@@ -167,7 +92,7 @@ test("an established connection closing does not count as a failed upgrade", asy
   );
   try {
     current().open();
-    current().frame({ t: "view" });
+    current().frame({ t: "view", you: 0 });
     await current().shutdown(1000);
     retry(500);
     await current().shutdown(1006);
@@ -179,5 +104,75 @@ test("an established connection closing does not count as a failed upgrade", asy
     expect(refresh).toHaveBeenCalledTimes(1);
   } finally {
     connection.stop();
+  }
+});
+
+test("ping renews the 45-second silence deadline and silence reconnects with backoff", async () => {
+  const connection = connect(
+    "table",
+    0,
+    () => {},
+    () => {},
+  );
+  try {
+    current().open();
+    current().frame({ t: "view", you: 0 });
+    const first = [...timers.keys()][0];
+    current().frame({ t: "ping" });
+    expect(timers.has(first as number)).toBe(false);
+    expect(timers.size).toBe(1);
+    const silent = current();
+    retry(45000);
+    expect(current().readyState).toBe(3);
+    // A silent transport may never complete its close handshake.
+    retry(500);
+    expect(Socket.all).toHaveLength(2);
+    current().open();
+    silent.onerror?.();
+    expect(current().readyState).toBe(1);
+  } finally {
+    connection.stop();
+  }
+  expect(timers.size).toBe(0);
+});
+
+test("fresh-tab reclaim probes occupied seats and trusts you, without comparing names", () => {
+  const received = mock((_message: Record<string, unknown>) => {});
+  const connection = connect(
+    "table",
+    null,
+    received,
+    () => {},
+    undefined,
+    [0, 2],
+  );
+  try {
+    current().open();
+    expect(current().sent.at(-1)?.seat).toBe(0);
+    current().frame({ t: "error", code: "forbidden" });
+    expect(current().sent.at(-1)?.seat).toBe(2);
+    current().frame({ t: "view", you: 2 });
+    expect(received).not.toHaveBeenCalledWith({ t: "signed_out" });
+  } finally {
+    connection.stop();
+  }
+});
+
+test("a view without a valid you is a protocol error, never a successful subscription", () => {
+  for (const you of [undefined, 4, "0"]) {
+    const receive = mock((_message: Record<string, unknown>) => {});
+    const status = mock((_up: boolean) => {});
+    const connection = connect("table", 0, receive, status);
+    try {
+      current().open();
+      current().frame({ t: "view", you });
+      expect(receive).toHaveBeenCalledWith(
+        expect.objectContaining({ t: "error", code: "bad_response" }),
+      );
+      expect(status).not.toHaveBeenCalledWith(true);
+      expect(current().readyState).toBe(3);
+    } finally {
+      connection.stop();
+    }
   }
 });

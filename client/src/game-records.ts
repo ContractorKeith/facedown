@@ -1,4 +1,10 @@
-export type LiveRecord = { commitment: string; logHash?: string };
+export type LiveRecord = {
+  commitment: string;
+  seq?: number;
+  logHash?: string;
+  unbroken?: boolean;
+  tampered?: boolean;
+};
 const key = (id: string) => `fd:game:${id}`;
 // Storage can be disabled or full; a browser without saved anchors gets Consistent only.
 export function liveRecord(id: string): LiveRecord | undefined {
@@ -7,24 +13,15 @@ export function liveRecord(id: string): LiveRecord | undefined {
     if (
       value &&
       /^[a-f0-9]{64}$/.test(value.commitment) &&
-      (value.logHash === undefined || /^[a-f0-9]{64}$/.test(value.logHash))
+      (value.logHash === undefined || /^[a-f0-9]{64}$/.test(value.logHash)) &&
+      (value.seq === undefined ||
+        (Number.isSafeInteger(value.seq) && value.seq >= 0))
     )
       return value;
   } catch {}
 }
-export function rememberGame(
-  id: string,
-  commitment: string,
-  logHash?: string,
-): void {
+export function rememberGame(id: string, record: LiveRecord): void {
   try {
-    const saved = liveRecord(id);
-    localStorage.setItem(
-      key(id),
-      JSON.stringify({
-        commitment: saved?.commitment ?? commitment,
-        logHash: saved?.logHash ?? logHash,
-      }),
-    );
+    localStorage.setItem(key(id), JSON.stringify(record));
   } catch {}
 }
