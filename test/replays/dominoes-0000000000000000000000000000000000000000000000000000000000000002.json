@@ -3,7 +3,8 @@
   "ruleset": {
     "maxPip": 6,
     "handSize": 5,
-    "target": 100
+    "target": 100,
+    "maxDeals": 50
   },
   "seed": "0000000000000000000000000000000000000000000000000000000000000002",
   "moves": [
@@ -855,5 +856,5 @@
     "scores": [129, 7],
     "winner": 0
   },
-  "expectedFinalStateHash": "8a1860af337dfee429ed7534e238a25d3ce81ed38602b0d9346095399d927375"
+  "expectedFinalStateHash": "8129db3b8b19f7fb086b9380e38894839939b9f10ff086ec5a1dd9d5fa28bb69"
 }

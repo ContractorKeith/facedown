@@ -1,10 +1,20 @@
 import { dealRng, shuffle } from "../core/random";
-import { nextSeat, type Seat } from "../core/types";
+import { nextSeat, type Seat, type Team } from "../core/types";
 
 export type Pip = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type TileId = `${Pip}-${Pip}`;
-export type DominoesRuleset = { maxPip: 6; handSize: 5; target: 100 };
-export const ruleset: DominoesRuleset = { maxPip: 6, handSize: 5, target: 100 };
+export type DominoesRuleset = {
+  maxPip: 6;
+  handSize: 5;
+  target: 100;
+  maxDeals: 50;
+};
+export const ruleset: DominoesRuleset = {
+  maxPip: 6,
+  handSize: 5,
+  target: 100,
+  maxDeals: 50,
+};
 export const tiles: readonly TileId[] = Array.from({ length: 7 }, (_, a) =>
   Array.from({ length: 7 - a }, (_, b) => `${a}-${a + b}` as TileId),
 ).flat();
@@ -19,8 +29,15 @@ export type Move =
   | { draw: true }
   | { pass: true };
 export type Play = { tile: TileId; seat: Seat; left: number; right: number };
+export type DealSummary = {
+  ending: { kind: "domino"; seat: Seat } | { kind: "blocked" };
+  pips: [number, number, number, number];
+  points: [number, number];
+};
 export type State = {
   seed: string;
+  lastScoringTeam: Team | null;
+  lastDeal: DealSummary | null;
   deal: number;
   leader: Seat;
   turn: Seat | null;
@@ -31,6 +48,7 @@ export type State = {
   consecutivePasses: number;
 };
 export type View = {
+  lastDeal: DealSummary | null;
   hand: TileId[];
   line: Play[];
   openEnds: [number, number] | null;
@@ -73,6 +91,8 @@ export function deal(
       : nextSeat(previousLeader);
   return {
     seed,
+    lastScoringTeam: null,
+    lastDeal: null,
     deal: n,
     leader,
     turn: leader,

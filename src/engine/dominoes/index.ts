@@ -1,12 +1,12 @@
-import { type Game, nextSeat, teamOf } from "../core/types";
+import { type Game, nextSeat } from "../core/types";
 import { bot } from "./bot";
+import { finishDeal, gameWinner, summaryView } from "./scoring";
 import {
   type DominoesRuleset,
   deal,
   ends,
   firstTile,
   type Move,
-  pips,
   ruleset,
   type State,
   type View,
@@ -19,8 +19,15 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
   type: "dominoes",
   ruleset,
   init(seed, config) {
-    if (config.maxPip !== 6 || config.handSize !== 5 || config.target !== 100)
-      throw new Error("Dominoes uses double-six, five tiles each, target 100");
+    if (
+      config.maxPip !== 6 ||
+      config.handSize !== 5 ||
+      config.target !== 100 ||
+      config.maxDeals !== 50
+    )
+      throw new Error(
+        "Dominoes uses double-six, five tiles each, target 100, max 50 deals",
+      );
     return deal(seed, 0, [0, 0]);
   },
   toAct: (state) => state.turn,
@@ -81,7 +88,7 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
       const tile = next.boneyard.shift();
       if (tile === undefined) throw new Error("Empty boneyard");
       next.hands[seat].push(tile);
-      next.consecutivePasses = 0;
+      // Passes require an empty boneyard, so a draw cannot follow a pass.
       return { ok: true, state: next };
     }
     next.turn = nextSeat(seat);
@@ -103,38 +110,15 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
       if (candidate.end === "left") next.line.unshift(play);
       else next.line.push(play);
     }
-    if (next.hands[seat].length === 0 || next.consecutivePasses === 4) {
-      const totals: [number, number] = [0, 0];
-      next.hands.forEach((hand, index) => {
-        totals[teamOf(index as typeof seat)] += hand.reduce(
-          (sum, tile) => sum + pips(tile),
-          0,
-        );
-      });
-      const winner =
-        next.hands[seat].length === 0
-          ? teamOf(seat)
-          : totals[0] === totals[1]
-            ? null
-            : totals[0] < totals[1]
-              ? 0
-              : 1;
-      if (winner !== null) next.scores[winner] += totals[winner === 0 ? 1 : 0];
-      // Only one team scores per deal, so both cannot reach 100 together.
-      if (next.scores.some((score) => score >= ruleset.target))
-        next.turn = null;
-      else
-        return {
-          ok: true,
-          state: deal(state.seed, state.deal + 1, next.scores, state.leader),
-        };
-    }
+    if (next.hands[seat].length === 0 || next.consecutivePasses === 4)
+      return { ok: true, state: finishDeal(next, seat) };
     return { ok: true, state: next };
   },
   view(state, viewer) {
     const first = state.line[0];
     const last = state.line.at(-1);
     return {
+      lastDeal: summaryView(state.lastDeal),
       hand: "seat" in viewer ? [...state.hands[viewer.seat]] : [],
       line: state.line.map((play) => ({ ...play })),
       openEnds: first && last ? [first.left, last.right] : null,
@@ -150,7 +134,7 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
     state.turn === null
       ? {
           scores: [...state.scores],
-          winner: state.scores[0] >= ruleset.target ? 0 : 1,
+          winner: gameWinner(state),
         }
       : null,
   bot,
