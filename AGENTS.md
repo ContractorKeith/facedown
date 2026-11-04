@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M4 complete; M5 playable client implemented in this PR.
+M0–M5 complete; M6 login, verified replay, profiles, leaderboards and spectating implemented in this PR.
 
 ## Commands
 

@@ -9,7 +9,7 @@ const app = startServer({
   hostname: "127.0.0.1",
   db: join(dir, "fd.db"),
   insecureCookie: true,
-  timing: { turn: 10000, hold: 15000, bot: 80 },
+  timing: { turn: 10000, hold: 15000, bot: 10 },
 });
 console.log(`http://127.0.0.1:${app.server.port}`);
 for (const signal of ["SIGTERM", "SIGINT"] as const)

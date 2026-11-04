@@ -1,4 +1,5 @@
 import type { Server } from "bun";
+import { moveLogHash } from "../../engine/core/log-hash";
 import type { Store } from "../store";
 import type { Tables } from "../tables";
 import { Fault } from "../tables/types";
@@ -132,6 +133,7 @@ export function handler(
             leaver: s.leaver,
           })),
           commitment: record.commitment,
+          logHash: moveLogHash(record.commitment, record.moves),
           seed: record.seed,
           moves: record.moves,
           outcome: record.outcome,

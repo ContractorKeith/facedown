@@ -27,7 +27,7 @@ export class Auth {
   constructor(
     private store: Store,
     private sessions: SessionResolver,
-    private retiredGuest: (session: Session) => void = () => {},
+    private retireSession: (session: Session) => void = () => {},
     private now = () => Date.now(),
   ) {}
   async handle(
@@ -87,9 +87,9 @@ export class Auth {
     }
     if (!account || !this.sessions.account) throw new Fault("unavailable");
     const issued = this.sessions.account(account.id);
-    if (previous && !previous.accountId && this.sessions.logout) {
+    if (previous && this.sessions.logout) {
       this.sessions.logout(previous);
-      this.retiredGuest(previous);
+      this.retireSession(previous);
     }
     return Response.json(identity(issued.session), {
       status: path === "/api/register" ? 201 : 200,

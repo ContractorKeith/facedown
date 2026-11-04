@@ -23,7 +23,7 @@ const positions = ["south", "west", "north", "east"];
     <div class={`seat ${positions[(index - (seat ?? 0) + 4) % 4]}`} class:active={message.toAct === index}>
       <span class="avatar">{occupant?.bot ? "♟" : index === seat ? "You" : index + 1}</span>
       <strong>{occupant?.name ?? "Empty seat"}</strong>
-      <small>{index === seat ? "Your seat" : (index - (seat ?? 0) + 4) % 4 === 2 ? "Partner" : "Opponent"}{"bids" in view ? ` · ${view.bids[index] ?? "–"} bid / ${view.tricks[index]} won` : ` · ${view.tileCounts[index]} tiles`}</small>
+      <small>{seat === null ? `Team ${index % 2 + 1}` : index === seat ? "Your seat" : (index - (seat ?? 0) + 4) % 4 === 2 ? "Partner" : "Opponent"}{"bids" in view ? ` · ${view.bids[index] ?? "–"} bid / ${view.tricks[index]} won` : ` · ${view.tileCounts[index]} tiles`}</small>
       {#if bubbles[index]}
         <span class="bubble" role="status">{bubbles[index]}</span>
       {/if}
