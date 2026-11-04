@@ -166,7 +166,10 @@ start left of the dealer. Bids 0–13; 0 is nil (±100 to the bidder's team, sco
 separately from the partner's bid). Team bid made: 10 × bid + 1 per overtrick (bag); set:
 −10 × bid. Every 10 accumulated bags: −100 and bags reset by 10. Spades cannot be led until
 broken unless the leader holds only spades. Follow suit if able. Game to 500; if both teams
-pass 500 on the same deal, the higher score wins; a tie plays another deal. No blind nil.
+pass 500 on the same deal, the higher score wins; a tie plays another deal. A team at
+−200 or below at the end of a deal loses (mercy rule; if both are, the higher score wins). A
+set team scores −10 × bid and no bag points, but its overtricks and nil tricks still count
+as bags. No blind nil.
 
 ### 5.4 Dominoes ruleset (v1, fixed)
 
@@ -177,6 +180,16 @@ until it can play or the boneyard is empty, then passes. A deal ends when a seat
 dominoes (plays its last tile) or the line is blocked (all four pass in a row). The
 winning team scores the pips left in the opponents' hands, unrounded; when blocked, the team with the lower pip total wins the deal and scores the
 opponents' pips; equal totals score nothing. Game to 100.
+
+### 5.4.1 Every game ends
+
+Both games stop after 50 deals whatever the score (`maxDeals` in the ruleset): the higher
+score wins; on a tie the team that won the last scoring deal wins, and if no deal scored,
+the team of seat 1. Termination is a property of the engine, not of the bots.
+
+Both views carry `lastDeal`, a public summary of the previous deal (Spades: bids, tricks
+per seat, points and bags per team; Dominoes: how it ended, pips per seat, points awarded),
+so a client can show the result after the next deal has been dealt.
 
 ### 5.5 Ratings
 
