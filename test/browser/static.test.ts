@@ -31,3 +31,10 @@ test("hashed assets cache; missing assets and traversal fail closed", async () =
   ])
     expect((await staticFile(path, root)).status).toBe(404);
 });
+
+test("an unbuilt client returns an uncached HTML service-unavailable page", async () => {
+  const response = await staticFile("/", join(root, "not-built"));
+  expect(response.status).toBe(503);
+  expect(response.headers.get("content-type")).toContain("text/html");
+  expect(response.headers.get("cache-control")).toBe("no-store");
+});

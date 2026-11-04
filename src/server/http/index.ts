@@ -190,5 +190,14 @@ export async function staticFile(path: string, root = resolve("dist/client")) {
   const index = Bun.file(resolve(root, "index.html"));
   return (await index.exists())
     ? new Response(index, { headers: { "cache-control": "no-store" } })
-    : new Response("Client not built", { status: 503 });
+    : new Response(
+        "<!doctype html><title>facedown</title><p>Client not built. Run bun run build.</p>",
+        {
+          status: 503,
+          headers: {
+            "content-type": "text/html; charset=utf-8",
+            "cache-control": "no-store",
+          },
+        },
+      );
 }
