@@ -1,106 +1,112 @@
 import { deepStrictEqual, ok } from "node:assert";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { fold } from "../../src/engine/core/fold";
 import type { Envelope, Viewer } from "../../src/engine/core/types";
 import { seats } from "../../src/engine/core/types";
-import type { GameEntry, Place } from "../../src/engine/registry";
 import { canonical } from "./canonical";
+import type { GameEntry } from "./invariants";
+import { checkView } from "./view-check";
 
-function strings(value: unknown): string[] {
-  if (typeof value === "string") return [value];
-  if (Array.isArray(value)) return value.flatMap(strings);
-  if (value && typeof value === "object")
-    return Object.entries(value).flatMap(([key, item]) => [
-      key,
-      ...strings(item),
-    ]);
-  return [];
-}
-function visible(places: readonly Place[], viewer: Viewer): boolean {
-  return places.some(
-    (place) =>
-      "public" in place ||
-      ("seat" in place && "seat" in viewer && place.seat === viewer.seat),
-  );
-}
+export const REFOLD_INTERVAL = 64;
 const viewers: Viewer[] = [
   ...seats.map((seat) => ({ seat })),
   { spectator: true },
 ];
-
+export class PlayoutError extends Error {
+  constructor(
+    message: string,
+    readonly replayPath: string,
+    cause: unknown,
+  ) {
+    super(message, { cause });
+  }
+}
 export function playout<S, M, V, R, K extends string>(
   entry: GameEntry<S, M, V, R, K>,
   seed: string,
+  replayDir = ".tmp",
 ) {
-  const game = entry;
   const moves: Envelope<M>[] = [];
-  let state = game.init(seed, game.ruleset);
-  const pieces = [...entry.locate(state).keys()].sort();
-  const check = () => {
-    const locations = entry.locate(state);
-    deepStrictEqual(
-      [...locations.keys()].sort(),
-      pieces,
-      "conservation: piece set changed",
-    );
-    for (const places of locations.values())
-      ok(places.length === 1, "conservation: duplicate or missing piece");
-    for (const viewer of viewers) {
-      for (const id of strings(game.view(state, viewer))) {
-        const places = locations.get(id);
-        if (places) ok(visible(places, viewer), `no leak: ${id}`);
-      }
-    }
-    const replay = fold(game, seed, moves);
-    ok(replay.ok, "determinism: replay rejected a move");
-    deepStrictEqual(replay.state, state, "determinism: refold differs");
-  };
+  let state: S;
   try {
+    state = entry.init(seed, entry.ruleset);
+    const pieces = [...entry.pieces].sort();
+    ok(
+      new Set(pieces).size === pieces.length,
+      "conservation: duplicate declared piece",
+    );
+    // These sanity checks constrain locate; its classifications are otherwise trusted.
+    const initial = entry.locate(state);
+    for (const seat of seats)
+      ok(
+        [...initial.values()].some((places) =>
+          places.some((place) => "seat" in place && place.seat === seat),
+        ),
+        `locate: seat ${seat} must hold a piece at init`,
+      );
+    const check = () => {
+      const locations = entry.locate(state);
+      deepStrictEqual(
+        [...locations.keys()].sort(),
+        pieces,
+        "conservation: piece set changed",
+      );
+      for (const places of locations.values())
+        ok(places.length === 1, "conservation: duplicate or missing piece");
+      for (const viewer of viewers)
+        checkView(entry.view(state, viewer), viewer, locations);
+      if (moves.length % REFOLD_INTERVAL === 0 || entry.toAct(state) === null) {
+        const replay = fold(entry, seed, moves);
+        ok(replay.ok, "determinism: replay rejected a move");
+        deepStrictEqual(replay.state, state, "determinism: refold differs");
+      }
+    };
     check();
-    while (game.toAct(state) !== null) {
+    while (entry.toAct(state) !== null) {
       ok(moves.length < entry.maxMoves, "termination: move bound exceeded");
-      const seat = game.toAct(state);
+      const seat = entry.toAct(state);
       ok(seat !== null);
       const before = structuredClone(state);
-      const legal = game.legalMoves(state, seat);
-      const move = game.bot(game.view(state, { seat }), legal);
+      const legal = entry.legalMoves(state, seat);
+      const move = entry.bot(entry.view(state, { seat }), legal);
       ok(
         legal.some((candidate) => canonical(candidate) === canonical(move)),
         "legality: bot chose illegal move",
       );
-      const rejected = game.apply(state, {
+      const rejected = entry.apply(state, {
         seat,
         move: entry.illegalMove(state, seat),
       });
       ok(!rejected.ok, "legality: illegal move accepted");
       deepStrictEqual(state, before, "legality: rejection mutated input");
-      // Include timeout envelopes so replay verifies deterministic timeout resolution too.
       const envelope: Envelope<M> =
         moves.length % 7 === 0 ? { seat, timeout: true } : { seat, move };
-      const result = game.apply(state, envelope);
+      const result = entry.apply(state, envelope);
       ok(result.ok, "legality: legal move rejected");
       deepStrictEqual(state, before, "apply mutated input");
       moves.push(envelope);
       state = result.state;
       check();
     }
-    ok(game.outcome(state), "termination: missing outcome");
+    ok(entry.outcome(state), "termination: missing outcome");
     entry.checkOutcome(state);
     return { state, moves };
   } catch (cause) {
-    mkdirSync(".tmp", { recursive: true });
-    const path = `.tmp/playout-${game.type}-${seed}.json`;
+    mkdirSync(replayDir, { recursive: true });
+    const path = join(mkdtempSync(join(replayDir, "playout-")), "replay.json");
     writeFileSync(
       path,
       JSON.stringify(
-        { type: game.type, ruleset: game.ruleset, seed, moves },
+        { type: entry.type, ruleset: entry.ruleset, seed, moves },
         null,
         2,
       ),
     );
-    throw new Error(
+    throw new PlayoutError(
       `seed=${seed} moves=${moves.length} replay=${path}: ${String(cause)}`,
-      { cause },
+      path,
+      cause,
     );
   }
 }

@@ -4,41 +4,58 @@ import { join, resolve } from "node:path";
 import { purityViolations } from "./purity";
 
 const root = resolve(import.meta.dir, "../../src/engine");
+const check = (source: string) =>
+  purityViolations(source, join(root, "fixture.ts"), root);
 function filesAt(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const file = join(directory, entry.name);
     return entry.isDirectory() ? filesAt(file) : [file];
   });
 }
-test("engine sources import only the engine and use no forbidden globals", () => {
+test("engine sources import only the engine and use no forbidden globals", async () => {
   const files = filesAt(root);
   expect(files.length).toBeGreaterThan(0);
   for (const file of files)
-    expect(purityViolations(readFileSync(file, "utf8"), file, root)).toEqual(
-      [],
-    );
+    expect(
+      await purityViolations(readFileSync(file, "utf8"), file, root),
+    ).toEqual([]);
 });
-test("purity checker catches forbidden fixture syntax", () => {
-  const file = join(root, "fixture.ts");
-  const check = (source: string) => purityViolations(source, file, root);
-  expect(
-    check(
-      'import { sha256 } from "./core/sha256"; export const x = sha256("abc");',
-    ),
-  ).toEqual([]);
-  expect(check('import { Database } from "bun:sqlite";')).toContain(
-    "Import outside engine: bun:sqlite",
-  );
-  expect(check("Date.now()")).toContain("Forbidden identifier: Date");
-  for (const source of [
-    'export * from "../server/store";',
-    'import("bun:sqlite")',
-    'type T = import("bun:sqlite").Database',
-    "const r = Math.random;",
-    'globalThis["Date"].now()',
-    'Math["random"]()',
-    'require("./core/types")',
-  ])
-    expect(check(source).length).toBeGreaterThan(0);
-  expect(check('// Date.now()\nconst text = "Bun";')).toEqual([]);
+test.each([
+  'import { Database } from "bun:sqlite";',
+  'export * from "../../server/x";',
+  'export { x } from "./core/../../../server/x";',
+  'export * from "..\\x2fserver/x";',
+  'import("bun:sqlite")',
+  "import(`bun:sqlite`)",
+  "import(target)",
+  'type T = import("bun:sqlite").Database',
+  "Date.now()",
+  "const {random} = Math;",
+  "Math?.random()",
+  "const r = Math.random;",
+  'Math["floor"](1)',
+  'globalThis["Bun"]',
+  "performance.now()",
+  'eval("1")',
+  'new Function("return 1")',
+  'require("./core/types")',
+  'self.fetch("/")',
+  "setImmediate(() => 1)",
+  "clearTimeout(1)",
+  "clearInterval(1)",
+  "queueMicrotask(() => 1)",
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: This is source text for the parser fixture.
+  "const x = `safe ${Date.now()}`;",
+])("purity rejects %s", async (source) => {
+  expect((await check(source)).length).toBeGreaterThan(0);
+});
+test.each([
+  'import { sha256 } from "./core/sha256"; export const x = sha256("abc");',
+  "const text = `Bun Date fetch`;",
+  '// Date.now()\nconst text = "Bun";',
+  "const object = { Date: 1, Bun: 2, fetch() { return 1; } }; object.Date;",
+  "const { Date: safe } = object;",
+  "Math.floor(1.2); Math?.ceil(1.2); Math.imul(2,3)",
+])("purity accepts %s", async (source) => {
+  expect(await check(source)).toEqual([]);
 });

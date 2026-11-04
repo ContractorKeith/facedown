@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { sha256 } from "../../src/engine/core/sha256";
-import { playout } from "./harness";
+import { PlayoutError, playout } from "./harness";
 import { highcardEntry } from "./highcard";
 import { locate, type State } from "./highcard/state";
 
@@ -16,12 +16,15 @@ test("conservation rejects duplicate locations and persists the failing replay",
       return places;
     },
   };
-  expect(() => playout(entry, seed)).toThrow(
-    "conservation: duplicate or missing piece",
-  );
-  const replay = JSON.parse(
-    readFileSync(`.tmp/playout-highcard-${seed}.json`, "utf8"),
-  );
+  let replay: unknown;
+  try {
+    playout(entry, seed);
+    throw new Error("Expected conservation failure");
+  } catch (error) {
+    if (!(error instanceof PlayoutError)) throw error;
+    expect(error.message).toContain("conservation: duplicate or missing piece");
+    replay = JSON.parse(readFileSync(error.replayPath, "utf8"));
+  }
   expect(replay).toEqual({
     type: "highcard",
     ruleset: entry.ruleset,
@@ -60,4 +63,29 @@ test("termination and game-supplied scoring checks are enforced", () => {
       seed,
     ),
   ).toThrow("bad score");
+});
+
+test("an apply wrapper mutating rejected input fails immutability", () => {
+  const entry = {
+    ...highcardEntry,
+    apply(state: State, envelope: Parameters<typeof highcardEntry.apply>[1]) {
+      const result = highcardEntry.apply(state, envelope);
+      if (!result.ok) state.scores[0]++;
+      return result;
+    },
+  };
+  expect(() => playout(entry, seed)).toThrow(
+    "legality: rejection mutated input",
+  );
+});
+test("an apply wrapper mutating accepted input fails immutability", () => {
+  const entry = {
+    ...highcardEntry,
+    apply(state: State, envelope: Parameters<typeof highcardEntry.apply>[1]) {
+      const result = highcardEntry.apply(state, envelope);
+      if (result.ok) state.scores[0]++;
+      return result;
+    },
+  };
+  expect(() => playout(entry, seed)).toThrow("apply mutated input");
 });

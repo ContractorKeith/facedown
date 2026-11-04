@@ -1,8 +1,22 @@
-import { type GameEntry, registry } from "../../src/engine/registry";
+import type { Game, GameType } from "../../src/engine/core/types";
+import { registry } from "../../src/engine/registry";
 import { highcardEntry } from "./highcard";
+import type { GameEntry, GameInvariants } from "./invariants";
 
-// Method parameters on GameEntry preserve each implementation's concrete state types.
+// M1/M2 add their game-specific checks here, separate from the shipped registry.
+const invariants = new Map<GameType, GameInvariants>();
+export function registeredGames(
+  registered: ReadonlyMap<GameType, Game<unknown, unknown, unknown, unknown>>,
+  checks: ReadonlyMap<GameType, GameInvariants> = invariants,
+): GameEntry[] {
+  return [...registered].map(([type, game]) => {
+    const hooks = checks.get(type);
+    if (!hooks)
+      throw new Error(`Missing invariants for registered game: ${type}`);
+    return { ...game, ...hooks };
+  });
+}
 export const games: GameEntry<unknown, unknown, unknown, unknown, string>[] = [
-  ...registry.values(),
+  ...registeredGames(registry),
   highcardEntry,
 ];

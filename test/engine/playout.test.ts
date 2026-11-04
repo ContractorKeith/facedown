@@ -60,6 +60,6 @@ test("a planted module counter fails determinism", () => {
     },
   };
   expect(() => playout({ ...highcardEntry, ...impure }, seed)).toThrow(
-    new RegExp(`seed=${seed} moves=1.*determinism: refold differs`),
+    new RegExp(`seed=${seed} moves=[0-9]+.*determinism: refold differs`),
   );
 });

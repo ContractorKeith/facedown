@@ -1,6 +1,6 @@
 import { dealRng, shuffle } from "../../../src/engine/core/random";
 import { nextSeat, type Seat } from "../../../src/engine/core/types";
-import type { Place } from "../../../src/engine/registry";
+import type { Place } from "../invariants";
 
 export const deck = [..."9TJQKA"].flatMap((rank) => [`${rank}C`, `${rank}D`]);
 export type Play = { seat: Seat; card: string };

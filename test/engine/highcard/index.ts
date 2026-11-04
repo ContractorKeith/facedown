@@ -5,9 +5,10 @@ import {
   type Outcome,
   teamOf,
 } from "../../../src/engine/core/types";
-import type { GameEntry } from "../../../src/engine/registry";
+import type { GameEntry } from "../invariants";
 import {
   deal,
+  deck,
   locate,
   type Move,
   type Ruleset,
@@ -121,6 +122,7 @@ export const highcardEntry: GameEntry<State, Move, View, Ruleset, "highcard"> =
   {
     ...highcard,
     locate,
+    pieces: deck,
     illegalMove: () => ({ card: "invalid" }),
     maxMoves: 36,
     checkOutcome(state) {
