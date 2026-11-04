@@ -1,3 +1,4 @@
+import { resolve, sep } from "node:path";
 import type { Server } from "bun";
 import type { Store } from "../store";
 import type { Tables } from "../tables";
@@ -141,10 +142,7 @@ export function handler(
         !path.startsWith("/api/") &&
         path !== "/ws"
       )
-        return new Response(
-          "<!doctype html><title>facedown</title><h1>facedown</h1><p>The table is being set.</p>",
-          { headers: { "content-type": "text/html; charset=utf-8" } },
-        );
+        return staticFile(path);
       throw new Fault("not_found");
     } catch (error) {
       const code = error instanceof Fault ? error.code : "bad_request";
@@ -163,4 +161,34 @@ export function handler(
       );
     }
   };
+}
+
+// Only files inside the built client are public; API misses never reach this route.
+export async function staticFile(path: string, root = resolve("dist/client")) {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(path);
+  } catch {
+    return new Response("Not found", { status: 404 });
+  }
+  const target = resolve(root, `.${decoded}`);
+  if (!target.startsWith(`${root}${sep}`) && target !== root)
+    return new Response("Not found", { status: 404 });
+  const asset = decoded.startsWith("/assets/");
+  const file = Bun.file(target);
+  if (target !== root && (await file.exists()))
+    return new Response(file, {
+      headers: {
+        "cache-control":
+          asset && /-[\w-]{8,}\.[\w]+$/.test(decoded)
+            ? "public, max-age=31536000, immutable"
+            : "no-store",
+      },
+    });
+  if (asset || /\.[a-z0-9]+$/i.test(decoded))
+    return new Response("Not found", { status: 404 });
+  const index = Bun.file(resolve(root, "index.html"));
+  return (await index.exists())
+    ? new Response(index, { headers: { "cache-control": "no-store" } })
+    : new Response("Client not built", { status: 503 });
 }

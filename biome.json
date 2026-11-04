@@ -21,5 +21,18 @@
     "formatter": {
       "enabled": false
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["client/**/*.svelte"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off",
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    }
+  ]
 }

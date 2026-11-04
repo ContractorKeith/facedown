@@ -10,11 +10,18 @@
     "replay:record": "bun scripts/replay-record.ts",
     "start": "bun src/server/main.ts",
     "dev": "bun --watch src/server/main.ts",
-    "test:e2e": "bun test test/e2e"
+    "test:e2e": "bun test test/e2e",
+    "build": "vite build",
+    "dev:client": "vite",
+    "test:browser": "FACEDOWN_BROWSER=1 playwright test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.4",
+    "@playwright/test": "1.64.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
     "@types/bun": "1.4.3",
-    "typescript": "7.0.2"
+    "svelte": "5.57.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
   }
 }
