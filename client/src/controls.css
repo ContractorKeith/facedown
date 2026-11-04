@@ -141,6 +141,15 @@
 }
 
 @media (max-width: 599px) {
+  .game .brand {
+    margin-bottom: 8px;
+  }
+  .game-heading {
+    margin-bottom: 8px;
+  }
+  .game .scorebar {
+    padding: 6px 0;
+  }
   .hand:not(.dominoes) {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));

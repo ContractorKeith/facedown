@@ -24,25 +24,31 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(page.locator(".bids button")).toHaveCount(14);
   });
 
-  test("phone bidding fits every card and bid in the viewport", async ({
-    page,
-    origin,
-  }, info) => {
-    const wire = await tableFixture(page);
-    await page.goto(`${origin}/tables/${wire.id}`);
-    await expect(
-      page.getByText("Waiting to start", { exact: true }),
-    ).toBeVisible();
-    wire.send(0, { you: wire.record.moves[0]?.seat });
-    await expect(page.locator(".piece")).toHaveCount(13);
-    await expect(page.locator(".bids button")).toHaveCount(14);
-    for (const item of await page.locator(".piece, .bids button").all())
-      await expect(item).toBeInViewport({ ratio: 1 });
-    await page.screenshot({
-      path: `docs/screenshots/bidding-${info.project.name}-phone.png`,
-      animations: "disabled",
+  for (const largerType of [false, true])
+    test(`phone bidding fits every card and bid in the viewport${largerType ? " with larger type" : ""}`, async ({
+      page,
+      origin,
+    }, info) => {
+      const wire = await tableFixture(page);
+      await page.goto(`${origin}/tables/${wire.id}`);
+      await expect(
+        page.getByText("Waiting to start", { exact: true }),
+      ).toBeVisible();
+      if (largerType)
+        await page.addStyleTag({
+          content: ":root { font-size: 18px; }",
+        });
+      wire.send(0, { you: wire.record.moves[0]?.seat });
+      await expect(page.locator(".piece")).toHaveCount(13);
+      await expect(page.locator(".bids button")).toHaveCount(14);
+      for (const item of await page.locator(".piece, .bids button").all())
+        await expect(item).toBeInViewport({ ratio: 1 });
+      if (!largerType)
+        await page.screenshot({
+          path: `docs/screenshots/bidding-${info.project.name}-phone.png`,
+          animations: "disabled",
+        });
     });
-  });
 
   test("keyboard play retains focus in the hand", async ({ page, origin }) => {
     await page.setViewportSize({ width: 1100, height: 900 });

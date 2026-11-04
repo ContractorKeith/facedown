@@ -162,7 +162,7 @@ onMount(() => {
   {#if chain?.tampered}<p role="alert">This game's move log changed unexpectedly</p>{/if}
   {#if message}
     {#if view}
-    {#if !message.rated}<p class="banner">Casual · Ratings stay unchanged. Rated play requires four signed-in humans at the start; guests or bots make a table casual.</p>{/if}
+    {#if !message.rated}<p class="banner">Casual · Ratings stay unchanged; guests or bots make a table casual.</p>{/if}
     <Scorebar {view} />
     {/if}
     <Board {message} {seat} {bubbles} />
