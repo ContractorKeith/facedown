@@ -1,5 +1,4 @@
 import type { Team } from "../core/types";
-import { exp, log, pi, sqrt } from "./math";
 
 export type Rating = { rating: number; rd: number; volatility: number };
 export const initial: Readonly<Rating> = {
@@ -18,18 +17,19 @@ export function update(player: Rating, results: Result[]): Rating {
   let precision = 0,
     improvement = 0;
   for (const opponent of results) {
-    const g = 1 / sqrt(1 + (3 * (opponent.rd / scale) ** 2) / pi ** 2);
+    const g =
+      1 / Math.sqrt(1 + (3 * (opponent.rd / scale) ** 2) / Math.PI ** 2);
     const expected =
-      1 / (1 + exp(-g * (mu - (opponent.rating - 1500) / scale)));
+      1 / (1 + Math.exp(-g * (mu - (opponent.rating - 1500) / scale)));
     precision += g * g * expected * (1 - expected);
     improvement += g * (opponent.score - expected);
   }
   const v = 1 / precision,
     delta = v * improvement;
-  const a = log(player.volatility ** 2),
+  const a = Math.log(player.volatility ** 2),
     tau = 0.5;
   const f = (x: number) => {
-    const ex = exp(x),
+    const ex = Math.exp(x),
       sum = phi * phi + v + ex;
     return (
       (ex * (delta * delta - phi * phi - v - ex)) / (2 * sum * sum) -
@@ -38,7 +38,8 @@ export function update(player: Rating, results: Result[]): Rating {
   };
   let A = a,
     B: number;
-  if (delta * delta > phi * phi + v) B = log(delta * delta - phi * phi - v);
+  if (delta * delta > phi * phi + v)
+    B = Math.log(delta * delta - phi * phi - v);
   else {
     let k = 1;
     while (f(a - k * tau) < 0) k++;
@@ -56,8 +57,8 @@ export function update(player: Rating, results: Result[]): Rating {
     B = C;
     fB = fC;
   }
-  const volatility = exp(A / 2);
-  const rd = 1 / sqrt(1 / (phi * phi + volatility * volatility) + 1 / v);
+  const volatility = Math.exp(A / 2);
+  const rd = 1 / Math.sqrt(1 / (phi * phi + volatility * volatility) + 1 / v);
   return {
     rating: 1500 + scale * (mu + rd * rd * improvement),
     rd: scale * rd,

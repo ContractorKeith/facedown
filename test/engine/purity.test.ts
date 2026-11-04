@@ -56,6 +56,7 @@ test.each([
   "const object = { Date: 1, Bun: 2, fetch() { return 1; } }; object.Date;",
   "const { Date: safe } = object;",
   "Math.floor(1.2); Math?.ceil(1.2); Math.imul(2,3)",
+  "Math.sqrt(4); Math.exp(1); Math.log(2); Math.PI",
 ])("purity accepts %s", async (source) => {
   expect(await check(source)).toEqual([]);
 });

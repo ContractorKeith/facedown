@@ -35,6 +35,10 @@ const mathMembers = new Set([
   "imul",
   "pow",
   "round",
+  "sqrt",
+  "exp",
+  "log",
+  "PI",
 ]);
 function propertyName(node: ts.Identifier, parent: ts.Node): boolean {
   if (ts.isPropertyAccessExpression(parent)) return parent.name === node;
