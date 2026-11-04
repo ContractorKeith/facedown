@@ -1,47 +1,17 @@
 import { Database } from "bun:sqlite";
-import type {
-  Envelope,
-  GameType,
-  Outcome,
-  Seat,
-} from "../../engine/core/types";
+import type { Envelope, Outcome, Seat } from "../../engine/core/types";
+import { GuestStore } from "./guests";
 import { migrations } from "./migrations";
+import type { GameRecord, Row } from "./types";
 
-export type StoredSeat = {
-  seat: Seat;
-  session: string | null;
-  name: string | null;
-  bot: boolean;
-  leaver: boolean;
-};
-export type GameRecord = {
-  id: string;
-  type: GameType;
-  ruleset: unknown;
-  seed: string;
-  commitment: string;
-  host: string;
-  created: number;
-  status: "live" | "finished";
-  seats: StoredSeat[];
-  moves: Envelope<unknown>[];
-  outcome: Outcome | null;
-};
-type Row = {
-  id: string;
-  type: GameType;
-  ruleset_json: string;
-  seed: string;
-  commitment: string;
-  host_session: string;
-  created_at: number;
-  status: GameRecord["status"];
-  outcome_json: string | null;
-};
+export type { GameRecord, StoredSeat } from "./types";
+
 export class Store {
   private db: Database;
+  readonly guests: GuestStore;
   constructor(path = process.env.FACEDOWN_DB ?? "./facedown.db") {
     this.db = new Database(path, { create: true, strict: true });
+    this.guests = new GuestStore(this.db);
     try {
       this.db.exec(
         "PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;",
@@ -70,7 +40,7 @@ export class Store {
     this.db
       .transaction(() => {
         this.db.run(
-          "INSERT INTO games(id,type,ruleset_json,seed,commitment,status,created_at,host_session) VALUES (?,?,?,?,?,'live',?,?)",
+          "INSERT INTO games(id,type,ruleset_json,seed,commitment,status,created_at,host_session,casual) VALUES (?,?,?,?,?,'live',?,?,?)",
           [
             record.id,
             record.type,
@@ -79,6 +49,7 @@ export class Store {
             record.commitment,
             record.created,
             record.host,
+            Number(record.casual),
           ],
         );
         for (const seat of record.seats)
@@ -162,13 +133,17 @@ export class Store {
         leaver: !!s.leaver,
       }));
     const moves = this.db
-      .query<{ envelope_json: string }, [string]>(
-        "SELECT envelope_json FROM moves WHERE game_id=? ORDER BY seq",
+      .query<{ seq: number; envelope_json: string }, [string]>(
+        "SELECT seq, envelope_json FROM moves WHERE game_id=? ORDER BY seq",
       )
       .all(id)
-      .map((m) => JSON.parse(m.envelope_json) as Envelope<unknown>);
+      .map((m, index) => {
+        if (m.seq !== index + 1) throw new Error("Move sequence is not dense");
+        return JSON.parse(m.envelope_json) as Envelope<unknown>;
+      });
     return {
       id,
+      casual: !!row.casual,
       type: row.type,
       ruleset: JSON.parse(row.ruleset_json),
       seed: row.seed,
@@ -181,11 +156,26 @@ export class Store {
       outcome: row.outcome_json ? JSON.parse(row.outcome_json) : null,
     };
   }
-  listLive(): GameRecord[] {
+  listLiveIds(): string[] {
     return this.db
       .query<{ id: string }, []>("SELECT id FROM games WHERE status='live'")
       .all()
-      .map(({ id }) => this.loadGame(id) as GameRecord);
+      .map((r) => r.id);
+  }
+  listLive(): GameRecord[] {
+    return this.listLiveIds().map((id) => this.loadGame(id) as GameRecord);
+  }
+  gameStatus(id: string): GameRecord["status"] | null {
+    return (
+      this.db
+        .query<{ status: GameRecord["status"] }, [string]>(
+          "SELECT status FROM games WHERE id=?",
+        )
+        .get(id)?.status ?? null
+    );
+  }
+  abandon(id: string): void {
+    this.db.run("UPDATE games SET status='abandoned' WHERE id=?", [id]);
   }
   close(): void {
     this.db.close();

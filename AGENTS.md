@@ -46,6 +46,8 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - The seed is never returned by any API while a game is live.
 - Only `src/server/store` touches SQLite.
 - `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
+- `FACEDOWN_ORIGIN` pins the exact mutation/WS Origin in production; unset uses the request origin.
+- `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.
 - `FACEDOWN_TURN_MS` / `FACEDOWN_HOLD_MS` / `FACEDOWN_BOT_MS`: 30000 / 180000 / 600 ms.
 - Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
 - Tooling is Bun, `tsc --noEmit`, Biome. No ESLint, Prettier, Vitest or ORM.

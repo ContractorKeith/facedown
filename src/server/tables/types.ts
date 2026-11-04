@@ -14,16 +14,19 @@ export type Table = {
   id: string;
   type: GameType;
   host: string;
+  casual: boolean;
   game: Engine;
   seed: string;
   commitment: string;
   state: unknown;
   seq: number;
-  status: "open" | "live" | "finished";
+  status: "open" | "live" | "finished" | "unavailable";
   seats: (Occupant | null)[];
   viewers: Map<Peer, Viewer>;
   deadline: number | null;
   cancelTurn?: () => void;
+  cancelExpiry?: () => void;
+  overSent: Set<Peer>;
 };
 export type ErrorCode =
   | "stale_seq"
@@ -32,7 +35,10 @@ export type ErrorCode =
   | "rate_limited"
   | "not_found"
   | "forbidden"
-  | "bad_request";
+  | "bad_request"
+  | "unavailable"
+  | "unauthorized"
+  | "conflict";
 export class Fault extends Error {
   constructor(readonly code: ErrorCode) {
     super(code);

@@ -7,6 +7,7 @@ export class Membership {
     readonly lifecycle: Lifecycle,
     private getTable: (id: string) => Table,
     private all: () => Iterable<Table>,
+    private changed: (table: Table) => void,
   ) {}
   join(id: string, seat: Seat, peer: Peer): void {
     const table = this.getTable(id);
@@ -41,21 +42,29 @@ export class Membership {
     if (wasBot && table.game.toAct(table.state) === seat)
       this.lifecycle.schedule(table);
     this.lifecycle.broadcast(table);
+    this.changed(table);
   }
   spectate(id: string, peer: Peer): void {
     const table = this.getTable(id);
     this.lifecycle.leave(table, peer);
     table.viewers.set(peer, { spectator: true });
     this.lifecycle.send(table, peer);
+    this.changed(table);
   }
   leave(id: string, peer: Peer): void {
     const table = this.getTable(id);
     this.lifecycle.leave(table, peer);
     this.lifecycle.broadcast(table);
+    this.changed(table);
   }
   disconnect(peer: Peer): void {
-    for (const table of this.all())
-      if (table.viewers.has(peer)) this.leave(table.id, peer);
+    for (const table of this.all()) {
+      table.overSent.delete(peer);
+      if (!table.viewers.has(peer)) continue;
+      this.lifecycle.leave(table, peer);
+      if (table.status !== "unavailable") this.lifecycle.broadcast(table);
+      this.changed(table);
+    }
   }
   move(id: string, seq: number, move: unknown, peer: Peer): void {
     const table = this.getTable(id);

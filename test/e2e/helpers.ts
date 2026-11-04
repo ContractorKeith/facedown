@@ -1,8 +1,8 @@
 import { expect } from "bun:test";
 import type { GameType, Seat, Viewer } from "../../src/engine/core/types";
-import { startServer } from "../../src/server";
-import { GuestSessions } from "../../src/server/http/sessions";
+import { type ServerOptions, startServer } from "../../src/server";
 import { FakeClock, scratch } from "../server/helpers";
+import { legalMovesFromView } from "./client-moves";
 
 export type Message = Record<string, unknown> & {
   t: string;
@@ -72,7 +72,7 @@ export class Client {
     });
   }
 }
-export function fixture() {
+export function fixture(overrides: Partial<ServerOptions> = {}) {
   const temp = scratch(),
     clock = new FakeClock();
   const options = {
@@ -81,7 +81,8 @@ export function fixture() {
     db: temp.db,
     clock,
     timing: { turn: 10000, hold: 30000, bot: 1 },
-    sessions: new GuestSessions(true),
+    insecureCookie: true,
+    ...overrides,
   };
   let app = startServer(options);
   const clients: Client[] = [];
@@ -106,14 +107,19 @@ export function fixture() {
     expect(response.status).toBe(200);
     return response.headers.get("set-cookie")?.split(";")[0] as string;
   }
-  async function connect(cookie: string, viewer: Viewer, table: string) {
+  async function connect(
+    cookie: string,
+    viewer: Viewer,
+    table: string,
+    wsOrigin = origin(),
+  ) {
     // DOM typings omit Bun’s authenticated-client options.
     const Socket = WebSocket as unknown as new (
       url: string,
       options: Bun.WebSocketOptions,
     ) => WebSocket;
     const ws = new Socket(`${origin().replace("http:", "ws:")}/ws`, {
-      headers: { cookie, origin: origin() },
+      headers: { cookie, origin: wsOrigin },
     });
     const client = new Client(ws, viewer);
     clients.push(client);
@@ -153,25 +159,25 @@ export function fixture() {
   ) {
     for (let count = 0; !until(); count++) {
       if (count > 15000) throw new Error("Game did not finish");
-      const table = app.tables.get(id),
-        seat = table.game.toAct(table.state) as Seat;
+      const table = app.tables.get(id);
+      const current = await (players[0] as Client).view(table.seq);
+      const seat = current.toAct as Seat;
       const client = players[seat] as Client;
       const message = await client.view(table.seq);
       const move = table.game.bot(
         message.view,
-        table.game.legalMoves(table.state, seat),
+        legalMovesFromView(table.type, message.view),
       );
       clock.advance(201); // Keep real per-connection rate limits enabled.
       client.send({ t: "move", table: id, seq: table.seq, move });
       await client.view(table.seq + 1);
-      // Permit the next play loop to consume this most recent view again.
-      players[seat] = client;
     }
   }
   return {
     get app() {
       return app;
     },
+    db: temp.db,
     clock,
     clients,
     request,

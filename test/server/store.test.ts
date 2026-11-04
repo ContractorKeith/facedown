@@ -9,6 +9,7 @@ test("empty database migrates, reopens without changes, enforces dense seq and a
     expect(store.listLive()).toEqual([]);
     store.createGame({
       id: "abcdefghij",
+      casual: false,
       type: "spades",
       seed: "0".repeat(64),
       commitment: "hash",

@@ -2,53 +2,77 @@ import { fold } from "../../engine/core/fold";
 import { commitment } from "../../engine/core/random";
 import type { GameType, Seat } from "../../engine/core/types";
 import { registry } from "../../engine/registry";
-import { type Clock, clock, type Timing, timing } from "../clock";
-import { randomHex, type Session } from "../http/sessions";
+import { type Clock, clock, openTTL, type Timing, timing } from "../clock";
+import { randomHex, randomId, type Session } from "../http/sessions";
 import type { Store } from "../store";
 import { Lifecycle } from "./lifecycle";
 import { Membership } from "./membership";
+import { Retention } from "./retention";
 import { Fault, type Peer, publicSeats, type Table } from "./types";
 
 export class Tables {
   private tables = new Map<string, Table>();
   readonly lifecycle: Lifecycle;
   private membership: Membership;
-  constructor(store: Store, time: Clock = clock, delays: Timing = timing()) {
-    this.lifecycle = new Lifecycle(store, time, delays);
+  readonly retention: Retention;
+  constructor(
+    store: Store,
+    time: Clock = clock,
+    delays: Timing = timing(),
+    ttl = openTTL(),
+  ) {
+    this.lifecycle = new Lifecycle(store, time, delays, (table) =>
+      this.retention.changed(table),
+    );
+    this.retention = new Retention(this.tables, this.lifecycle, ttl);
     this.membership = new Membership(
       this.lifecycle,
       (id) => this.get(id),
       () => this.tables.values(),
+      (table) => {
+        if (table.status === "open" && !table.seats.some((s) => s?.session))
+          this.retention.remove(table);
+        else this.retention.changed(table);
+      },
     );
-    for (const record of store.listLive()) {
-      const game = registry.get(record.type);
-      if (
-        !game ||
-        JSON.stringify(game.ruleset) !== JSON.stringify(record.ruleset)
-      )
-        throw new Error("Unsupported saved ruleset");
-      const rebuilt = fold(game, record.seed, record.moves);
-      if (!rebuilt.ok) throw new Error(`Corrupt move log: ${record.id}`);
-      const table: Table = {
-        id: record.id,
-        type: record.type,
-        host: record.host,
-        game,
-        seed: record.seed,
-        commitment: record.commitment,
-        state: rebuilt.state,
-        seq: record.moves.length,
-        status: "live",
-        deadline: null,
-        viewers: new Map(),
-        seats: record.seats.map((s) => ({
-          session: s.session,
-          name: s.name ?? "bot",
-          bot: s.bot,
-          sockets: new Set(),
-        })),
-      };
-      this.tables.set(table.id, table);
+    for (const id of store.listLiveIds()) {
+      try {
+        const record = store.loadGame(id);
+        if (!record) throw new Error("Missing live game");
+        const game = registry.get(record.type);
+        if (
+          !game ||
+          JSON.stringify(game.ruleset) !== JSON.stringify(record.ruleset)
+        )
+          throw new Error("Unsupported saved ruleset");
+        const rebuilt = fold(game, record.seed, record.moves);
+        if (!rebuilt.ok) throw new Error(`Corrupt move log: ${record.id}`);
+        const table: Table = {
+          id: record.id,
+          type: record.type,
+          host: record.host,
+          casual: record.casual,
+          overSent: new Set(),
+          game,
+          seed: record.seed,
+          commitment: record.commitment,
+          state: rebuilt.state,
+          seq: record.moves.length,
+          status: "live",
+          deadline: null,
+          viewers: new Map(),
+          seats: record.seats.map((s) => ({
+            session: s.session,
+            name: s.name ?? "bot",
+            bot: s.bot,
+            sockets: new Set(),
+          })),
+        };
+        this.tables.set(table.id, table);
+      } catch {
+        store.abandon(id);
+        console.warn(`Abandoned corrupt game: ${id}`);
+      }
     }
     for (const table of this.tables.values()) {
       this.lifecycle.schedule(table);
@@ -60,11 +84,12 @@ export class Tables {
   get(id: string): Table {
     const table = this.tables.get(id);
     if (!table) throw new Fault("not_found");
+    if (table.status === "unavailable") throw new Fault("unavailable");
     return table;
   }
   list() {
     return [...this.tables.values()]
-      .filter((t) => t.status !== "finished")
+      .filter((t) => t.status === "open" || t.status === "live")
       .map((t) => ({
         id: t.id,
         type: t.type,
@@ -72,22 +97,21 @@ export class Tables {
         seats: publicSeats(t),
       }));
   }
-  create(type: GameType, host: Session): Table {
+  create(type: GameType, host: Session, casual = false): Table {
     const game = registry.get(type);
     if (!game) throw new Fault("bad_request");
-    const alphabet = "abcdefghijklmnopqrstuvwxyz234567";
+    this.retention.admit(host);
     let id: string;
     do {
-      id = Array.from(
-        crypto.getRandomValues(new Uint8Array(10)),
-        (b) => alphabet[b % 32],
-      ).join("");
-    } while (this.tables.has(id) || this.lifecycle.store.loadGame(id));
+      id = randomId(10);
+    } while (this.tables.has(id) || this.lifecycle.store.gameStatus(id));
     const seed = randomHex();
     const table: Table = {
       id,
       type,
       host: host.id,
+      casual,
+      overSent: new Set(),
       game,
       seed,
       commitment: commitment(seed),
@@ -104,6 +128,7 @@ export class Tables {
       ],
     };
     this.tables.set(id, table);
+    this.retention.changed(table);
     return table;
   }
   private hosted(id: string, session: Session): Table {
@@ -129,6 +154,7 @@ export class Tables {
       seed: table.seed,
       commitment: table.commitment,
       host: table.host,
+      casual: table.casual,
       created: this.lifecycle.clock.now(),
       seats: table.seats.map((s, seat) => ({
         seat: seat as Seat,
@@ -139,6 +165,7 @@ export class Tables {
       })),
     });
     table.status = "live";
+    this.retention.changed(table);
     this.lifecycle.schedule(table);
     table.seats.forEach((_, seat) => {
       this.lifecycle.hold(table, seat);

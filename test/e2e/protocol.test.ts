@@ -128,7 +128,7 @@ test("HTTP sessions, origins, lobby, host authority and malformed requests", asy
     expect((await f.request("/")).headers.get("content-type")).toContain(
       "text/html",
     );
-    expect((await f.request("/api/me")).status).toBe(403);
+    expect((await f.request("/api/me")).status).toBe(401);
     const host = await f.guest(),
       other = await f.guest();
     expect(await (await f.request("/api/me", host)).json()).toMatchObject({
@@ -146,7 +146,7 @@ test("HTTP sessions, origins, lobby, host authority and malformed requests", asy
     ).toBe(403);
     expect(
       (await f.request("/api/tables", "", { type: "spades" })).status,
-    ).toBe(403);
+    ).toBe(401);
     for (const body of [
       null,
       [],

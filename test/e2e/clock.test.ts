@@ -1,20 +1,19 @@
 import { expect, test } from "bun:test";
 import { startServer } from "../../src/server";
-import { GuestSessions } from "../../src/server/http/sessions";
 import { scratch } from "../server/helpers";
 import { Client } from "./helpers";
 import { checkWire } from "./wire";
 
 test("real clock schedules turn timeout and disconnected-seat takeover", async () => {
-  const temp = scratch(),
-    sessions = new GuestSessions(true);
+  const temp = scratch();
   const app = startServer({
     db: temp.db,
     port: 0,
     hostname: "127.0.0.1",
-    sessions,
+    insecureCookie: true,
     timing: { turn: 10, hold: 1, bot: 2 },
   });
+  const sessions = app.sessions;
   let client: Client | undefined;
   try {
     const host = sessions.guest().session;

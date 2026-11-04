@@ -1,13 +1,15 @@
 import type { ServerWebSocket } from "bun";
-import type { Session } from "../http/sessions";
+import type { Session, SessionResolver } from "../http/sessions";
 import type { Tables } from "../tables";
 import { Fault, type Peer, seatNumber } from "../tables/types";
+import { Budget } from "./budget";
 
-export type SocketData = { session: Session; peer?: Peer; moves: number[] };
-export function websocket(tables: Tables) {
+export type SocketData = { session: Session; peer?: Peer; budget?: Budget };
+export function websocket(tables: Tables, sessions: SessionResolver) {
   return {
     maxPayloadLength: 4096,
     open(ws: ServerWebSocket<SocketData>) {
+      ws.data.budget = new Budget();
       ws.data.peer = {
         session: ws.data.session,
         send: (message) => {
@@ -22,6 +24,26 @@ export function websocket(tables: Tables) {
       }
       const peer = ws.data.peer;
       if (!peer) return;
+      if (!sessions.active(peer.session)) {
+        ws.close(1008, "Session expired");
+        return;
+      }
+      const now = tables.lifecycle.clock.now();
+      const budget = ws.data.budget as Budget;
+      const reject = (result: string) => {
+        peer.send({
+          t: "error",
+          code: "rate_limited",
+          message: "rate_limited",
+        });
+        if (result === "close") ws.close(1008, "Sustained flooding");
+      };
+      // Charge every message before parsing, including invalid JSON.
+      const total = budget.accept(now);
+      if (total !== "ok") {
+        reject(total);
+        return;
+      }
       try {
         const message: unknown = JSON.parse(
           typeof raw === "string" ? raw : raw.toString(),
@@ -40,6 +62,7 @@ export function websocket(tables: Tables) {
         };
         const extra = fields[m.t];
         if (
+          !Object.hasOwn(fields, m.t) ||
           !extra ||
           Object.keys(m).some((k) => !["t", "table", ...extra].includes(k))
         )
@@ -60,10 +83,11 @@ export function websocket(tables: Tables) {
             tables.react(m.table, m.id, peer);
             break;
           case "move": {
-            const now = tables.lifecycle.clock.now();
-            ws.data.moves = ws.data.moves.filter((t) => now - t < 1000);
-            if (ws.data.moves.length >= 5) throw new Fault("rate_limited");
-            ws.data.moves.push(now);
+            const result = budget.acceptMove(now);
+            if (result !== "ok") {
+              reject(result);
+              return;
+            }
             if (
               !Number.isSafeInteger(m.seq) ||
               Number(m.seq) < 0 ||

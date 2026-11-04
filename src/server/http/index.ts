@@ -12,6 +12,7 @@ export function handler(
   store: Store,
   tables: Tables,
   sessions: SessionResolver,
+  origin?: string,
 ) {
   return async (
     request: Request,
@@ -22,7 +23,7 @@ export function handler(
     try {
       if (
         request.method !== "GET" &&
-        request.headers.get("origin") !== url.origin
+        request.headers.get("origin") !== (origin || url.origin)
       )
         throw new Fault("forbidden");
       if (path === "/healthz" && request.method === "GET")
@@ -34,20 +35,27 @@ export function handler(
         });
       }
       const session = sessions.resolve(request);
+      if (
+        !session &&
+        (path.startsWith("/api/") || path === "/ws") &&
+        /(?:^|;)\s*(?:fd|__Host-fd)=/.test(request.headers.get("cookie") ?? "")
+      )
+        throw new Fault("unauthorized");
       if (path === "/ws" && request.method === "GET") {
-        if (!session || request.headers.get("origin") !== url.origin)
+        if (request.headers.get("origin") !== (origin || url.origin))
           throw new Fault("forbidden");
-        if (server.upgrade(request, { data: { session, moves: [] } })) return;
+        if (!session) throw new Fault("unauthorized");
+        if (server.upgrade(request, { data: { session } })) return;
         throw new Fault("bad_request");
       }
       if (path === "/api/me" && request.method === "GET") {
-        if (!session) throw new Fault("forbidden");
+        if (!session) throw new Fault("unauthorized");
         return json({ name: session.name, guest: true });
       }
       if (path === "/api/tables") {
         if (request.method === "GET") return json(tables.list());
         if (request.method === "POST") {
-          if (!session) throw new Fault("forbidden");
+          if (!session) throw new Fault("unauthorized");
           const body: unknown = await request.json();
           if (!body || typeof body !== "object" || Array.isArray(body))
             throw new Fault("bad_request");
@@ -58,7 +66,11 @@ export function handler(
             (b.casual !== undefined && typeof b.casual !== "boolean")
           )
             throw new Fault("bad_request");
-          const table = tables.create(b.type as GameType, session);
+          const table = tables.create(
+            b.type as GameType,
+            session,
+            b.casual as boolean | undefined,
+          );
           return json({ id: table.id, inviteUrl: `/tables/${table.id}` }, 201);
         }
       }
@@ -66,7 +78,7 @@ export function handler(
         path,
       );
       if (mutation && request.method === "POST") {
-        if (!session) throw new Fault("forbidden");
+        if (!session) throw new Fault("unauthorized");
         const id = mutation[1] as string;
         if (mutation[2] === "bots") tables.fill(id, session);
         else tables.start(id, session);
@@ -74,7 +86,9 @@ export function handler(
       }
       const replay = /^\/api\/games\/([a-z2-7]{10})$/.exec(path);
       if (replay && request.method === "GET") {
-        const record = store.loadGame(replay[1] as string);
+        const id = replay[1] as string;
+        if (store.gameStatus(id) !== "finished") throw new Fault("not_found");
+        const record = store.loadGame(id);
         if (record?.status !== "finished") throw new Fault("not_found");
         return json({
           type: record.type,
@@ -105,7 +119,16 @@ export function handler(
       const code = error instanceof Fault ? error.code : "bad_request";
       return json(
         { code, message: code },
-        code === "forbidden" ? 403 : code === "not_found" ? 404 : 400,
+        (
+          {
+            forbidden: 403,
+            unauthorized: 401,
+            not_found: 404,
+            conflict: 409,
+            rate_limited: 429,
+            unavailable: 503,
+          } as Record<string, number>
+        )[code] ?? 400,
       );
     }
   };

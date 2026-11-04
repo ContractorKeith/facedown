@@ -65,7 +65,7 @@ test("finishing while bot-held records a leaver and prevents reclaim", () => {
     expect(table.status).toBe("finished");
     expect(store.loadGame(table.id)?.seats[0]?.leaver).toBe(true);
     expect(() => tables.join(table.id, 0, { session, send: () => {} })).toThrow(
-      "forbidden",
+      "not_found",
     );
   } finally {
     tables.stop();

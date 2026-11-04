@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { legalMovesFromView } from "./client-moves";
 import { fixture } from "./helpers";
 import { checkWire } from "./wire";
 
@@ -30,7 +31,10 @@ test("disconnect holds seat, records timeouts, takes over with a bot, then recla
       t: "move",
       table: g.id,
       seq,
-      move: table.game.bot(view.view, table.game.legalMoves(table.state, 0)),
+      move: table.game.bot(
+        view.view,
+        legalMovesFromView(table.type, view.view),
+      ),
     });
     await client.view(seq + 1);
     f.clock.advance(1);

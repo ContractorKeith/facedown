@@ -24,6 +24,9 @@ for (const type of ["spades", "dominoes"] as const)
       });
       expect(JSON.stringify(replay)).not.toContain("session");
       checkWire(record, f.clients);
+      expect(f.clock.pending).toBe(1); // Finished table retention deadline.
+      f.clock.advance(600000); // Evicts even while viewers stay connected.
+      expect(() => f.app.tables.get(g.id)).toThrow("not_found");
       expect(f.clock.pending).toBe(0);
     } finally {
       await f.stop();
@@ -40,7 +43,11 @@ test("restart mid-deal restores the same view, reconnects and finishes", async (
       before.game.view(before.state, { seat: seat as 0 | 1 | 2 | 3 }),
     );
     const seq = before.seq;
+    const beforeSession = await (await f.request("/api/me", g.host)).json();
     await f.restart();
+    expect(await (await f.request("/api/me", g.host)).json()).toEqual(
+      beforeSession,
+    );
     expect(f.app.tables.get(g.id).seq).toBe(seq);
     expect(
       f.app.tables.get(g.id).seats.every((s) => s?.sockets.size === 0),
