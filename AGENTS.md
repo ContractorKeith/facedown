@@ -35,7 +35,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
   API/protocol, milestones, testing.
 - `CONTEXT.md` — glossary. Use its words in code, issues and PRs (Deal, not round; Hand is
   what a seat holds).
-- `docs/adr/0001` — seed + move log is the record, with a seed commitment.
+- `docs/adr/0001` — seed + move log is the record, with a seed commitment; `0002` — move-log hash chain.
 - Session logs: `~/Projects/worklog/projects/facedown.md` (not in this repo).
 
 ## Conventions & Gotchas

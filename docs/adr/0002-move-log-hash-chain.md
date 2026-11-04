@@ -1,0 +1,3 @@
+# The move log is pinned by a hash chain players see live
+
+The seed commitment (ADR 0001) proves the deals were fixed before play, but not that the stored move log is the one that was played: a different legal log with the same result would still replay cleanly. Every view message therefore carries `logHash`, where `logHash_0` is the commitment and `logHash_n = sha256(logHash_{n-1} + ":" + canonical JSON of move n)`, and the browser keeps the commitment and the final hash it saw. The replay viewer says "Verified" only when the stored game matches what that browser saw live, and "Consistent" when it can check only the published values. We chose a hash chain over signing each move because it needs no keys and the engine's pure sha256 already runs in the browser.

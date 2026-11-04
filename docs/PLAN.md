@@ -237,7 +237,7 @@ WebSocket `/ws` (session from the cookie). Client → server:
 Server → client:
 
 ```
-{t:"view", table, seq, view, toAct, deadline, seats, commitment}   full view, every update
+{t:"view", table, seq, view, toAct, deadline, seats, commitment, logHash}   full view, every update
 {t:"reaction", table, seat, id}
 {t:"over", table, outcome, seed}                                     seed revealed here
 {t:"error", code, message}   codes: stale_seq, illegal_move, not_your_turn, rate_limited, not_found, forbidden, bad_request
