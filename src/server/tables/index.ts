@@ -1,10 +1,10 @@
 import { fold } from "../../engine/core/fold";
-import { commitment } from "../../engine/core/random";
 import type { GameType, Seat } from "../../engine/core/types";
 import { registry } from "../../engine/registry";
 import { type Clock, clock, openTTL, type Timing, timing } from "../clock";
-import { randomHex, randomId, type Session } from "../http/sessions";
+import type { Session } from "../http/sessions";
 import type { Store } from "../store";
+import { Creation } from "./creation";
 import { Lifecycle } from "./lifecycle";
 import { Membership } from "./membership";
 import { Retention } from "./retention";
@@ -14,6 +14,7 @@ export class Tables {
   private tables = new Map<string, Table>();
   readonly lifecycle: Lifecycle;
   private membership: Membership;
+  private creation: Creation;
   readonly retention: Retention;
   constructor(
     store: Store,
@@ -25,6 +26,7 @@ export class Tables {
       this.retention.changed(table),
     );
     this.retention = new Retention(this.tables, this.lifecycle, ttl);
+    this.creation = new Creation(this.tables, this.lifecycle, this.retention);
     this.membership = new Membership(
       this.lifecycle,
       (id) => this.get(id),
@@ -98,38 +100,10 @@ export class Tables {
       }));
   }
   create(type: GameType, host: Session, casual = false): Table {
-    const game = registry.get(type);
-    if (!game) throw new Fault("bad_request");
-    this.retention.admit(host);
-    let id: string;
-    do {
-      id = randomId(10);
-    } while (this.tables.has(id) || this.lifecycle.store.gameStatus(id));
-    const seed = randomHex();
-    const table: Table = {
-      id,
-      type,
-      host: host.id,
-      casual,
-      overSent: new Set(),
-      game,
-      seed,
-      commitment: commitment(seed),
-      state: game.init(seed, game.ruleset),
-      seq: 0,
-      status: "open",
-      deadline: null,
-      viewers: new Map(),
-      seats: [
-        { session: host.id, name: host.name, bot: false, sockets: new Set() },
-        null,
-        null,
-        null,
-      ],
-    };
-    this.tables.set(id, table);
-    this.retention.changed(table);
-    return table;
+    return this.creation.create(type, host, casual);
+  }
+  createFromJSON(host: Session, read: () => Promise<unknown>): Promise<Table> {
+    return this.creation.fromJSON(host, read);
   }
   private hosted(id: string, session: Session): Table {
     const table = this.get(id);

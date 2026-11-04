@@ -1,5 +1,4 @@
 import type { Server } from "bun";
-import type { GameType } from "../../engine/core/types";
 import type { Store } from "../store";
 import type { Tables } from "../tables";
 import { Fault } from "../tables/types";
@@ -56,20 +55,8 @@ export function handler(
         if (request.method === "GET") return json(tables.list());
         if (request.method === "POST") {
           if (!session) throw new Fault("unauthorized");
-          const body: unknown = await request.json();
-          if (!body || typeof body !== "object" || Array.isArray(body))
-            throw new Fault("bad_request");
-          const b = body as Record<string, unknown>;
-          if (
-            !["spades", "dominoes"].includes(String(b.type)) ||
-            Object.keys(b).some((k) => !["type", "casual"].includes(k)) ||
-            (b.casual !== undefined && typeof b.casual !== "boolean")
-          )
-            throw new Fault("bad_request");
-          const table = tables.create(
-            b.type as GameType,
-            session,
-            b.casual as boolean | undefined,
+          const table = await tables.createFromJSON(session, () =>
+            request.json(),
           );
           return json({ id: table.id, inviteUrl: `/tables/${table.id}` }, 201);
         }

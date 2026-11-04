@@ -9,7 +9,7 @@ export class Retention {
     private lifecycle: Lifecycle,
     private ttl: number,
   ) {}
-  admit(host: Session): void {
+  attempt(host: Session): void {
     const now = this.lifecycle.clock.now();
     for (const [id, times] of this.creates) {
       const recent = times.filter((t) => now - t < 600000);
@@ -19,6 +19,8 @@ export class Retention {
     const recent = this.creates.get(host.id) ?? [];
     if (recent.length >= 10) throw new Fault("rate_limited");
     this.creates.set(host.id, [...recent, now]);
+  }
+  checkOpen(host: Session): void {
     if (
       [...this.tables.values()].filter(
         (t) => t.host === host.id && t.status === "open",
