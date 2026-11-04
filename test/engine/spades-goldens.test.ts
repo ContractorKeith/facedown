@@ -56,8 +56,7 @@ test.each(["nil-made", "nil-set", "bag-penalty", "team-set", "both-over-500"])(
           if (penalties > 0) events.add("bag-penalty");
           expected.scores[team] +=
             nilPoints +
-            (taken >= bid ? 10 * bid : -10 * bid) +
-            bags -
+            (taken >= bid ? 10 * bid + bags : -10 * bid) -
             100 * penalties;
           expected.bags[team] = (state.bags[team] + bags) % 10;
         }
@@ -74,6 +73,6 @@ test.each(["nil-made", "nil-set", "bag-penalty", "team-set", "both-over-500"])(
     }
     expect(events.has(event)).toBe(true);
     expect(spades.outcome(state)).toEqual(replay.expectedOutcome);
-    expect(replay.moves.length).toBeLessThanOrEqual(5600);
+    expect(replay.moves.length).toBeLessThanOrEqual(2800);
   },
 );

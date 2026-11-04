@@ -8,11 +8,31 @@ export const SpadesRuleset = {
   blindNil: false,
   bagLimit: 10,
   bagPenalty: 100,
+  maxDeals: 50,
+  mercyScore: -200,
 } as const;
-export type Ruleset = typeof SpadesRuleset;
+export type Ruleset = {
+  target: number;
+  nil: boolean;
+  blindNil: boolean;
+  bagLimit: number;
+  bagPenalty: number;
+  maxDeals: number;
+  mercyScore: number;
+};
+export type DealSummary = {
+  bids: State["bids"];
+  tricks: State["tricks"];
+  points: [number, number];
+  // Bags earned in this deal, before any ten-bag deduction.
+  bags: [number, number];
+};
 export type Move = { bid: number } | { play: CardId };
 export type State = {
   seed: string;
+  ruleset: Ruleset;
+  lastDeal: DealSummary | null;
+  lastScoringTeam: 0 | 1 | null;
   deal: number;
   dealer: Seat;
   turn: Seat | null;
@@ -37,6 +57,7 @@ export type View = Pick<
   | "scores"
   | "bags"
   | "spadesBroken"
+  | "lastDeal"
 > & {
   seat: Seat | null;
   hand: CardId[];
@@ -47,11 +68,17 @@ export function deal(
   n: number,
   scores: [number, number],
   bags: [number, number],
+  ruleset: Ruleset,
+  lastDeal: DealSummary | null = null,
+  lastScoringTeam: 0 | 1 | null = null,
 ): State {
   const cards = shuffle(deck, dealRng(seed, n));
   const dealer = (n % 4) as Seat;
   return {
     seed,
+    ruleset: { ...ruleset },
+    lastDeal,
+    lastScoringTeam,
     deal: n,
     dealer,
     turn: nextSeat(dealer),
@@ -74,8 +101,11 @@ export function deal(
 export type Place = { seat: Seat } | { public: true };
 export function locate(state: State): ReadonlyMap<string, readonly Place[]> {
   const result = new Map<string, Place[]>();
-  const add = (card: CardId, place: Place) =>
-    result.set(card, [...(result.get(card) ?? []), place]);
+  const add = (card: CardId, place: Place) => {
+    const places = result.get(card);
+    if (places) places.push(place);
+    else result.set(card, [place]);
+  };
   for (const seat of [0, 1, 2, 3] as const)
     for (const card of state.hands[seat]) add(card, { seat });
   for (const card of state.played) add(card, { public: true });

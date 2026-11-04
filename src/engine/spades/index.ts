@@ -1,3 +1,4 @@
+import { checkEnvelope, isPlainObject } from "../core/envelope";
 import {
   type Envelope,
   type Game,
@@ -21,10 +22,19 @@ export type { CardId } from "./cards";
 export type { Move, Ruleset, State, View } from "./state";
 export { locate, SpadesRuleset } from "./state";
 export const init = (seed: string, ruleset: Ruleset): State => {
-  for (const key of Object.keys(SpadesRuleset) as (keyof Ruleset)[])
-    if (ruleset[key] !== SpadesRuleset[key])
-      throw new Error("Unsupported Spades ruleset");
-  return deal(seed, 0, [0, 0], [0, 0]);
+  if (
+    !ruleset.nil ||
+    ruleset.blindNil ||
+    ![ruleset.target, ruleset.bagLimit, ruleset.maxDeals].every(
+      (n) => Number.isInteger(n) && n > 0,
+    ) ||
+    !Number.isInteger(ruleset.bagPenalty) ||
+    ruleset.bagPenalty < 0 ||
+    !Number.isInteger(ruleset.mercyScore) ||
+    ruleset.mercyScore >= 0
+  )
+    throw new Error("Unsupported Spades ruleset");
+  return deal(seed, 0, [0, 0], [0, 0], ruleset);
 };
 export const toAct = (state: State): Seat | null => state.turn;
 export function legalMoves(state: State, seat: Seat): Move[] {
@@ -58,12 +68,22 @@ export function view(state: State, viewer: Viewer): View {
     scores: [...state.scores],
     bags: [...state.bags],
     spadesBroken: state.spadesBroken,
+    lastDeal: state.lastDeal
+      ? {
+          bids: [...state.lastDeal.bids],
+          tricks: [...state.lastDeal.tricks],
+          points: [...state.lastDeal.points],
+          bags: [...state.lastDeal.bags],
+        }
+      : null,
   };
 }
 export function apply(
   state: State,
   envelope: Envelope<Move>,
 ): ReturnType<Game<State, Move, View, Ruleset>["apply"]> {
+  const envelopeError = checkEnvelope(envelope);
+  if (envelopeError) return { ok: false, error: envelopeError };
   if (state.turn === null)
     return { ok: false, error: { code: "game_over", message: "Game is over" } };
   if (state.turn !== envelope.seat)
@@ -77,8 +97,9 @@ export function apply(
       ? bot(view(state, { seat: envelope.seat }), legal)
       : envelope.move;
   if (
-    !move ||
-    typeof move !== "object" ||
+    !isPlainObject(move) ||
+    Reflect.ownKeys(move).length !== 1 ||
+    !Object.hasOwn(move, state.phase === "bidding" ? "bid" : "play") ||
     !legal.some((candidate) =>
       "bid" in candidate
         ? "bid" in move && candidate.bid === move.bid && !("play" in move)
@@ -89,42 +110,58 @@ export function apply(
       ok: false,
       error: { code: "illegal_move", message: "Choose a legal bid or play" },
     };
-  const next: State = {
-    ...state,
-    bids: [...state.bids],
-    hands: state.hands.map((hand) => [...hand]) as State["hands"],
-    trick: [...state.trick],
-    played: [...state.played],
-    tricks: [...state.tricks],
-    scores: [...state.scores],
-    bags: [...state.bags],
-  };
+  const next: State = { ...state };
   next.turn = nextSeat(envelope.seat);
   if ("bid" in move) {
+    next.bids = [...state.bids];
     next.bids[envelope.seat] = move.bid;
     if (next.bids.every((bid) => bid !== null)) {
       next.phase = "playing";
       next.turn = nextSeat(next.dealer);
     }
   } else {
-    next.hands[envelope.seat] = next.hands[envelope.seat].filter(
+    next.hands = [...state.hands];
+    next.hands[envelope.seat] = state.hands[envelope.seat].filter(
       (card) => card !== move.play,
     );
-    next.trick.push({ seat: envelope.seat, card: move.play });
+    next.trick = [...state.trick, { seat: envelope.seat, card: move.play }];
     next.spadesBroken ||= move.play[1] === "S";
     if (next.trick.length === 4) {
       const winner = trickWinner(next.trick).seat;
+      next.tricks = [...state.tricks];
       next.tricks[winner]++;
       next.turn = winner;
-      next.played.push(...next.trick.map((play) => play.card));
+      next.played = [...state.played, ...next.trick.map((play) => play.card)];
       next.trick = [];
       if (next.played.length === 52) {
-        Object.assign(next, scoreDeal(next));
-        if (winningTeam(next.scores) !== null) next.turn = null;
+        const scored = scoreDeal(next);
+        next.scores = scored.scores;
+        next.bags = scored.bags;
+        const points: [number, number] = [
+          next.scores[0] - state.scores[0],
+          next.scores[1] - state.scores[1],
+        ];
+        next.lastDeal = {
+          bids: [...next.bids],
+          tricks: [...next.tricks],
+          points,
+          bags: scored.earnedBags,
+        };
+        if (points[0] !== points[1])
+          next.lastScoringTeam = points[0] > points[1] ? 0 : 1;
+        if (winningTeam(next) !== null) next.turn = null;
         else
           return {
             ok: true,
-            state: deal(next.seed, next.deal + 1, next.scores, next.bags),
+            state: deal(
+              next.seed,
+              next.deal + 1,
+              next.scores,
+              next.bags,
+              next.ruleset,
+              next.lastDeal,
+              next.lastScoringTeam,
+            ),
           };
       }
     }
@@ -132,7 +169,7 @@ export function apply(
   return { ok: true, state: next };
 }
 export const outcome = (state: State) => {
-  const winner = winningTeam(state.scores);
+  const winner = winningTeam(state);
   return state.turn === null && winner !== null
     ? { scores: [...state.scores] as [number, number], winner }
     : null;

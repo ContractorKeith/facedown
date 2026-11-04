@@ -1,13 +1,15 @@
 import type { Team } from "../core/types";
-import { SpadesRuleset, type State } from "./state";
+import type { State } from "./state";
 
 // Nil tricks are bags, never credit toward the partner's contract.
 export function scoreDeal(state: State): {
   scores: [number, number];
   bags: [number, number];
+  earnedBags: [number, number];
 } {
   const scores: [number, number] = [...state.scores];
   const bags: [number, number] = [...state.bags];
+  const earnedBags: [number, number] = [0, 0];
   for (const team of [0, 1] as const) {
     let contract = 0;
     let taken = 0;
@@ -26,17 +28,23 @@ export function scoreDeal(state: State): {
     }
     const overtricks = Math.max(0, taken - contract) + nilTricks;
     scores[team] +=
-      (taken >= contract ? 10 * contract : -10 * contract) + overtricks;
+      taken >= contract ? 10 * contract + overtricks : -10 * contract;
+    earnedBags[team] = overtricks;
     bags[team] += overtricks;
-    while (bags[team] >= SpadesRuleset.bagLimit) {
-      scores[team] -= SpadesRuleset.bagPenalty;
-      bags[team] -= SpadesRuleset.bagLimit;
+    while (bags[team] >= state.ruleset.bagLimit) {
+      scores[team] -= state.ruleset.bagPenalty;
+      bags[team] -= state.ruleset.bagLimit;
     }
   }
-  return { scores, bags };
+  return { scores, bags, earnedBags };
 }
-export function winningTeam(scores: readonly [number, number]): Team | null {
-  if (Math.max(...scores) < SpadesRuleset.target || scores[0] === scores[1])
-    return null;
+// Called only at deal boundaries; the deal index is zero-based.
+export function winningTeam(state: State): Team | null {
+  const { scores, ruleset } = state;
+  const mercy = scores.some((score) => score <= ruleset.mercyScore);
+  const capped = state.deal + 1 >= ruleset.maxDeals;
+  if (scores[0] === scores[1])
+    return capped ? (state.lastScoringTeam ?? 1) : null;
+  if (!mercy && !capped && Math.max(...scores) < ruleset.target) return null;
   return scores[0] > scores[1] ? 0 : 1;
 }

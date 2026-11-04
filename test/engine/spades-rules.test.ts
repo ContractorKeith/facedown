@@ -36,9 +36,11 @@ test("fixed ruleset and 52 unique cards dealt with dealRng", () => {
     blindNil: false,
     bagLimit: 10,
     bagPenalty: 100,
+    maxDeals: 50,
+    mercyScore: -200,
   });
   expect(() =>
-    spades.init(seed, { ...SpadesRuleset, target: 100 } as never),
+    spades.init(seed, { ...SpadesRuleset, blindNil: true }),
   ).toThrow();
 });
 test("bidding starts left of dealer and accepts each integer 0 through 13", () => {
@@ -164,4 +166,17 @@ test("wrong seat, wrong phase, malformed moves and finished games are rejected",
     spades.apply({ ...state, turn: null }, { seat: 0, timeout: true }),
   ).toMatchObject({ ok: false, error: { code: "game_over" } });
   expect(spades.outcome(state)).toBeNull();
+});
+
+test("the illegal probe attempts a revoke, falling back to an unheld card", async () => {
+  const { spadesInvariants } = await import("./spades-invariants");
+  const state = playing(["2C", "AS"]);
+  state.trick = [{ seat: 3, card: "AC" }];
+  const revoke = spadesInvariants.illegalMove(state, 0);
+  expect(revoke).toEqual({ play: "AS" });
+  expect(spades.apply(state, { seat: 0, move: revoke } as never).ok).toBe(
+    false,
+  );
+  state.hands[0] = ["2C"];
+  expect(spadesInvariants.illegalMove(state, 0)).toEqual({ play: "3C" });
 });

@@ -5,3854 +5,688 @@
     "nil": true,
     "blindNil": false,
     "bagLimit": 10,
-    "bagPenalty": 100
+    "bagPenalty": 100,
+    "maxDeals": 50,
+    "mercyScore": -200
   },
   "seed": "f5ce10d56074649b629e88781f9e2317d654e9b105950ec88e87fc6671c1ef76",
-  "moves": [
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 0
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 5
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 5
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 1
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 5
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 1
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 1
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 1
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 3
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 8
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 0
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "bid": 1
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JD"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 1,
-      "timeout": true
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "9S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6H"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "bid": 2
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "bid": 4
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "9D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4D"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3C"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "4C"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "9C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6D"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TD"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "3S"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "5H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "AH"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "2H"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "7H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3H"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "2C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "KC"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "6C"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "JH"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "6S"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "TS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "3D"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8D"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "4S"
-      }
-    },
-    {
-      "seat": 0,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "8C"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "JC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "QC"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "7C"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "AD"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "8S"
-      }
-    },
-    {
-      "seat": 3,
-      "timeout": true
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "5S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "QS"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "KS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "9H"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "2S"
-      }
-    },
-    {
-      "seat": 2,
-      "timeout": true
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "7S"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "KD"
-      }
-    },
-    {
-      "seat": 3,
-      "move": {
-        "play": "AS"
-      }
-    },
-    {
-      "seat": 0,
-      "move": {
-        "play": "AC"
-      }
-    },
-    {
-      "seat": 1,
-      "move": {
-        "play": "JS"
-      }
-    },
-    {
-      "seat": 2,
-      "move": {
-        "play": "QH"
-      }
-    }
-  ],
   "expectedOutcome": {
-    "scores": [98, 533],
+    "scores": [97, 533],
     "winner": 1
   },
-  "expectedFinalStateHash": "8233436f837880917b524341fed1a83efddf60023e025eda340db5722048c17f"
+  "expectedFinalStateHash": "7c8899df9a1e3927d16765fb48c8f5c976495b7ceafb1b7802f50d2d7eb1bd95",
+  "moves": [
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "bid": 3 } },
+    { "seat": 3, "move": { "bid": 4 } },
+    { "seat": 0, "move": { "bid": 0 } },
+    { "seat": 1, "move": { "play": "2D" } },
+    { "seat": 2, "move": { "play": "5D" } },
+    { "seat": 3, "move": { "play": "8D" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 3, "move": { "play": "3C" } },
+    { "seat": 0, "move": { "play": "2C" } },
+    { "seat": 1, "move": { "play": "4C" } },
+    { "seat": 2, "move": { "play": "8C" } },
+    { "seat": 2, "move": { "play": "3H" } },
+    { "seat": 3, "move": { "play": "8H" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "2H" } },
+    { "seat": 3, "move": { "play": "6C" } },
+    { "seat": 0, "move": { "play": "7C" } },
+    { "seat": 1, "move": { "play": "AC" } },
+    { "seat": 2, "move": { "play": "JC" } },
+    { "seat": 1, "move": { "play": "4D" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "KD" } },
+    { "seat": 0, "move": { "play": "7D" } },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "5H" } },
+    { "seat": 1, "move": { "play": "3S" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "TH" } },
+    { "seat": 3, "move": { "play": "9D" } },
+    { "seat": 0, "move": { "play": "TD" } },
+    { "seat": 0, "move": { "play": "6H" } },
+    { "seat": 1, "move": { "play": "5S" } },
+    { "seat": 2, "move": { "play": "QH" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 2, "move": { "play": "KC" } },
+    { "seat": 3, "move": { "play": "9C" } },
+    { "seat": 0, "move": { "play": "TC" } },
+    { "seat": 2, "move": { "play": "2S" } },
+    { "seat": 3, "move": { "play": "8S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "6S" } },
+    { "seat": 3, "move": { "play": "QC" } },
+    { "seat": 0, "move": { "play": "7H" } },
+    { "seat": 1, "move": { "play": "JS" } },
+    { "seat": 2, "move": { "play": "4S" } },
+    { "seat": 1, "move": { "play": "AD" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "KS" } },
+    { "seat": 0, "move": { "play": "JD" } },
+    { "seat": 3, "move": { "play": "AH" } },
+    { "seat": 0, "move": { "play": "9S" } },
+    { "seat": 1, "move": { "play": "AS" } },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "bid": 2 } },
+    { "seat": 0, "move": { "bid": 4 } },
+    { "seat": 1, "move": { "bid": 4 } },
+    { "seat": 2, "move": { "play": "7C" } },
+    { "seat": 3, "move": { "play": "3C" } },
+    { "seat": 0, "move": { "play": "2C" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 1, "move": { "play": "2H" } },
+    { "seat": 2, "move": { "play": "7H" } },
+    { "seat": 3, "move": { "play": "8H" } },
+    { "seat": 0, "move": { "play": "3H" } },
+    { "seat": 3, "move": { "play": "2D" } },
+    { "seat": 0, "move": { "play": "5D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "TD" } },
+    { "seat": 2, "move": { "play": "9C" } },
+    { "seat": 3, "move": { "play": "7S" } },
+    { "seat": 0, "move": { "play": "8C" } },
+    { "seat": 1, "move": { "play": "4C" } },
+    { "seat": 3, "move": { "play": "7D" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "4D" } },
+    { "seat": 2, "move": { "play": "3D" } },
+    { "seat": 0, "move": { "play": "TC" } },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 2, "move": { "play": "JC" } },
+    { "seat": 3, "move": { "play": "9S" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "3S" } },
+    { "seat": 1, "move": { "play": "4H" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 1, "move": { "play": "2S" } },
+    { "seat": 2, "move": { "play": "6D" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 1, "move": { "play": "6H" } },
+    { "seat": 2, "move": { "play": "TH" } },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "5S" } },
+    { "seat": 0, "move": { "play": "KC" } },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "TS" } },
+    { "seat": 3, "move": { "play": "QD" } },
+    { "seat": 0, "move": { "play": "AD" } },
+    { "seat": 1, "move": { "play": "KS" } },
+    { "seat": 2, "move": { "play": "4S" } },
+    { "seat": 1, "move": { "play": "AH" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "KH" } },
+    { "seat": 0, "move": { "play": "6S" } },
+    { "seat": 0, "move": { "play": "8S" } },
+    { "seat": 1, "move": { "play": "AS" } },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 3, "move": { "play": "JS" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "bid": 3 } },
+    { "seat": 1, "move": { "bid": 2 } },
+    { "seat": 2, "move": { "bid": 4 } },
+    { "seat": 3, "move": { "play": "2H" } },
+    { "seat": 0, "move": { "play": "4H" } },
+    { "seat": 1, "move": { "play": "8H" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 2, "move": { "play": "2D" } },
+    { "seat": 3, "move": { "play": "3D" } },
+    { "seat": 0, "move": { "play": "5D" } },
+    { "seat": 1, "move": { "play": "JD" } },
+    { "seat": 1, "move": { "play": "3C" } },
+    { "seat": 2, "move": { "play": "4C" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "TC" } },
+    { "seat": 0, "move": { "play": "5H" } },
+    { "seat": 1, "move": { "play": "JH" } },
+    { "seat": 2, "move": { "play": "8S" } },
+    { "seat": 3, "move": { "play": "3H" } },
+    { "seat": 2, "move": { "play": "4D" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "6D" } },
+    { "seat": 1, "move": { "play": "QD" } },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 2, "move": { "play": "9C" } },
+    { "seat": 3, "move": { "play": "8C" } },
+    { "seat": 0, "move": { "play": "2C" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "KD" } },
+    { "seat": 0, "move": { "play": "8D" } },
+    { "seat": 1, "move": { "play": "7C" } },
+    { "seat": 3, "move": { "play": "6H" } },
+    { "seat": 0, "move": { "play": "7H" } },
+    { "seat": 1, "move": { "play": "QH" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 2, "move": { "play": "TD" } },
+    { "seat": 3, "move": { "play": "2S" } },
+    { "seat": 0, "move": { "play": "6S" } },
+    { "seat": 1, "move": { "play": "7S" } },
+    { "seat": 1, "move": { "play": "JC" } },
+    { "seat": 2, "move": { "play": "AC" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "KC" } },
+    { "seat": 3, "move": { "play": "TH" } },
+    { "seat": 0, "move": { "play": "KH" } },
+    { "seat": 1, "move": { "play": "QC" } },
+    { "seat": 2, "move": { "play": "JS" } },
+    { "seat": 2, "move": { "play": "AD" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "9S" } },
+    { "seat": 1, "move": { "play": "KS" } },
+    { "seat": 1, "move": { "play": "AS" } },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 3, "move": { "play": "5S" } },
+    { "seat": 0, "move": { "play": "AH" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "bid": 3 } },
+    { "seat": 2, "move": { "bid": 2 } },
+    { "seat": 3, "move": { "bid": 3 } },
+    { "seat": 0, "move": { "play": "6D" } },
+    { "seat": 1, "move": { "play": "7D" } },
+    { "seat": 2, "move": { "play": "2D" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 3, "move": { "play": "5C" } },
+    { "seat": 0, "move": { "play": "3C" } },
+    { "seat": 1, "move": { "play": "2C" } },
+    { "seat": 2, "move": { "play": "9C" } },
+    { "seat": 2, "move": { "play": "4H" } },
+    { "seat": 3, "move": { "play": "6H" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "KH" } },
+    { "seat": 1, "move": { "play": "3D" } },
+    { "seat": 2, "move": { "play": "4D" } },
+    { "seat": 3, "move": { "play": "QD" } },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 0, "move": { "play": "TD" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "5D" } },
+    { "seat": 3, "move": { "play": "2H" } },
+    { "seat": 1, "move": { "play": "5H" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "2S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "KS" } },
+    { "seat": 2, "move": { "play": "5S" } },
+    { "seat": 3, "move": { "play": "3H" } },
+    { "seat": 1, "move": { "play": "TC" } },
+    { "seat": 2, "move": { "play": "QC" } },
+    { "seat": 3, "move": { "play": "KC" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 0, "move": { "play": "7S" } },
+    { "seat": 1, "move": { "play": "7H" } },
+    { "seat": 2, "move": { "play": "6S" } },
+    { "seat": 3, "move": { "play": "6C" } },
+    { "seat": 0, "move": { "play": "8S" } },
+    { "seat": 1, "move": { "play": "8H" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "7C" } },
+    { "seat": 2, "move": { "play": "4C" } },
+    { "seat": 3, "move": { "play": "8C" } },
+    { "seat": 0, "move": { "play": "9S" } },
+    { "seat": 1, "move": { "play": "JC" } },
+    { "seat": 0, "move": { "play": "JS" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 3, "move": { "play": "AC" } },
+    { "seat": 2, "move": { "play": "TH" } },
+    { "seat": 3, "move": { "play": "AH" } },
+    { "seat": 0, "move": { "play": "AS" } },
+    { "seat": 1, "move": { "play": "AD" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "bid": 2 } },
+    { "seat": 3, "move": { "bid": 3 } },
+    { "seat": 0, "move": { "bid": 5 } },
+    { "seat": 1, "move": { "play": "3H" } },
+    { "seat": 2, "move": { "play": "8H" } },
+    { "seat": 3, "move": { "play": "KH" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 0, "move": { "play": "3C" } },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 2, "move": { "play": "KC" } },
+    { "seat": 3, "move": { "play": "AC" } },
+    { "seat": 3, "move": { "play": "3D" } },
+    { "seat": 0, "move": { "play": "8D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "AD" } },
+    { "seat": 2, "move": { "play": "2H" } },
+    { "seat": 3, "move": { "play": "7H" } },
+    { "seat": 0, "move": { "play": "2S" } },
+    { "seat": 1, "move": { "play": "4H" } },
+    { "seat": 0, "move": { "play": "4C" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "5C" } },
+    { "seat": 3, "move": { "play": "JC" } },
+    { "seat": 3, "move": { "play": "4D" } },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 1, "move": { "play": "6D" } },
+    { "seat": 2, "move": { "play": "2D" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "TC" } },
+    { "seat": 2, "move": { "play": "6S" } },
+    { "seat": 3, "move": { "play": "AS" } },
+    { "seat": 3, "move": { "play": "7D" } },
+    { "seat": 0, "move": { "play": "7S" } },
+    { "seat": 1, "move": { "play": "QS" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 1, "move": { "play": "5H" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 3, "move": { "play": "4S" } },
+    { "seat": 0, "move": { "play": "TS" } },
+    { "seat": 0, "move": { "play": "9C" } },
+    { "seat": 1, "move": { "play": "2C" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "5S" } },
+    { "seat": 2, "move": { "play": "TH" } },
+    { "seat": 3, "move": { "play": "9D" } },
+    { "seat": 0, "move": { "play": "JS" } },
+    { "seat": 1, "move": { "play": "6H" } },
+    { "seat": 0, "move": { "play": "QC" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "9S" } },
+    { "seat": 3, "move": { "play": "TD" } },
+    { "seat": 2, "move": { "play": "QH" } },
+    { "seat": 3, "move": { "play": "QD" } },
+    { "seat": 0, "move": { "play": "KS" } },
+    { "seat": 1, "move": { "play": "JH" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "bid": 2 } },
+    { "seat": 0, "move": { "bid": 5 } },
+    { "seat": 1, "move": { "bid": 1 } },
+    { "seat": 2, "move": { "play": "2D" } },
+    { "seat": 3, "move": { "play": "4D" } },
+    { "seat": 0, "move": { "play": "6D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 2, "move": { "play": "TC" } },
+    { "seat": 3, "move": { "play": "JC" } },
+    { "seat": 0, "move": { "play": "AC" } },
+    { "seat": 0, "move": { "play": "3D" } },
+    { "seat": 1, "move": { "play": "7S" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "8D" } },
+    { "seat": 1, "move": { "play": "2H" } },
+    { "seat": 2, "move": { "play": "8H" } },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "QH" } },
+    { "seat": 0, "move": { "play": "JD" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "9D" } },
+    { "seat": 3, "move": { "play": "TD" } },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 2, "move": { "play": "3C" } },
+    { "seat": 3, "move": { "play": "2C" } },
+    { "seat": 0, "move": { "play": "4C" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 3, "move": { "play": "3H" } },
+    { "seat": 0, "move": { "play": "7H" } },
+    { "seat": 2, "move": { "play": "AH" } },
+    { "seat": 3, "move": { "play": "KH" } },
+    { "seat": 0, "move": { "play": "4S" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 1, "move": { "play": "6H" } },
+    { "seat": 2, "move": { "play": "2S" } },
+    { "seat": 3, "move": { "play": "QD" } },
+    { "seat": 2, "move": { "play": "3S" } },
+    { "seat": 3, "move": { "play": "5S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "7C" } },
+    { "seat": 0, "move": { "play": "AD" } },
+    { "seat": 1, "move": { "play": "8C" } },
+    { "seat": 2, "move": { "play": "6S" } },
+    { "seat": 3, "move": { "play": "TS" } },
+    { "seat": 3, "move": { "play": "QC" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "9C" } },
+    { "seat": 2, "move": { "play": "JS" } },
+    { "seat": 2, "move": { "play": "KS" } },
+    { "seat": 3, "move": { "play": "KC" } },
+    { "seat": 0, "move": { "play": "QS" } },
+    { "seat": 1, "move": { "play": "TH" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "bid": 3 } },
+    { "seat": 1, "move": { "bid": 5 } },
+    { "seat": 2, "move": { "bid": 1 } },
+    { "seat": 3, "move": { "play": "5D" } },
+    { "seat": 0, "move": { "play": "7D" } },
+    { "seat": 1, "move": { "play": "KD" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 1, "move": { "play": "4C" } },
+    { "seat": 2, "move": { "play": "7C" } },
+    { "seat": 3, "move": { "play": "QC" } },
+    { "seat": 0, "move": { "play": "9C" } },
+    { "seat": 3, "move": { "play": "4H" } },
+    { "seat": 0, "move": { "play": "5H" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "2S" } },
+    { "seat": 2, "move": { "play": "2C" } },
+    { "seat": 3, "move": { "play": "7S" } },
+    { "seat": 0, "move": { "play": "KS" } },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 0, "move": { "play": "2H" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "4S" } },
+    { "seat": 3, "move": { "play": "8H" } },
+    { "seat": 2, "move": { "play": "3C" } },
+    { "seat": 3, "move": { "play": "9S" } },
+    { "seat": 0, "move": { "play": "3H" } },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "QD" } },
+    { "seat": 1, "move": { "play": "2D" } },
+    { "seat": 2, "move": { "play": "4D" } },
+    { "seat": 0, "move": { "play": "6H" } },
+    { "seat": 1, "move": { "play": "3S" } },
+    { "seat": 2, "move": { "play": "8C" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 1, "move": { "play": "JC" } },
+    { "seat": 2, "move": { "play": "TC" } },
+    { "seat": 3, "move": { "play": "8D" } },
+    { "seat": 0, "move": { "play": "6S" } },
+    { "seat": 0, "move": { "play": "7H" } },
+    { "seat": 1, "move": { "play": "5S" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "QH" } },
+    { "seat": 1, "move": { "play": "KC" } },
+    { "seat": 2, "move": { "play": "AC" } },
+    { "seat": 3, "move": { "play": "TS" } },
+    { "seat": 0, "move": { "play": "9H" } },
+    { "seat": 3, "move": { "play": "TD" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "8S" } },
+    { "seat": 2, "move": { "play": "JD" } },
+    { "seat": 1, "move": { "play": "AS" } },
+    { "seat": 2, "move": { "play": "JS" } },
+    { "seat": 3, "move": { "play": "QS" } },
+    { "seat": 0, "move": { "play": "KH" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "bid": 1 } },
+    { "seat": 2, "move": { "bid": 3 } },
+    { "seat": 3, "move": { "bid": 4 } },
+    { "seat": 0, "move": { "play": "4D" } },
+    { "seat": 1, "move": { "play": "TD" } },
+    { "seat": 2, "move": { "play": "KD" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 3, "move": { "play": "TC" } },
+    { "seat": 0, "move": { "play": "JC" } },
+    { "seat": 1, "move": { "play": "5C" } },
+    { "seat": 2, "move": { "play": "2C" } },
+    { "seat": 0, "move": { "play": "6D" } },
+    { "seat": 1, "move": { "play": "6S" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "3D" } },
+    { "seat": 1, "move": { "play": "2H" } },
+    { "seat": 2, "move": { "play": "5H" } },
+    { "seat": 3, "move": { "play": "6H" } },
+    { "seat": 0, "move": { "play": "KH" } },
+    { "seat": 0, "move": { "play": "7D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "9D" } },
+    { "seat": 3, "move": { "play": "5D" } },
+    { "seat": 1, "move": { "play": "3H" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 3, "move": { "play": "QH" } },
+    { "seat": 0, "move": { "play": "2S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "9S" } },
+    { "seat": 2, "move": { "play": "3C" } },
+    { "seat": 3, "move": { "play": "QC" } },
+    { "seat": 1, "move": { "play": "4H" } },
+    { "seat": 2, "move": { "play": "8S" } },
+    { "seat": 3, "move": { "play": "JS" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 0, "move": { "play": "8D" } },
+    { "seat": 1, "move": { "play": "7H" } },
+    { "seat": 2, "move": { "play": "6C" } },
+    { "seat": 3, "move": { "play": "QD" } },
+    { "seat": 3, "move": { "play": "AC" } },
+    { "seat": 0, "move": { "play": "8C" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "7C" } },
+    { "seat": 3, "move": { "play": "3S" } },
+    { "seat": 0, "move": { "play": "4S" } },
+    { "seat": 1, "move": { "play": "TH" } },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 2, "move": { "play": "9C" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "TS" } },
+    { "seat": 1, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "JD" } },
+    { "seat": 1, "move": { "play": "AH" } },
+    { "seat": 2, "move": { "play": "KC" } },
+    { "seat": 3, "move": { "play": "AS" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "bid": 4 } },
+    { "seat": 3, "move": { "bid": 2 } },
+    { "seat": 0, "move": { "bid": 1 } },
+    { "seat": 1, "move": { "play": "5H" } },
+    { "seat": 2, "move": { "play": "8H" } },
+    { "seat": 3, "move": { "play": "9H" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 0, "move": { "play": "2D" } },
+    { "seat": 1, "move": { "play": "4D" } },
+    { "seat": 2, "move": { "play": "TD" } },
+    { "seat": 3, "move": { "play": "5D" } },
+    { "seat": 2, "move": { "play": "5C" } },
+    { "seat": 3, "move": { "play": "6C" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "JC" } },
+    { "seat": 1, "move": { "play": "6H" } },
+    { "seat": 2, "move": { "play": "2H" } },
+    { "seat": 3, "move": { "play": "4H" } },
+    { "seat": 0, "move": { "play": "6S" } },
+    { "seat": 0, "move": { "play": "3D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "QD" } },
+    { "seat": 3, "move": { "play": "6D" } },
+    { "seat": 2, "move": { "play": "QC" } },
+    { "seat": 3, "move": { "play": "8C" } },
+    { "seat": 0, "move": { "play": "2C" } },
+    { "seat": 1, "move": { "play": "AC" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "3H" } },
+    { "seat": 3, "move": { "play": "QH" } },
+    { "seat": 0, "move": { "play": "8S" } },
+    { "seat": 0, "move": { "play": "7D" } },
+    { "seat": 1, "move": { "play": "2S" } },
+    { "seat": 2, "move": { "play": "KD" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 3, "move": { "play": "9C" } },
+    { "seat": 0, "move": { "play": "4C" } },
+    { "seat": 1, "move": { "play": "3C" } },
+    { "seat": 2, "move": { "play": "KC" } },
+    { "seat": 2, "move": { "play": "5S" } },
+    { "seat": 3, "move": { "play": "TS" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "4S" } },
+    { "seat": 3, "move": { "play": "TC" } },
+    { "seat": 0, "move": { "play": "8D" } },
+    { "seat": 1, "move": { "play": "JH" } },
+    { "seat": 2, "move": { "play": "7S" } },
+    { "seat": 2, "move": { "play": "JS" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "JD" } },
+    { "seat": 1, "move": { "play": "KS" } },
+    { "seat": 3, "move": { "play": "KH" } },
+    { "seat": 0, "move": { "play": "AD" } },
+    { "seat": 1, "move": { "play": "AH" } },
+    { "seat": 2, "move": { "play": "QS" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "bid": 3 } },
+    { "seat": 0, "move": { "bid": 8 } },
+    { "seat": 1, "move": { "bid": 0 } },
+    { "seat": 2, "move": { "play": "2C" } },
+    { "seat": 3, "move": { "play": "4C" } },
+    { "seat": 0, "move": { "play": "TC" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 0, "move": { "play": "2D" } },
+    { "seat": 1, "move": { "play": "3D" } },
+    { "seat": 2, "move": { "play": "8D" } },
+    { "seat": 3, "move": { "play": "4D" } },
+    { "seat": 2, "move": { "play": "4H" } },
+    { "seat": 3, "move": { "play": "9H" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "2H" } },
+    { "seat": 0, "move": { "play": "KC" } },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 2, "move": { "play": "5C" } },
+    { "seat": 3, "move": { "play": "QC" } },
+    { "seat": 0, "move": { "play": "TD" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "5H" } },
+    { "seat": 3, "move": { "play": "5D" } },
+    { "seat": 0, "move": { "play": "3H" } },
+    { "seat": 1, "move": { "play": "6H" } },
+    { "seat": 2, "move": { "play": "TH" } },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 1, "move": { "play": "7D" } },
+    { "seat": 2, "move": { "play": "5S" } },
+    { "seat": 2, "move": { "play": "8C" } },
+    { "seat": 3, "move": { "play": "AD" } },
+    { "seat": 0, "move": { "play": "AC" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 0, "move": { "play": "AH" } },
+    { "seat": 1, "move": { "play": "7H" } },
+    { "seat": 2, "move": { "play": "KH" } },
+    { "seat": 3, "move": { "play": "2S" } },
+    { "seat": 3, "move": { "play": "3S" } },
+    { "seat": 0, "move": { "play": "4S" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "6S" } },
+    { "seat": 2, "move": { "play": "JC" } },
+    { "seat": 3, "move": { "play": "7S" } },
+    { "seat": 0, "move": { "play": "QS" } },
+    { "seat": 1, "move": { "play": "9C" } },
+    { "seat": 0, "move": { "play": "KS" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "9S" } },
+    { "seat": 3, "move": { "play": "8S" } },
+    { "seat": 0, "move": { "play": "AS" } },
+    { "seat": 1, "move": { "play": "JD" } },
+    { "seat": 2, "move": { "play": "TS" } },
+    { "seat": 3, "move": { "play": "JS" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "bid": 1 } },
+    { "seat": 1, "move": { "bid": 4 } },
+    { "seat": 2, "move": { "bid": 2 } },
+    { "seat": 3, "move": { "play": "7D" } },
+    { "seat": 0, "move": { "play": "TD" } },
+    { "seat": 1, "move": { "play": "JD" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 1, "move": { "play": "6C" } },
+    { "seat": 2, "move": { "play": "7C" } },
+    { "seat": 3, "move": { "play": "KC" } },
+    { "seat": 0, "move": { "play": "4C" } },
+    { "seat": 3, "move": { "play": "9D" } },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "5D" } },
+    { "seat": 0, "move": { "play": "9C" } },
+    { "seat": 1, "move": { "play": "JC" } },
+    { "seat": 2, "move": { "play": "2C" } },
+    { "seat": 3, "move": { "play": "5C" } },
+    { "seat": 1, "move": { "play": "5H" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "8H" } },
+    { "seat": 0, "move": { "play": "3H" } },
+    { "seat": 3, "move": { "play": "AD" } },
+    { "seat": 0, "move": { "play": "2D" } },
+    { "seat": 1, "move": { "play": "6S" } },
+    { "seat": 2, "move": { "play": "8D" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "3C" } },
+    { "seat": 3, "move": { "play": "2H" } },
+    { "seat": 0, "move": { "play": "TC" } },
+    { "seat": 0, "move": { "play": "4D" } },
+    { "seat": 1, "move": { "play": "JS" } },
+    { "seat": 2, "move": { "play": "8S" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 1, "move": { "play": "9H" } },
+    { "seat": 2, "move": { "play": "JH" } },
+    { "seat": 3, "move": { "play": "3S" } },
+    { "seat": 0, "move": { "play": "4H" } },
+    { "seat": 3, "move": { "play": "4S" } },
+    { "seat": 0, "move": { "play": "7S" } },
+    { "seat": 1, "timeout": true },
+    { "seat": 2, "move": { "play": "TS" } },
+    { "seat": 1, "move": { "play": "AC" } },
+    { "seat": 2, "move": { "play": "QH" } },
+    { "seat": 3, "move": { "play": "5S" } },
+    { "seat": 0, "move": { "play": "QC" } },
+    { "seat": 3, "move": { "play": "9S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "play": "AS" } },
+    { "seat": 2, "move": { "play": "KH" } },
+    { "seat": 1, "move": { "play": "TH" } },
+    { "seat": 2, "move": { "play": "AH" } },
+    { "seat": 3, "move": { "play": "QS" } },
+    { "seat": 0, "move": { "play": "6H" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 1, "move": { "bid": 4 } },
+    { "seat": 2, "move": { "bid": 2 } },
+    { "seat": 3, "move": { "bid": 4 } },
+    { "seat": 0, "move": { "play": "5D" } },
+    { "seat": 1, "move": { "play": "9D" } },
+    { "seat": 2, "move": { "play": "4D" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 1, "move": { "play": "3C" } },
+    { "seat": 2, "move": { "play": "4C" } },
+    { "seat": 3, "move": { "play": "5C" } },
+    { "seat": 0, "move": { "play": "9C" } },
+    { "seat": 0, "move": { "play": "6D" } },
+    { "seat": 1, "move": { "play": "TD" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "3S" } },
+    { "seat": 3, "move": { "play": "4H" } },
+    { "seat": 0, "move": { "play": "5H" } },
+    { "seat": 1, "move": { "play": "KH" } },
+    { "seat": 2, "move": { "play": "AH" } },
+    { "seat": 2, "move": { "play": "2H" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "7H" } },
+    { "seat": 1, "move": { "play": "3H" } },
+    { "seat": 0, "move": { "play": "2C" } },
+    { "seat": 1, "move": { "play": "TC" } },
+    { "seat": 2, "move": { "play": "KC" } },
+    { "seat": 3, "move": { "play": "6C" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "JH" } },
+    { "seat": 0, "move": { "play": "6S" } },
+    { "seat": 1, "move": { "play": "TS" } },
+    { "seat": 1, "move": { "play": "3D" } },
+    { "seat": 2, "move": { "play": "8D" } },
+    { "seat": 3, "move": { "play": "4S" } },
+    { "seat": 0, "timeout": true },
+    { "seat": 3, "move": { "play": "8C" } },
+    { "seat": 0, "move": { "play": "JC" } },
+    { "seat": 1, "move": { "play": "QC" } },
+    { "seat": 2, "move": { "play": "7C" } },
+    { "seat": 1, "move": { "play": "AD" } },
+    { "seat": 2, "move": { "play": "8S" } },
+    { "seat": 3, "timeout": true },
+    { "seat": 0, "move": { "play": "QD" } },
+    { "seat": 3, "move": { "play": "5S" } },
+    { "seat": 0, "move": { "play": "QS" } },
+    { "seat": 1, "move": { "play": "KS" } },
+    { "seat": 2, "move": { "play": "9H" } },
+    { "seat": 1, "move": { "play": "2S" } },
+    { "seat": 2, "timeout": true },
+    { "seat": 3, "move": { "play": "7S" } },
+    { "seat": 0, "move": { "play": "KD" } },
+    { "seat": 3, "move": { "play": "AS" } },
+    { "seat": 0, "move": { "play": "AC" } },
+    { "seat": 1, "move": { "play": "JS" } },
+    { "seat": 2, "move": { "play": "QH" } }
+  ]
 }

@@ -8,7 +8,12 @@ import { canonical } from "./canonical";
 import type { GameEntry } from "./invariants";
 import { checkView } from "./view-check";
 
-export const REFOLD_INTERVAL = 64;
+// Full-log refolds are quadratic in game length; retain intermediate and final checks.
+export const REFOLD_INTERVAL = 256;
+function assertSame(actual: unknown, expected: unknown, message: string): void {
+  if (!Bun.deepEquals(actual, expected, true))
+    deepStrictEqual(actual, expected, message);
+}
 const viewers: Viewer[] = [
   ...seats.map((seat) => ({ seat })),
   { spectator: true },
@@ -45,7 +50,17 @@ export function playout<S, M, V, R, K extends string>(
         ),
         `locate: seat ${seat} must hold a piece at init`,
       );
+    let previousDeal: unknown;
     const check = () => {
+      const deal =
+        state && typeof state === "object" && "deal" in state
+          ? state.deal
+          : null;
+      const plainJson =
+        moves.length === 0 ||
+        deal !== previousDeal ||
+        entry.toAct(state) === null;
+      previousDeal = deal;
       const locations = entry.locate(state);
       deepStrictEqual(
         [...locations.keys()].sort(),
@@ -55,11 +70,11 @@ export function playout<S, M, V, R, K extends string>(
       for (const places of locations.values())
         ok(places.length === 1, "conservation: duplicate or missing piece");
       for (const viewer of viewers)
-        checkView(entry.view(state, viewer), viewer, locations);
+        checkView(entry.view(state, viewer), viewer, locations, plainJson);
       if (moves.length % REFOLD_INTERVAL === 0 || entry.toAct(state) === null) {
         const replay = fold(entry, seed, moves);
         ok(replay.ok, "determinism: replay rejected a move");
-        deepStrictEqual(replay.state, state, "determinism: refold differs");
+        assertSame(replay.state, state, "determinism: refold differs");
       }
     };
     check();
@@ -80,12 +95,12 @@ export function playout<S, M, V, R, K extends string>(
         move: entry.illegalMove(state, seat),
       });
       ok(!rejected.ok, "legality: illegal move accepted");
-      deepStrictEqual(state, before, "legality: rejection mutated input");
+      assertSame(state, before, "legality: rejection mutated input");
       const envelope: Envelope<M> =
         moves.length % 7 === 0 ? { seat, timeout: true } : { seat, move };
       const result = entry.apply(state, envelope);
       ok(result.ok, "legality: legal move rejected");
-      deepStrictEqual(state, before, "apply mutated input");
+      assertSame(state, before, "apply mutated input");
       moves.push(envelope);
       state = result.state;
       check();
