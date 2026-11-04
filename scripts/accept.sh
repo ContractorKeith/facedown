@@ -19,9 +19,13 @@ echo "== e2e"
 bun run test:e2e
 
 echo "== build"
-# M5 adds: bun run build
+bun run build
 
 echo "== browser"
-# M5 adds: bun run test:browser (when Playwright browsers are installed or CI=1)
+if [ "${CI:-}" = "1" ] || (bunx playwright --version >/dev/null 2>&1 && bun -e 'import { chromium } from "@playwright/test"; process.exit(await Bun.file(chromium.executablePath()).exists() ? 0 : 1)'); then
+  bun run test:browser
+else
+  echo "browser: skipped (no chromium)"
+fi
 
 echo "accept: ok"

@@ -3,6 +3,7 @@ import type { Clock, Timing } from "../clock";
 import type { Store } from "../store";
 import {
   Fault,
+  owns,
   type Peer,
   publicSeats,
   ratedIfStarted,
@@ -56,6 +57,11 @@ export class Lifecycle {
           : (table.rated ?? false),
       table: table.id,
       seq: table.seq,
+      host:
+        table.host === peer.session.id ||
+        table.seats.some(
+          (s) => s?.session === table.host && owns(s, peer.session),
+        ),
       view: table.game.view(table.state, viewer),
       toAct: table.status === "open" ? null : table.game.toAct(table.state),
       deadline: table.deadline,

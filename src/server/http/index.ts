@@ -6,6 +6,7 @@ import type { SocketData } from "../ws";
 import type { SessionSockets } from "../ws/sessions";
 import { Auth, identity } from "./auth";
 import type { SessionResolver } from "./sessions";
+import { staticFile } from "./static";
 
 const json = (value: unknown, status = 200, headers?: HeadersInit) =>
   Response.json(value, { status, headers });
@@ -141,10 +142,7 @@ export function handler(
         !path.startsWith("/api/") &&
         path !== "/ws"
       )
-        return new Response(
-          "<!doctype html><title>facedown</title><h1>facedown</h1><p>The table is being set.</p>",
-          { headers: { "content-type": "text/html; charset=utf-8" } },
-        );
+        return await staticFile(path);
       throw new Fault("not_found");
     } catch (error) {
       const code = error instanceof Fault ? error.code : "bad_request";

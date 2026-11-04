@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M3 complete; M4 accounts, ratings and replay APIs implemented in this PR.
+M0–M4 complete; M5 playable client implemented in this PR.
 
 ## Commands
 
@@ -21,6 +21,9 @@ bun run lint              # Biome
 bun test                  # unit, purity, goldens, 200 playouts per game
 bun run start             # server, PORT defaults to 8080
 bun run dev               # server with watch
+bun run build             # client into dist/client
+bun run dev:client        # Vite, proxies API and WS to :8080
+bun run test:browser      # phone viewport Playwright smoke
 bun run test:e2e          # real HTTP + WebSocket server tests
 bun run replay:record <type> <64-char-hex-seed>
 bash scripts/accept.sh    # full gate, 2000 playouts per game
@@ -51,6 +54,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - `FACEDOWN_TURN_MS` / `FACEDOWN_HOLD_MS` / `FACEDOWN_BOT_MS`: 30000 / 180000 / 600 ms.
 - Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
 - Rated games require four distinct accounts at start and no casual flag; bot-held seats at finish score a loss, reclaim clears it.
+- Browser smoke needs `bunx playwright install chromium` (CI adds `--with-deps`).
 - Tooling is Bun, `tsc --noEmit`, Biome. No ESLint, Prettier, Vitest or ORM.
 - Commits: `<type>: <description>`, author @ContractorKeith only.
 

@@ -53,6 +53,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
             : locateSpades(state as SpadesState);
         checkView(message, client.viewer as Viewer, locations);
         expect(message.commitment).toBe(record.commitment);
+        expect(typeof message.host).toBe("boolean");
         expect(Object.keys(message).sort()).toEqual(
           [
             "status",
@@ -65,6 +66,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
             "deadline",
             "seats",
             "commitment",
+            "host",
           ].sort(),
         );
       } else {

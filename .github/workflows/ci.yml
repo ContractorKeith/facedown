@@ -15,9 +15,10 @@ jobs:
         with:
           bun-version: 1.4.3
       - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - name: Acceptance and nonzero playout guard
         shell: bash
         run: |
           set -o pipefail
-          bash scripts/accept.sh 2>&1 | tee /tmp/facedown-accept.log
+          CI=1 bash scripts/accept.sh 2>&1 | tee /tmp/facedown-accept.log
           grep -E 'playouts: [1-9][0-9]* games' /tmp/facedown-accept.log

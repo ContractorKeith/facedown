@@ -1,0 +1,195 @@
+.game {
+  max-width: 720px;
+  padding: 14px 16px 20px;
+}
+.game .brand {
+  margin-bottom: 16px;
+}
+.quiet {
+  background: transparent;
+  color: var(--accent);
+  border-color: #587461;
+  font-size: 0.75rem;
+}
+.game-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.game-heading h1 {
+  font:
+    500 1.75rem Georgia,
+    serif;
+}
+.game-heading small {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+}
+.scorebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  border-top: 1px solid #4e6c5c;
+  border-bottom: 1px solid #4e6c5c;
+  padding: 10px 0;
+}
+.scorebar strong {
+  font:
+    500 1.65rem Georgia,
+    serif;
+}
+.scorebar small {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+}
+.scorebar span {
+  font-size: 0.8rem;
+}
+.board {
+  height: 330px;
+  position: relative;
+  margin: 8px 0;
+  background: #194739;
+  border-radius: 44%;
+  border: 1px solid #3f6850;
+}
+.seat {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100px;
+  text-align: center;
+  z-index: 2;
+}
+.seat strong {
+  font-size: 0.68rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seat small {
+  font-size: 0.56rem;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #244b3e;
+  border: 1px solid #6c8871;
+  font-size: 0.7rem;
+}
+.active .avatar {
+  background: var(--accent);
+  color: #15352b;
+  box-shadow: 0 0 0 3px #edcc8233;
+}
+.north {
+  top: 8px;
+  left: calc(50% - 50px);
+}
+.south {
+  bottom: 8px;
+  left: calc(50% - 50px);
+}
+.west {
+  left: -7px;
+  top: 125px;
+}
+.east {
+  right: -7px;
+  top: 125px;
+}
+.table-center {
+  position: absolute;
+  top: 84px;
+  bottom: 82px;
+  left: 65px;
+  right: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.trick {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.card {
+  display: block;
+  width: 56px;
+  height: 80px;
+}
+.tile {
+  display: block;
+  width: 40px;
+  height: 80px;
+}
+.played {
+  animation: play 0.25s ease-out;
+}
+.played small {
+  font-size: 0.55rem;
+  text-align: center;
+}
+.trick .card {
+  width: 44px;
+  height: 63px;
+}
+.table-mark {
+  text-align: center;
+  font-size: 3.4rem;
+  color: #6a8c6a;
+}
+.table-mark small {
+  font-size: 0.65rem;
+}
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  max-height: 150px;
+  overflow: auto;
+}
+.line .tile {
+  width: 21px;
+  height: 42px;
+}
+.open-ends {
+  margin-top: 6px;
+  font-size: 0.65rem;
+}
+@media (min-width: 600px) {
+  .board {
+    height: 400px;
+  }
+  .west,
+  .east {
+    top: 160px;
+  }
+  .hand {
+    gap: 8px;
+  }
+  .piece {
+    margin-left: -12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: Override inline Svelte transition animations for reduced motion. */
+    animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced motion applies to all interactive states. */
+    transition: none !important;
+    scroll-behavior: auto;
+  }
+}
