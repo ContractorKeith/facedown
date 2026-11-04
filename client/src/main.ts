@@ -5,3 +5,5 @@ import "./board.css";
 import "./controls.css";
 
 mount(App, { target: document.getElementById("app") as HTMLElement });
+
+import "./account.css";

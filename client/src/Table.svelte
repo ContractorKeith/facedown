@@ -58,6 +58,7 @@ function subscribe(next: number | null) {
       if (incoming.t === "view") {
         pending = false;
         message = incoming as unknown as ViewMessage;
+        over = message.status === "finished";
         error = "";
       }
       if (incoming.t === "over") over = true;
@@ -121,11 +122,13 @@ onMount(() => {
       const saved = sessionStorage.getItem(`seat:${id}`);
       const own = table.seats.findIndex((s) => s?.name === name);
       subscribe(
-        own >= 0
-          ? own
-          : saved !== null && table.status === "live"
-            ? Number(saved)
-            : null,
+        location.search === "?watch=1"
+          ? null
+          : own >= 0
+            ? own
+            : saved !== null && table.status === "live"
+              ? Number(saved)
+              : null,
       );
     })
     .catch((e) => (error = e.message));
@@ -145,7 +148,7 @@ onMount(() => {
   </header>
   <div class="game-heading">
     <h1>{table?.type === "dominoes" ? "Dominoes" : "Spades"}</h1>
-    <small>{message?.rated ? "RATED" : "CASUAL"} · {id}</small>
+    <small>{message?.rated ? "Rated" : "Casual"} · {id}</small>
   </div>
   {#if !up && table}
     <p class="banner" role="status">Reconnecting…</p>
@@ -155,6 +158,7 @@ onMount(() => {
     <p role="alert">{error}</p>
   {/if}
   {#if message && view}
+    {#if !message.rated}<p class="banner">Casual · Ratings stay unchanged. Rated play requires four signed-in humans at the start; guests or bots make a table casual.</p>{/if}
     <Scorebar {view} />
     <Board {message} {seat} {bubbles} />
     {#if view.lastDeal}
@@ -162,6 +166,7 @@ onMount(() => {
     {/if}
     {#if over}
       <p class="banner">Game over · Final scores {view.scores.join(" / ")}</p>
+      <a class="replay-link" href={`/games/${id}`}>Check the replay →</a>
     {:else if message.status === "open"}
       <div class="controls">
         {#if message.host}

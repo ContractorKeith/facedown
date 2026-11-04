@@ -14,3 +14,11 @@ browser — sees a card it shouldn't.
 Status: planned, no code yet. See [`docs/PLAN.md`](docs/PLAN.md).
 
 MIT licensed.
+
+### Check a game yourself
+
+Open a finished game’s replay to see every hand and step through its moves. Before the
+first deal, the server publishes a seed commitment (the SHA-256 of its secret seed).
+After the game, it reveals the seed. Your browser checks that commitment and runs the
+same game engine through the move log. “Verified” means the seed matches and the log
+produces the stored final scores and winner; “Mismatch” tells you which check failed.

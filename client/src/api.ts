@@ -38,9 +38,12 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
   if (!response.ok)
     throw new ApiError(
       response.status,
-      (await response.json()).message ?? "Request failed",
+      response.status === 429
+        ? "Too many attempts. Please wait before trying again."
+        : ((await response.json()).message?.replaceAll("_", " ") ??
+            "Request failed"),
     );
-  return response.json();
+  return response.status === 204 ? (undefined as T) : response.json();
 }
 export async function session(): Promise<string> {
   try {
