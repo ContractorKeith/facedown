@@ -1,33 +1,12 @@
-import { type ChildProcess, spawn } from "node:child_process";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // Bun also discovers this file; only the browser command registers the suite.
 if (process.env.FACEDOWN_BROWSER === "1") {
-  let server: ChildProcess;
-  let origin: string;
-  test.beforeAll(async () => {
-    server = spawn("bun", ["test/browser/server.ts"], {
-      stdio: ["ignore", "pipe", "inherit"],
-    });
-    origin = await new Promise<string>((resolve, reject) => {
-      server.once("exit", (code) =>
-        reject(new Error(`Server exited: ${code}`)),
-      );
-      server.stdout?.once("data", (chunk) => resolve(String(chunk).trim()));
-    });
-  });
-  test.afterAll(async () => {
-    if (server && server.exitCode === null)
-      await new Promise<void>((resolve) => {
-        server.once("exit", () => resolve());
-        server.kill("SIGTERM");
-      });
-  });
-
   for (const type of ["Spades", "Dominoes"] as const) {
     test(`${type}: a phone plays a deal, reacts and reconnects`, async ({
       page,
       browser,
+      origin,
     }) => {
       // Track the real socket so the test can simulate a dropped connection.
       await page.addInitScript(() => {

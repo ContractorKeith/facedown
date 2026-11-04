@@ -1,31 +1,43 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { api, type Table, type ViewMessage } from "./api";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Hand from "./Hand.svelte";
 import { legalMovesFromView } from "./legal";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
+import Reactions from "./Reactions.svelte";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
+import Scorebar from "./Scorebar.svelte";
 import { connect } from "./socket";
 
-let { id, name, navigate } = $props<{
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
+let { id, name, navigate, refreshSession } = $props<{
   id: string;
   name: string;
   navigate: (path: string) => void;
+  refreshSession: () => Promise<string>;
 }>();
 let table = $state<Table>();
 let message = $state<ViewMessage>();
 let seat = $state<number | null>(null);
 let up = $state(false);
 let error = $state("");
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let copied = $state(false);
+let pending = $state(false);
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
+let notice = $state("");
 let over = $state(false);
 let now = $state(Date.now());
 let bubbles = $state<Record<number, string>>({});
 let connection: ReturnType<typeof connect> | undefined;
 const timers = new Set<ReturnType<typeof setTimeout>>();
-const reactions = ["nice", "oops", "gg", "hurry", "thanks", "wow"];
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const view = $derived(message?.view);
 const moves = $derived(
-  (up && message && message.toAct === seat && seat !== null && !over
+  (up && !pending && message && message.toAct === seat && seat !== null && !over
     ? legalMovesFromView(table?.type ?? "spades", message.view)
     : []) as Record<string, unknown>[],
 );
@@ -37,13 +49,22 @@ function subscribe(next: number | null) {
     id,
     next,
     (incoming) => {
+      if (incoming.t === "signed_out") {
+        seat = null;
+        pending = false;
+        sessionStorage.removeItem(`seat:${id}`);
+        notice = "You were signed out of this seat. You are spectating.";
+      }
       if (incoming.t === "view") {
+        pending = false;
         message = incoming as unknown as ViewMessage;
         error = "";
       }
       if (incoming.t === "over") over = true;
-      if (incoming.t === "error" && incoming.code !== "stale_seq")
+      if (incoming.t === "error" && incoming.code !== "stale_seq") {
+        pending = false;
         error = String(incoming.message).replaceAll("_", " ");
+      }
       if (incoming.t === "reaction") {
         const index = Number(incoming.seat);
         bubbles[index] = String(incoming.id);
@@ -54,9 +75,14 @@ function subscribe(next: number | null) {
         timers.add(timer);
       }
     },
-    (value) => (up = value),
+    (value) => {
+      up = value;
+      if (!value) pending = false;
+    },
+    refreshSession,
   );
 }
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function control(action: string) {
   try {
     await api(`/tables/${id}/${action}`, {});
@@ -65,17 +91,18 @@ async function control(action: string) {
     error = (e as Error).message;
   }
 }
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 function play(move: Record<string, unknown>) {
-  if (up && message && moves.includes(move))
+  if (up && !pending && message && moves.includes(move)) {
+    pending = true;
     connection?.send({ t: "move", seq: message.seq, move });
+  }
 }
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function copy() {
   try {
     await navigator.clipboard.writeText(
-      new URL(
-        sessionStorage.getItem(`invite:${id}`) ?? `/tables/${id}`,
-        location.origin,
-      ).href,
+      new URL(location.pathname, location.origin).href,
     );
     copied = true;
   } catch {
@@ -124,24 +151,12 @@ onMount(() => {
   {#if !up && table}
     <p class="banner" role="status">Reconnecting…</p>
   {/if}
+  {#if notice}<p class="banner" role="status">{notice}</p>{/if}
   {#if error}
     <p role="alert">{error}</p>
   {/if}
   {#if message && view}
-    <div class="scorebar">
-      <div>
-        <small>TEAM 1 · 1 + 3</small>
-        <strong>{view.scores[0]}</strong>
-      </div>
-      <div>
-        <small>DEAL {view.deal + 1}</small>
-        <span>{"bags" in view ? `Bags ${view.bags.join(" / ")}` : `Boneyard ${view.boneyardCount}`}</span>
-      </div>
-      <div>
-        <small>TEAM 2 · 2 + 4</small>
-        <strong>{view.scores[1]}</strong>
-      </div>
-    </div>
+    <Scorebar {view} />
     <Board {message} {seat} {bubbles} />
     {#if view.lastDeal}
       <p class="deal-result" data-testid="deal-result">Deal scored · {view.lastDeal.points.join(" / ")} points</p>
@@ -150,7 +165,7 @@ onMount(() => {
       <p class="banner">Game over · Final scores {view.scores.join(" / ")}</p>
     {:else if table?.status === "open" && !message.deadline}
       <div class="controls">
-        {#if sessionStorage.getItem(`host:${id}`)}
+        {#if message.host}
           <button onclick={() => control("bots")}>Fill bots</button>
           <button disabled={!message.seats.every(Boolean)} onclick={() => control("start")}>Start game</button>
         {/if}
@@ -176,11 +191,7 @@ onMount(() => {
     {/each}
     {#if seat !== null}
       <Hand hand={view.hand} {moves} dominoes={table?.type === "dominoes"} {play} />
-      <nav class="reactions" aria-label="Reactions">
-        {#each reactions as id}
-          <button disabled={!up} onclick={() => connection?.send({ t: "react", id })}>{id}</button>
-        {/each}
-      </nav>
+      <Reactions {up} send={value => connection?.send(value)} />
     {/if}
   {/if}
 </main>

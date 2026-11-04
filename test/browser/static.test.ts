@@ -38,3 +38,28 @@ test("an unbuilt client returns an uncached HTML service-unavailable page", asyn
   expect(response.headers.get("content-type")).toContain("text/html");
   expect(response.headers.get("cache-control")).toBe("no-store");
 });
+
+test("NUL paths return 404 instead of rejecting", async () => {
+  for (const path of ["/%00", "/index.html%00.js"])
+    expect((await staticFile(path, root)).status).toBe(404);
+});
+test("symlinks cannot expose files outside the client root", async () => {
+  const { symlinkSync, mkdirSync } = await import("node:fs");
+  const outside = mkdtempSync(join(tmpdir(), "facedown-outside-"));
+  try {
+    await Bun.write(join(outside, "secret.html"), "private");
+    symlinkSync(join(outside, "secret.html"), join(root, "leak.html"));
+    expect((await staticFile("/leak.html", root)).status).toBe(404);
+    symlinkSync(join(outside, "secret.html"), join(root, "assets/leak.js"));
+    expect((await staticFile("/assets/leak.js", root)).status).toBe(404);
+    symlinkSync(outside, join(root, "linked"));
+    expect((await staticFile("/linked/secret.html", root)).status).toBe(404);
+    // The SPA fallback must validate index.html too.
+    const fallback = join(root, "fallback");
+    mkdirSync(fallback);
+    symlinkSync(join(outside, "secret.html"), join(fallback, "index.html"));
+    expect((await staticFile("/unknown", fallback)).status).toBe(404);
+  } finally {
+    rmSync(outside, { recursive: true });
+  }
+});

@@ -1,3 +1,4 @@
+import { realpath, stat } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import type { Server } from "bun";
 import type { Store } from "../store";
@@ -142,7 +143,7 @@ export function handler(
         !path.startsWith("/api/") &&
         path !== "/ws"
       )
-        return staticFile(path);
+        return await staticFile(path);
       throw new Fault("not_found");
     } catch (error) {
       const code = error instanceof Fault ? error.code : "bad_request";
@@ -171,12 +172,32 @@ export async function staticFile(path: string, root = resolve("dist/client")) {
   } catch {
     return new Response("Not found", { status: 404 });
   }
+  if (decoded.includes("\0")) return new Response("Not found", { status: 404 });
+  root = resolve(root);
   const target = resolve(root, `.${decoded}`);
   if (!target.startsWith(`${root}${sep}`) && target !== root)
     return new Response("Not found", { status: 404 });
   const asset = decoded.startsWith("/assets/");
-  const file = Bun.file(target);
-  if (target !== root && (await file.exists()))
+  const canonicalRoot = await realpath(root).catch(() => null);
+  async function fileAt(path: string) {
+    const canonical = await realpath(path).catch(() => null);
+    if (!canonical || !canonicalRoot) return null;
+    if (
+      canonical !== canonicalRoot &&
+      !canonical.startsWith(`${canonicalRoot}${sep}`)
+    )
+      throw new Fault("not_found");
+    return (await stat(canonical)).isFile() ? Bun.file(canonical) : null;
+  }
+  let file: ReturnType<typeof Bun.file> | null;
+  try {
+    file = await fileAt(target);
+  } catch (error) {
+    if (error instanceof Fault)
+      return new Response("Not found", { status: 404 });
+    throw error;
+  }
+  if (file)
     return new Response(file, {
       headers: {
         "cache-control":
@@ -187,8 +208,15 @@ export async function staticFile(path: string, root = resolve("dist/client")) {
     });
   if (asset || /\.[a-z0-9]+$/i.test(decoded))
     return new Response("Not found", { status: 404 });
-  const index = Bun.file(resolve(root, "index.html"));
-  return (await index.exists())
+  let index: ReturnType<typeof Bun.file> | null;
+  try {
+    index = await fileAt(resolve(root, "index.html"));
+  } catch (error) {
+    if (error instanceof Fault)
+      return new Response("Not found", { status: 404 });
+    throw error;
+  }
+  return index
     ? new Response(index, { headers: { "cache-control": "no-store" } })
     : new Response(
         "<!doctype html><title>facedown</title><p>Client not built. Run bun run build.</p>",

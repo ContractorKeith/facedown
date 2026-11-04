@@ -17,7 +17,16 @@ export type ViewMessage = {
   deadline: number | null;
   seats: Seat[];
   commitment: string;
+  host: boolean;
 };
+class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
 export async function api<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`/api${path}`, {
     method: body === undefined ? "GET" : "POST",
@@ -25,13 +34,17 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (!response.ok)
-    throw new Error((await response.json()).message ?? "Request failed");
+    throw new ApiError(
+      response.status,
+      (await response.json()).message ?? "Request failed",
+    );
   return response.json();
 }
 export async function session(): Promise<string> {
   try {
     return (await api<{ name: string }>("/me")).name;
-  } catch {
+  } catch (error) {
+    if (!(error instanceof ApiError) || error.status !== 401) throw error;
     return (await api<{ name: string }>("/guest", {})).name;
   }
 }

@@ -56,6 +56,7 @@ export class Lifecycle {
           : (table.rated ?? false),
       table: table.id,
       seq: table.seq,
+      host: table.host === peer.session.id,
       view: table.game.view(table.state, viewer),
       toAct: table.status === "open" ? null : table.game.toAct(table.state),
       deadline: table.deadline,

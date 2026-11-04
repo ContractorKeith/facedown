@@ -1,15 +1,21 @@
 <script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import { fly } from "svelte/transition";
 import type { ViewMessage } from "./api";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Card from "./art/Card.svelte";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Tile from "./art/Tile.svelte";
 
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { message, seat, bubbles } = $props<{
   message: ViewMessage;
   seat: number | null;
   bubbles: Record<number, string>;
 }>();
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const view = $derived(message.view);
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const positions = ["south", "west", "north", "east"];
 </script>
 <div class="board" aria-label="Game table">

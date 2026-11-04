@@ -6,6 +6,12 @@ import { Tables } from "./tables";
 import { type SocketData, websocket } from "./ws";
 import { SessionSockets } from "./ws/sessions";
 
+export const serverError = () =>
+  Response.json(
+    { code: "internal_error", message: "Internal server error" },
+    { status: 500 },
+  );
+
 export type ServerOptions = {
   port?: number;
   hostname?: string;
@@ -43,6 +49,7 @@ export function startServer(options: ServerOptions = {}) {
       port: options.port ?? Number(process.env.PORT ?? 8080),
       hostname: options.hostname ?? "0.0.0.0",
       maxRequestBodySize: 4096,
+      error: serverError,
       fetch: handler(
         store,
         tables,
