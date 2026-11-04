@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0 and M1 complete; M2 Dominoes engine and bot implemented in this PR.
+M0–M2 complete; M3 game server implemented in this PR.
 
 ## Commands
 
@@ -19,6 +19,9 @@ bun install
 bun run typecheck         # tsc --noEmit
 bun run lint              # Biome
 bun test                  # unit, purity, goldens, 200 playouts per game
+bun run start             # server, PORT defaults to 8080
+bun run dev               # server with watch
+bun run test:e2e          # real HTTP + WebSocket server tests
 bun run replay:record <type> <64-char-hex-seed>
 bash scripts/accept.sh    # full gate, 2000 playouts per game
 ```
@@ -42,6 +45,9 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - State is always `fold(init(seed), moves)`; in-memory state and snapshots are caches.
 - The seed is never returned by any API while a game is live.
 - Only `src/server/store` touches SQLite.
+- `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
+- `FACEDOWN_TURN_MS` / `FACEDOWN_HOLD_MS` / `FACEDOWN_BOT_MS`: 30000 / 180000 / 600 ms.
+- Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
 - Tooling is Bun, `tsc --noEmit`, Biome. No ESLint, Prettier, Vitest or ORM.
 - Commits: `<type>: <description>`, author @ContractorKeith only.
 
