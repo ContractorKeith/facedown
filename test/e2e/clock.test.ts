@@ -13,13 +13,15 @@ test("real clock schedules turn timeout and disconnected-seat takeover", async (
     port: 0,
     hostname: "127.0.0.1",
     sessions,
-    timing: { turn: 10, hold: 1000, bot: 2 },
+    timing: { turn: 10, hold: 1, bot: 2 },
   });
   let client: Client | undefined;
   try {
     const host = sessions.guest().session;
     const table = app.tables.create("spades", host);
     app.tables.fill(table.id, host);
+    const hostPeer = { session: host, send: () => {} };
+    app.tables.join(table.id, 0, hostPeer);
     const spectator = sessions.guest(),
       origin = `http://127.0.0.1:${app.server.port}`;
     const Socket = WebSocket as unknown as new (
@@ -41,6 +43,7 @@ test("real clock schedules turn timeout and disconnected-seat takeover", async (
       seat: 0,
       timeout: true,
     });
+    app.tables.disconnect(hostPeer);
     await client.next(
       (m) => m.t === "view" && (m.seats as { bot: boolean }[])[0]?.bot === true,
     );
