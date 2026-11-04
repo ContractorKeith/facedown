@@ -128,6 +128,11 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         }
         await page.waitForTimeout(230); // Respect the server's real move rate limit.
       }
+      if (!captured)
+        await page.screenshot({
+          path: `test-results/${type.toLowerCase()}-phone.png`,
+          fullPage: true,
+        });
       await expect(scoring).toBeVisible();
       expect(moves).toBeGreaterThan(0);
       if (type === "Dominoes") expect(draws).toBeGreaterThan(0);
