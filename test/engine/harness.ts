@@ -67,7 +67,8 @@ export function playout<S, M, V, R, K extends string>(
       ok(moves.length < entry.maxMoves, "termination: move bound exceeded");
       const seat = entry.toAct(state);
       ok(seat !== null);
-      const before = structuredClone(state);
+      // Engine states are JSON data; round-trip cloning keeps long playouts cheap.
+      const before = JSON.parse(JSON.stringify(state)) as S;
       const legal = entry.legalMoves(state, seat);
       const move = entry.bot(entry.view(state, { seat }), legal);
       ok(

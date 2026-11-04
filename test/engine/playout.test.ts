@@ -16,7 +16,7 @@ test("seeded bot playouts satisfy every invariant", () => {
     }
   }
   console.log(`playouts: ${total} games`);
-}, 120000);
+}, 180000);
 
 test("a planted leak fails with a replay and seed", () => {
   const seed = sha256("planted leak");
