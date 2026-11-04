@@ -9,7 +9,7 @@
     "test": "bun test",
     "replay:record": "bun scripts/replay-record.ts",
     "start": "bun src/server/main.ts",
-    "dev": "bun --watch src/server/main.ts",
+    "dev": "FACEDOWN_INSECURE_COOKIE=1 bun --watch src/server/main.ts",
     "test:e2e": "bun test test/e2e",
     "build": "vite build",
     "dev:client": "vite",

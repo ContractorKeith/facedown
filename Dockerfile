@@ -29,6 +29,8 @@ COPY src ./src
 COPY package.json ./
 ENV FACEDOWN_DB=/data/facedown.db
 ENV PORT=8080
+ENV HOST=0.0.0.0
+ENV FACEDOWN_TRUST_PROXY=1
 ENV PATH=/usr/local/bin
 USER 1000:1000
 EXPOSE 8080

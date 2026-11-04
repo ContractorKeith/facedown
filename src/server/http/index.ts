@@ -5,7 +5,8 @@ import type { Tables } from "../tables";
 import { Fault } from "../tables/types";
 import type { SocketData } from "../ws";
 import type { SessionSockets } from "../ws/sessions";
-import { Auth, identity } from "./auth";
+import { Auth, clientIP, identity } from "./auth";
+import { AuthLimits } from "./auth-limits";
 import type { SessionResolver } from "./sessions";
 import { staticFile } from "./static";
 
@@ -18,6 +19,7 @@ export function handler(
   origin?: string,
   sockets?: SessionSockets,
 ) {
+  const limits = new AuthLimits();
   const auth = new Auth(
     store,
     sessions,
@@ -44,6 +46,7 @@ export function handler(
       if ((path === "/ws" || path.startsWith("/api/tables")) && !tables.ready)
         throw new Fault("unavailable");
       if (path === "/api/guest" && request.method === "POST") {
+        limits.guest(clientIP(request, server), tables.lifecycle.clock.now());
         const guest = sessions.guest();
         return json(
           { name: guest.session.name, guest: true },
@@ -56,6 +59,11 @@ export function handler(
       const session = sessions.resolve(request);
       if (
         !session &&
+        !(
+          request.method === "GET" &&
+          (path === "/api/tables" ||
+            /^\/api\/(leaderboard|games|players)\//.test(path))
+        ) &&
         (path.startsWith("/api/") || path === "/ws") &&
         /(?:^|;)\s*(?:fd|__Host-fd)=/.test(request.headers.get("cookie") ?? "")
       )
@@ -158,6 +166,7 @@ export function handler(
             unauthorized: 401,
             not_found: 404,
             conflict: 409,
+            busy: 409,
             rate_limited: 429,
             unavailable: 503,
           } as Record<string, number>

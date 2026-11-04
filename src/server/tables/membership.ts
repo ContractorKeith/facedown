@@ -36,6 +36,10 @@ export class Membership {
       sockets: new Set<Peer>(),
     };
     if (table.status === "finished" && next.bot) throw new Fault("forbidden");
+    if (next.bot && table.status === "live")
+      this.lifecycle.guard(() =>
+        this.lifecycle.store.setBot(table.id, seat, false),
+      );
     next.cancelHold?.();
     next.sockets.add(peer);
     const wasBot = next.bot;

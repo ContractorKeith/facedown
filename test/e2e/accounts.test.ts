@@ -26,6 +26,7 @@ test("accounts validate, case-fold, authenticate, expire, revoke and enforce ori
       )
     ).status,
   ).toBe(403);
+  f.clock.advance(3600000); // Validation attempts count toward the registration budget.
   const registered = await f.request("/api/register", "", {
     username: "Keith_1",
     password: "correct horse",

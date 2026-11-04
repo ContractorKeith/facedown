@@ -34,7 +34,10 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         .getByRole("button", { name: "Join seat 2", exact: true })
         .click();
       await expect(invitee.locator(".south strong")).toContainText("guest-");
-      await expect(invitee.locator(".hand")).toBeVisible();
+      await expect(invitee.locator(".hand")).toHaveCount(0);
+      await expect(
+        invitee.getByText("Waiting to start", { exact: true }),
+      ).toBeVisible();
       await invitee.close();
       await expect(page.locator(".west strong")).toHaveText("Empty seat");
       await page.getByRole("button", { name: "Fill bots" }).click();

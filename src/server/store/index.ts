@@ -54,7 +54,7 @@ export class Store {
         );
         for (const seat of record.seats)
           this.db.run(
-            "INSERT INTO game_seats(game_id,seat,guest_name,bot_at_start,leaver,session_hash,account_id) VALUES (?,?,?,?,?,?,?)",
+            "INSERT INTO game_seats(game_id,seat,guest_name,bot_at_start,leaver,session_hash,account_id,bot_now) VALUES (?,?,?,?,?,?,?,?)",
             [
               record.id,
               seat.seat,
@@ -63,6 +63,7 @@ export class Store {
               Number(seat.leaver),
               seat.session,
               seat.accountId ?? null,
+              Number(seat.bot),
             ],
           );
       })
@@ -130,6 +131,7 @@ export class Store {
           session_hash: string | null;
           guest_name: string | null;
           bot_at_start: number;
+          bot_now: number;
           leaver: number;
         },
         [string]
@@ -143,6 +145,7 @@ export class Store {
         session: s.session_hash,
         name: s.guest_name,
         bot: !!s.bot_at_start,
+        botNow: !!s.bot_now,
         leaver: !!s.leaver,
       }));
     const moves = this.db
@@ -187,6 +190,13 @@ export class Store {
         )
         .get(id)?.status ?? null
     );
+  }
+  setBot(id: string, seat: number, bot: boolean): void {
+    this.db.run("UPDATE game_seats SET bot_now=? WHERE game_id=? AND seat=?", [
+      Number(bot),
+      id,
+      seat,
+    ]);
   }
   abandon(id: string): void {
     this.db.run("UPDATE games SET status='abandoned' WHERE id=?", [id]);

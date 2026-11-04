@@ -1,4 +1,10 @@
-import type { Game, GameType, Seat, Viewer } from "../../engine/core/types";
+import type {
+  Envelope,
+  Game,
+  GameType,
+  Seat,
+  Viewer,
+} from "../../engine/core/types";
 import type { Session } from "../http/sessions";
 export type Engine = Game<unknown, unknown, unknown, unknown>;
 export type Occupant = {
@@ -13,13 +19,16 @@ export type Occupant = {
 export type Peer = { session: Session; send(message: unknown): void };
 export type Table = {
   id: string;
+  created: number;
   type: GameType;
   host: string;
   casual: boolean;
   rated?: boolean;
   game: Engine;
-  seed: string;
-  commitment: string;
+  seed: string | null;
+  commitment: string | null;
+  logHash: string | null;
+  lastMove: Envelope<unknown> | null;
   state: unknown;
   seq: number;
   status: "open" | "live" | "finished" | "unavailable";
@@ -40,7 +49,9 @@ export type ErrorCode =
   | "bad_request"
   | "unavailable"
   | "unauthorized"
-  | "conflict";
+  | "conflict"
+  | "reserved"
+  | "busy";
 export class Fault extends Error {
   constructor(readonly code: ErrorCode) {
     super(code);

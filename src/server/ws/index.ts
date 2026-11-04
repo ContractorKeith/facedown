@@ -12,7 +12,7 @@ export function websocket(
   sockets: SessionSockets,
 ) {
   return {
-    maxPayloadLength: 4096,
+    maxPayloadLength: 8192,
     open(ws: ServerWebSocket<SocketData>) {
       if (!tables.ready) {
         ws.close(1012, "Service restart");
@@ -22,7 +22,10 @@ export function websocket(
         ws.close(1008, "Session expired");
         return;
       }
-      sockets.add(ws);
+      if (!sockets.add(ws)) {
+        ws.close(1008, "too_many_sockets");
+        return;
+      }
       ws.data.budget = new Budget();
       ws.data.peer = {
         session: ws.data.session,

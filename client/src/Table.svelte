@@ -38,7 +38,12 @@ const timers = new Set<ReturnType<typeof setTimeout>>();
 // biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const view = $derived(message?.view);
 const moves = $derived(
-  (up && !pending && message && message.toAct === seat && seat !== null && !over
+  (up &&
+  !pending &&
+  message?.view &&
+  message.toAct === seat &&
+  seat !== null &&
+  !over
     ? legalMovesFromView(table?.type ?? "spades", message.view)
     : []) as Record<string, unknown>[],
 );
@@ -60,12 +65,12 @@ function subscribe(next: number | null) {
       if (incoming.t === "view") {
         pending = false;
         message = incoming as unknown as ViewMessage;
-        rememberGame(id, message.commitment);
+        if (message.commitment) rememberGame(id, message.commitment);
         over = message.status === "finished";
         error = "";
       }
       if (incoming.t === "over") {
-        if (message)
+        if (message?.commitment)
           rememberGame(id, message.commitment, String(incoming.logHash));
         over = true;
       }
@@ -164,7 +169,28 @@ onMount(() => {
   {#if error}
     <p role="alert">{error}</p>
   {/if}
-  {#if message && view}
+  {#if message?.status === "open"}
+    <div class="board" aria-label="Game table">
+      {#each message.seats as occupant, index}
+        <div class={`seat ${["south", "west", "north", "east"][(index - (seat ?? 0) + 4) % 4]}`}>
+          <span class="avatar">{occupant?.bot ? "♟" : index === seat ? "You" : index + 1}</span>
+          <strong>{occupant?.name ?? "Empty seat"}</strong>
+          <small>Seat {index + 1}</small>
+        </div>
+      {/each}
+      <div class="table-center"><p role="status">Waiting to start</p></div>
+    </div>
+    <div class="controls">
+      {#if message.host}
+        <button onclick={() => control("bots")}>Fill bots</button>
+        <button disabled={!message.seats.every(Boolean)} onclick={() => control("start")}>Start game</button>
+      {/if}
+      {#if seat === null}{#each message.seats as occupant, index}{#if !occupant}
+            <button onclick={() => subscribe(index)}>Join seat {index + 1}</button>
+          {/if}{/each}{/if}
+      <small>Share your invite and settle in.</small>
+    </div>
+  {:else if message && view}
     {#if !message.rated}<p class="banner">Casual · Ratings stay unchanged. Rated play requires four signed-in humans at the start; guests or bots make a table casual.</p>{/if}
     <Scorebar {view} />
     <Board {message} {seat} {bubbles} />
@@ -174,17 +200,6 @@ onMount(() => {
     {#if over}
       <p class="banner">Game over · Final scores {view.scores.join(" / ")}</p>
       <a class="replay-link" href={`/games/${id}`}>Check the replay →</a>
-    {:else if message.status === "open"}
-      <div class="controls">
-        {#if message.host}
-          <button onclick={() => control("bots")}>Fill bots</button>
-          <button disabled={!message.seats.every(Boolean)} onclick={() => control("start")}>Start game</button>
-        {/if}
-        {#if seat === null}{#each message.seats as occupant, index}{#if !occupant}
-              <button onclick={() => subscribe(index)}>Join seat {index + 1}</button>
-            {/if}{/each}{/if}
-        <small>Share your invite and settle in.</small>
-      </div>
     {:else}
       <div class="turn" role="status">{seat === null ? "Spectating" : message.toAct === seat ? "Your turn" : `Seat ${(message.toAct ?? 0) + 1}’s turn`}
         <span>{message.deadline ? `${Math.max(0, Math.ceil((message.deadline - now) / 1000))}s` : ""}</span>

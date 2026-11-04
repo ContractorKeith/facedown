@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M6 merged; M7 in this PR
+M0–M7 merged; skeptic round 1 fixes in progress
 
 ## Commands
 
@@ -20,7 +20,7 @@ bun run typecheck         # tsc --noEmit
 bun run lint              # Biome
 bun test                  # unit, purity, goldens, 200 playouts per game
 bun run start             # server, PORT defaults to 8080
-bun run dev               # server with watch
+bun run dev               # server with watch and insecure cookie for localhost HTTP
 bun run build             # client into dist/client
 bun run dev:client        # Vite, proxies API and WS to :8080
 bun run test:browser      # phone viewport Playwright smoke
@@ -52,6 +52,11 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - Containers run as bun, with writable persistent data mounted at `/data`; image default is `/data/facedown.db`.
 - `/healthz` is healthy during standby. The `tables` SQLite lease gates table traffic and rebuild (5 s heartbeat, 20 s expiry, 250 ms poll).
 - SIGTERM rejects moves with `unavailable`, drains writes, closes WS with 1012 and releases the lease; exit deadline is 9 s. Confirmed lease loss closes sockets, fails health, and exits 1 for replacement.
+- `HOST` defaults to `127.0.0.1`; the container sets `HOST=0.0.0.0`.
+- `FACEDOWN_TRUST_PROXY=1` trusts the last X-Forwarded-For hop (Caddy appends it); set in the container behind hoist only. Otherwise limits use the socket IP.
+- `FACEDOWN_PING_MS` sends socket pings every 20000 ms by default.
+- Guests: 30/IP/hour; registrations: 5 attempts/IP/hour; sockets: 8/session.
+- Open tables: 200 globally; lobby: newest 50 open plus newest 50 live.
 - `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
 - `FACEDOWN_ORIGIN` pins the exact mutation/WS Origin in production; unset uses the request origin.
 - `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.

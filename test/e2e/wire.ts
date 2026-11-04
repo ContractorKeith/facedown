@@ -47,6 +47,14 @@ export function checkWire(record: GameRecord, clients: Client[]) {
         expect(JSON.stringify(message)).not.toContain(record.seed);
         expect(hasSeed(message)).toBe(false);
       }
+      if (message.t === "view" && message.status === "open") {
+        expect(message.view).toBeNull();
+        expect(message.commitment).toBeNull();
+        expect(message.logHash).toBeNull();
+        expect(message.lastMove).toBeNull();
+        expect(message.toAct).toBeNull();
+        continue;
+      }
       if (message.t === "view") {
         lastSeq = message.seq as number;
         const state = states[lastSeq];
@@ -55,12 +63,23 @@ export function checkWire(record: GameRecord, clients: Client[]) {
           record.type === dominoes.type
             ? locateDominoes(state as DominoesState)
             : locateSpades(state as SpadesState);
-        checkView(message, client.viewer as Viewer, locations);
+        // lastMove is an exact public action; at a Deal boundary its piece
+        // may already be in a newly shuffled private Hand. Check it separately.
+        const { lastMove: _lastMove, ...current } = message;
+        checkView(current, client.viewer as Viewer, locations);
+        expect(message.you).toBe(
+          "seat" in client.viewer ? client.viewer.seat : null,
+        );
+        expect(message.lastMove).toEqual(
+          lastSeq ? record.moves[lastSeq - 1] : null,
+        );
         expect(message.logHash).toBe(hashes[lastSeq]);
         expect(message.commitment).toBe(record.commitment);
         expect(typeof message.host).toBe("boolean");
         expect(Object.keys(message).sort()).toEqual(
           [
+            "you",
+            "lastMove",
             "status",
             "rated",
             "t",
