@@ -3,6 +3,7 @@ import { onMount } from "svelte";
 import { api, type Table, type ViewMessage } from "./api";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
+import { rememberGame } from "./game-records";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Hand from "./Hand.svelte";
 import { legalMovesFromView } from "./legal";
@@ -54,14 +55,20 @@ function subscribe(next: number | null) {
         pending = false;
         sessionStorage.removeItem(`seat:${id}`);
         notice = "You were signed out of this seat. You are spectating.";
+        refreshSession().catch((e) => (error = e.message));
       }
       if (incoming.t === "view") {
         pending = false;
         message = incoming as unknown as ViewMessage;
+        rememberGame(id, message.commitment);
         over = message.status === "finished";
         error = "";
       }
-      if (incoming.t === "over") over = true;
+      if (incoming.t === "over") {
+        if (message)
+          rememberGame(id, message.commitment, String(incoming.logHash));
+        over = true;
+      }
       if (incoming.t === "error" && incoming.code !== "stale_seq") {
         pending = false;
         error = String(incoming.message).replaceAll("_", " ");

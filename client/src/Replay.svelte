@@ -7,6 +7,8 @@ import Card from "./art/Card.svelte";
 import Tile from "./art/Tile.svelte";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
+import { liveRecord } from "./game-records";
+import { parseReplay } from "./records";
 import { type Frame, type ReplayRecord, verifyReplay } from "./replay";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Scorebar from "./Scorebar.svelte";
@@ -15,6 +17,8 @@ let { id } = $props<{ id: string }>();
 let record = $state<ReplayRecord>();
 let frames = $state<Frame[]>([]);
 let failures = $state<string[]>([]);
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
+let verified = $state(false);
 let loaded = $state(false);
 let step = $state(0);
 const frame = $derived(frames[step]);
@@ -45,10 +49,12 @@ const deals = $derived(
   ),
 );
 onMount(() => {
-  api<ReplayRecord>(`/games/${id}`)
+  api<unknown>(`/games/${id}`)
     .then((value) => {
-      record = value;
-      const result = verifyReplay(value);
+      const parsed = parseReplay(value);
+      const result = verifyReplay(parsed, liveRecord(id));
+      record = parsed;
+      verified = !!result.verified;
       frames = result.frames;
       failures = result.failures;
     })
@@ -64,7 +70,7 @@ onMount(() => {
   <h1>{record?.type === "dominoes" ? "Dominoes" : "Spades"} replay</h1>
   {#if !loaded}<p role="status">Checking seed and move log…</p>
   {:else if failures.length}<div class="verification mismatch" role="alert"><strong>Mismatch</strong>{#each failures as failure}<p>{failure}</p>{/each}</div>
-  {:else}<div class="verification" role="status"><strong>Verified</strong><p>The seed matches its commitment. The move log produces the stored outcome.</p></div>{/if}
+  {:else}<div class="verification" role="status">{#if verified}<strong>Verified</strong><p>Verified: matches the commitment and move log your browser saw during the game</p>{:else}<strong>Consistent</strong><p>Consistent: the seed matches the published commitment and the log replays to the stored result (this browser didn't watch this game live)</p>{/if}</div>{/if}
   {#if frame && message && record}
     <div class="replay-controls" aria-label="Replay controls">
       <button onclick={() => step = 0} disabled={step === 0}>First</button>

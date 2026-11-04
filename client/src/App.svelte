@@ -20,10 +20,17 @@ import Table from "./Table.svelte";
 let guest = $state(true);
 let name = $state("");
 let error = $state("");
-let path = $state(location.pathname);
+function routePath() {
+  try {
+    return decodeURIComponent(location.pathname);
+  } catch {
+    return location.pathname;
+  }
+}
+let path = $state(routePath());
 function navigate(next: string) {
   history.pushState({}, "", next);
-  path = location.pathname;
+  path = routePath();
 }
 async function refreshSession() {
   name = await session();
@@ -32,7 +39,7 @@ async function refreshSession() {
 }
 onMount(() => {
   refreshSession().catch((e) => (error = e.message));
-  const pop = () => (path = location.pathname);
+  const pop = () => (path = routePath());
   window.addEventListener("popstate", pop);
   return () => window.removeEventListener("popstate", pop);
 });
@@ -40,6 +47,8 @@ onMount(() => {
 async function logout() {
   try {
     await api("/logout", {});
+    for (const key of Object.keys(sessionStorage))
+      if (key.startsWith("seat:")) sessionStorage.removeItem(key);
     await refreshSession();
     navigate("/");
   } catch (e) {

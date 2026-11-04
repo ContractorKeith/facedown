@@ -1,5 +1,6 @@
 import { expect } from "bun:test";
 import { fold } from "../../src/engine/core/fold";
+import { hashMove } from "../../src/engine/core/log-hash";
 import { commitment } from "../../src/engine/core/random";
 import type { Game, Viewer } from "../../src/engine/core/types";
 import {
@@ -24,11 +25,13 @@ export function checkWire(record: GameRecord, clients: Client[]) {
     unknown,
     unknown
   >;
+  const hashes = [record.commitment];
   const states: unknown[] = [game.init(record.seed, game.ruleset)];
   for (const envelope of record.moves) {
     const result = game.apply(states.at(-1), envelope);
     if (!result.ok) throw new Error("Invalid stored log");
     states.push(result.state);
+    hashes.push(hashMove(hashes.at(-1) as string, envelope));
   }
   for (const client of clients) {
     let lastSeq = 0;
@@ -36,6 +39,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
       (m) => m.table === record.id || m.t === "error",
     )) {
       if (message.t === "over") {
+        expect(message.logHash).toBe(hashes.at(-1));
         expect(message.seed).toBe(record.seed);
         expect(message.outcome).toEqual(record.outcome);
         expect(lastSeq).toBe(record.moves.length);
@@ -52,6 +56,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
             ? locateDominoes(state as DominoesState)
             : locateSpades(state as SpadesState);
         checkView(message, client.viewer as Viewer, locations);
+        expect(message.logHash).toBe(hashes[lastSeq]);
         expect(message.commitment).toBe(record.commitment);
         expect(typeof message.host).toBe("boolean");
         expect(Object.keys(message).sort()).toEqual(
@@ -66,6 +71,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
             "deadline",
             "seats",
             "commitment",
+            "logHash",
             "host",
           ].sort(),
         );
@@ -73,7 +79,7 @@ export function checkWire(record: GameRecord, clients: Client[]) {
         expect(["error", "reaction", "over"]).toContain(message.t);
         const fields =
           message.t === "over"
-            ? ["t", "table", "outcome", "seed"]
+            ? ["t", "table", "outcome", "seed", "logHash"]
             : message.t === "reaction"
               ? ["t", "table", "seat", "id"]
               : ["t", "code", "message"];

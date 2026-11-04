@@ -31,7 +31,7 @@ async function submit(e: SubmitEvent) {
 <main class="reading">
   <p class="eyebrow">YOUR PLACE AT THE TABLE</p>
   <h1>{register ? "Register" : "Log in"}</h1>
-  <form onsubmit={submit}>
+  <form method="post" onsubmit={submit}>
     <label>Username<input bind:value={username} required pattern={"[a-zA-Z0-9_]{3,20}"} maxlength="20" autocomplete="username" /></label>
     <small>3–20 letters, numbers or underscores.</small>
     <label>Password<input type="password" bind:value={password} required minlength={register ? 8 : 1} maxlength="200" autocomplete={register ? "new-password" : "current-password"} /></label>

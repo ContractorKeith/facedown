@@ -1,3 +1,4 @@
+import { moveLogHash } from "../../engine/core/log-hash";
 import type { Envelope } from "../../engine/core/types";
 import type { Clock, Timing } from "../clock";
 import type { Store } from "../store";
@@ -12,6 +13,7 @@ import {
 
 export class Lifecycle {
   closed = false;
+  private hashes = new WeakMap<Table, { seq: number; value: string }>();
   constructor(
     readonly store: Store,
     readonly clock: Clock,
@@ -48,8 +50,23 @@ export class Lifecycle {
   send(table: Table, peer: Peer): void {
     const viewer = table.viewers.get(peer);
     if (!viewer) return;
+    let cached = this.hashes.get(table);
+    if (!cached || cached.seq !== table.seq) {
+      const moves = table.seq ? this.store.loadGame(table.id)?.moves : [];
+      if (!moves || moves.length !== table.seq)
+        throw new Error("Move log sequence mismatch");
+      cached = {
+        seq: table.seq,
+        value: moveLogHash(
+          cached?.value ?? table.commitment,
+          moves.slice(cached?.seq ?? 0),
+        ),
+      };
+      this.hashes.set(table, cached);
+    }
     peer.send({
       t: "view",
+      logHash: cached.value,
       status: table.status,
       rated:
         table.status === "open"
@@ -72,6 +89,7 @@ export class Lifecycle {
       table.overSent.add(peer);
       peer.send({
         t: "over",
+        logHash: cached.value,
         table: table.id,
         outcome: table.game.outcome(table.state),
         seed: table.seed,

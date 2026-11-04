@@ -1,22 +1,14 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { api } from "./api";
+import { type Profile, parseProfile } from "./records";
 
 let { username } = $props<{ username: string }>();
-let profile = $state<{
-  username: string;
-  ratings: { type: string; rating: number; rd: number; games: number }[];
-  games: {
-    id: string;
-    type: string;
-    rated: boolean;
-    outcome: { scores: number[] };
-  }[];
-}>();
+let profile = $state<Profile>();
 let error = $state("");
 onMount(() => {
-  api<NonNullable<typeof profile>>(`/players/${username}`)
-    .then((value) => (profile = value))
+  api<unknown>(`/players/${username}`)
+    .then((value) => (profile = parseProfile(value)))
     .catch((e) => (error = e.message));
 });
 </script>

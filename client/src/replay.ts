@@ -1,32 +1,35 @@
+import { canonicalJSON, moveLogHash } from "../../src/engine/core/log-hash";
 import { sha256 } from "../../src/engine/core/sha256";
-import type { Envelope, Outcome, Seat } from "../../src/engine/core/types";
+import type { Seat } from "../../src/engine/core/types";
 import { registry } from "../../src/engine/registry";
-import type { GameType, ViewMessage } from "./api";
+import type { ViewMessage } from "./api";
+import type { LiveRecord } from "./game-records";
+import { parseReplay } from "./records";
 
-export type ReplayRecord = {
-  type: GameType;
-  ruleset: unknown;
-  seed: string;
-  commitment: string;
-  moves: Envelope<unknown>[];
-  outcome: Outcome;
-  rated: boolean;
-  seats: { seat: Seat; name: string }[];
-  rating_changes: { username: string; before: number; after: number }[];
-};
+export type { ReplayRecord } from "./records";
+
 export type Frame = {
   view: ViewMessage["view"];
   hands: string[][];
   toAct: Seat | null;
 };
 // Fold every move before exposing any frames: an invalid log is never a valid replay.
-export function verifyReplay(record: ReplayRecord) {
+export function verifyReplay(value: unknown, local?: LiveRecord) {
+  const record = parseReplay(value);
   const failures: string[] = [];
   if (sha256(record.seed) !== record.commitment)
     failures.push("Seed commitment check failed");
   const game = registry.get(record.type);
   if (!game) throw new Error("Unsupported game type");
-  let state = game.init(record.seed, record.ruleset);
+  if (canonicalJSON(record.ruleset) !== canonicalJSON(game.ruleset))
+    failures.push("Ruleset check failed");
+  const logHash = moveLogHash(record.commitment, record.moves);
+  if (logHash !== record.logHash) failures.push("Move log hash check failed");
+  if (local && local.commitment !== record.commitment)
+    failures.push("Saved commitment check failed");
+  if (local?.logHash && local.logHash !== record.logHash)
+    failures.push("Saved move log hash check failed");
+  let state = game.init(record.seed, game.ruleset);
   const frames: Frame[] = [];
   const capture = () =>
     frames.push({
@@ -57,5 +60,9 @@ export function verifyReplay(record: ReplayRecord) {
     outcome.scores.some((score, i) => score !== record.outcome.scores[i])
   )
     failures.push("Stored outcome check failed");
-  return { failures, frames };
+  return {
+    failures,
+    frames,
+    verified: !!local?.logHash && failures.length === 0,
+  };
 }

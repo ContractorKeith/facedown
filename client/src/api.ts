@@ -17,6 +17,7 @@ export type ViewMessage = {
   deadline: number | null;
   seats: Seat[];
   commitment: string;
+  logHash: string;
   host: boolean;
   status: "open" | "live" | "finished" | "unavailable";
   rated: boolean;
