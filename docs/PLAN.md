@@ -209,7 +209,7 @@ same-origin `Origin` header):
 
 ```
 POST /api/register {username,password}     → 201 account, sets session
-POST /api/login    {username,password}     → 200, sets session; 5 failures / IP / 15 min
+POST /api/login    {username,password}     → 200, sets session; 5 failures per IP+username and 20 per IP / 15 min
 POST /api/logout                           → 204
 POST /api/guest                            → 200 guest session (casual only)
 GET  /api/me                               → account or guest
@@ -237,11 +237,20 @@ WebSocket `/ws` (session from the cookie). Client → server:
 Server → client:
 
 ```
-{t:"view", table, seq, view, toAct, deadline, seats, commitment, logHash}   full view, every update
+{t:"view", table, seq, view, toAct, deadline, seats, you, host, commitment, logHash, lastMove}   full view, every update
+{t:"ping"}                                                           every 20 s; clients reconnect after 45 s of silence
 {t:"reaction", table, seat, id}
 {t:"over", table, outcome, seed}                                     seed revealed here
 {t:"error", code, message}   codes: stale_seq, illegal_move, not_your_turn, rate_limited, not_found, forbidden, bad_request
 ```
+
+While a table is open nothing is dealt: the server draws the seed and deals at `start`, and
+open-table view messages carry `view: null`, `commitment: null`, `logHash: null`. `you` is the
+receiving viewer's seat (or null); clients identify their seat from it, never from a name.
+`lastMove` is the envelope that produced this seq (null at seq 0); a client extends the hash
+chain itself with it (ADR 0002) and calls a replay Verified only if it saw the chain unbroken
+from the commitment. Client IPs come from the last `X-Forwarded-For` hop when
+`FACEDOWN_TRUST_PROXY=1` (set in the container image, which only runs behind hoist's proxy).
 
 Rules: a move with `seq` other than the table's current seq is rejected `stale_seq` and the
 client gets a fresh view. Moves: 5 per second per connection; messages over 4 KiB close the
