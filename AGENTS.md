@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M5 complete; M6 login, verified replay, profiles, leaderboards and spectating implemented in this PR.
+M0–M6 merged; M7 in this PR
 
 ## Commands
 
@@ -24,6 +24,7 @@ bun run dev               # server with watch
 bun run build             # client into dist/client
 bun run dev:client        # Vite, proxies API and WS to :8080
 bun run test:browser      # phone viewport Playwright smoke
+bun run test:container    # opt-in Docker image + lease handoff e2e
 bun run test:e2e          # real HTTP + WebSocket server tests
 bun run replay:record <type> <64-char-hex-seed>
 bash scripts/accept.sh    # full gate, 2000 playouts per game
@@ -48,6 +49,9 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - State is always `fold(init(seed), moves)`; in-memory state and snapshots are caches.
 - The seed is never returned by any API while a game is live.
 - Only `src/server/store` touches SQLite.
+- Containers run as bun, with writable persistent data mounted at `/data`; image default is `/data/facedown.db`.
+- `/healthz` is healthy during standby. The `tables` SQLite lease gates table traffic and rebuild (5 s heartbeat, 20 s expiry, 250 ms poll).
+- SIGTERM rejects moves with `unavailable`, drains writes, closes WS with 1012 and releases the lease; exit deadline is 9 s.
 - `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
 - `FACEDOWN_ORIGIN` pins the exact mutation/WS Origin in production; unset uses the request origin.
 - `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.

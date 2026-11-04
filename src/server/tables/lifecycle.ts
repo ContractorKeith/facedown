@@ -14,6 +14,7 @@ import {
 export class Lifecycle {
   closed = false;
   private hashes = new WeakMap<Table, { seq: number; value: string }>();
+  guard: <T>(action: () => T) => T = (action) => action();
   constructor(
     readonly store: Store,
     readonly clock: Clock,
@@ -25,6 +26,7 @@ export class Lifecycle {
     return this.clock.after(ms, () => {
       if (this.closed || table.status === "unavailable") return;
       try {
+        this.guard(() => {});
         callback();
       } catch (error) {
         this.freeze(table, error);
@@ -122,6 +124,8 @@ export class Lifecycle {
     });
   }
   apply(table: Table, envelope: Envelope<unknown>): void {
+    if (this.closed) throw new Fault("unavailable");
+
     if (table.status !== "live") throw new Fault("bad_request");
     const result = table.game.apply(table.state, envelope);
     if (!result.ok)
@@ -129,17 +133,19 @@ export class Lifecycle {
         result.error.code === "game_over" ? "bad_request" : result.error.code,
       );
     const outcome = table.game.outcome(result.state);
-    this.store.appendMove(
-      table.id,
-      table.seq + 1,
-      envelope,
-      this.clock.now(),
-      outcome
-        ? {
-            outcome,
-            leavers: table.seats.map((s) => !!s?.session && s.bot),
-          }
-        : undefined,
+    this.guard(() =>
+      this.store.appendMove(
+        table.id,
+        table.seq + 1,
+        envelope,
+        this.clock.now(),
+        outcome
+          ? {
+              outcome,
+              leavers: table.seats.map((s) => !!s?.session && s.bot),
+            }
+          : undefined,
+      ),
     );
     table.state = result.state;
     table.seq++;

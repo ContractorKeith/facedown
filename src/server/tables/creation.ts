@@ -31,6 +31,7 @@ export class Creation {
     return this.allocate(type, host, casual);
   }
   private allocate(type: GameType, host: Session, casual: boolean): Table {
+    if (this.lifecycle.closed) throw new Fault("unavailable");
     const game = registry.get(type);
     if (!game) throw new Fault("bad_request");
     this.retention.checkOpen(host);

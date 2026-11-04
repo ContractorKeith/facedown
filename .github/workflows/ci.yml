@@ -8,7 +8,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -22,3 +22,5 @@ jobs:
           set -o pipefail
           CI=1 bash scripts/accept.sh 2>&1 | tee /tmp/facedown-accept.log
           grep -E 'playouts: [1-9][0-9]* games' /tmp/facedown-accept.log
+      - name: Container lease handoff
+        run: bun run test:container

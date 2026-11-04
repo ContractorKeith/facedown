@@ -43,6 +43,15 @@ export function startServer(options: ServerOptions = {}) {
       (options.clock ?? clock).now(),
     );
   const sockets = new SessionSockets(tables);
+  let stopping = false;
+  const pending = new Set<Promise<unknown>>();
+  const serve = handler(
+    store,
+    tables,
+    sessions,
+    options.origin ?? process.env.FACEDOWN_ORIGIN,
+    sockets,
+  );
   let server: ReturnType<typeof Bun.serve<SocketData>>;
   try {
     server = Bun.serve<SocketData>({
@@ -50,13 +59,17 @@ export function startServer(options: ServerOptions = {}) {
       hostname: options.hostname ?? "0.0.0.0",
       maxRequestBodySize: 4096,
       error: serverError,
-      fetch: handler(
-        store,
-        tables,
-        sessions,
-        options.origin ?? process.env.FACEDOWN_ORIGIN,
-        sockets,
-      ),
+      fetch(request, server) {
+        if (stopping && new URL(request.url).pathname !== "/healthz")
+          return Response.json(
+            { code: "unavailable", message: "unavailable" },
+            { status: 503 },
+          );
+        const response = serve(request, server);
+        pending.add(response);
+        void response.finally(() => pending.delete(response));
+        return response;
+      },
       websocket: websocket(tables, sessions, sockets),
     });
   } catch (error) {
@@ -70,6 +83,11 @@ export function startServer(options: ServerOptions = {}) {
     tables,
     sessions,
     async stop() {
+      if (stopping) return;
+      stopping = true;
+      tables.lifecycle.closed = true;
+      await Promise.allSettled([...pending]);
+      sockets.closeAll();
       tables.stop();
       await server.stop(true);
       // Closing sockets can invoke disconnect handlers; cancel their holds too.
