@@ -14,7 +14,8 @@ const files = readdirSync(directory).filter((file) => file.endsWith(".json"));
 if (!files.length) throw new Error("No golden replays found");
 const load = (file: string): Replay =>
   JSON.parse(readFileSync(join(directory, file), "utf8"));
-const golden = files.find((file) => file.startsWith("highcard-"))!;
+const golden =
+  "highcard-0000000000000000000000000000000000000000000000000000000000000001.json";
 for (const file of files)
   test(`golden replay: ${file}`, () => verifyReplay(load(file), file));
 
