@@ -10,15 +10,18 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-Planned, no code yet (2026-11-04). Next: M0 (#1).
+M0 done in this PR.
 
 ## Commands
 
 ```bash
 bun install
-bash scripts/accept.sh     # the acceptance: worker, reviewer and CI run exactly this
+bun run typecheck         # tsc --noEmit
+bun run lint              # Biome
+bun test                  # unit, purity, goldens, 200 playouts per game
+bun run replay:record <type> <64-char-hex-seed>
+bash scripts/accept.sh    # full gate, 2000 playouts per game
 ```
-M0 adds the per-step scripts (typecheck, lint, test, e2e, build) and lists them here.
 
 ## Pointers
 
