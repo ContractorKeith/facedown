@@ -1,0 +1,128 @@
+{
+  "type": "highcard",
+  "ruleset": {
+    "target": 2
+  },
+  "seed": "0000000000000000000000000000000000000000000000000000000000000001",
+  "moves": [
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 2,
+      "move": {
+        "card": "AD"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "card": "TD"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "card": "AC"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "card": "9C"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "card": "KC"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "card": "JC"
+      }
+    },
+    {
+      "seat": 1,
+      "timeout": true
+    },
+    {
+      "seat": 3,
+      "move": {
+        "card": "TC"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "card": "QC"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "card": "QD"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "card": "KD"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "card": "AC"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "card": "AD"
+      }
+    },
+    {
+      "seat": 0,
+      "timeout": true
+    },
+    {
+      "seat": 1,
+      "move": {
+        "card": "9C"
+      }
+    },
+    {
+      "seat": 2,
+      "move": {
+        "card": "KC"
+      }
+    },
+    {
+      "seat": 3,
+      "move": {
+        "card": "KD"
+      }
+    },
+    {
+      "seat": 0,
+      "move": {
+        "card": "QC"
+      }
+    },
+    {
+      "seat": 1,
+      "move": {
+        "card": "TC"
+      }
+    }
+  ],
+  "expectedOutcome": {
+    "scores": [2, 0],
+    "winner": 0
+  },
+  "expectedFinalStateHash": "4931da0b2b52a72fae6ed171eb8825a60e462c8f2ce2dabdb5766bc4c0cffe52"
+}

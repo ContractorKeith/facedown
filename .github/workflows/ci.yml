@@ -1,0 +1,23 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - name: Acceptance and nonzero playout guard
+        shell: bash
+        run: |
+          set -o pipefail
+          bash scripts/accept.sh 2>&1 | tee /tmp/facedown-accept.log
+          grep -E 'playouts: [1-9][0-9]* games' /tmp/facedown-accept.log
