@@ -1,8 +1,8 @@
 // Docker probe: a missing or hung daemon must fail fast, never stall the suite.
-export function dockerAvailable(): boolean {
+export function dockerAvailable(command = "docker"): boolean {
   try {
     return (
-      Bun.spawnSync(["docker", "info"], {
+      Bun.spawnSync([command, "info"], {
         stdout: "ignore",
         stderr: "ignore",
         timeout: 5000,

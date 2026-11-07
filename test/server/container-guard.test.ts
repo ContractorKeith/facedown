@@ -13,13 +13,7 @@ test("opt-in with Docker available and no opt-in both pass", () => {
 });
 
 test("the real probe reports a missing executable as unavailable, fast", () => {
-  const path = process.env.PATH;
-  process.env.PATH = "";
   const started = performance.now();
-  try {
-    expect(dockerAvailable()).toBe(false);
-  } finally {
-    process.env.PATH = path;
-  }
+  expect(dockerAvailable("facedown-no-such-docker-binary")).toBe(false);
   expect(performance.now() - started).toBeLessThan(2000);
 });
