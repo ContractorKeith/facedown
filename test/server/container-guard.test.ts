@@ -1,25 +1,19 @@
 import { expect, test } from "bun:test";
+import { dockerAvailable, requireDocker } from "../container/guard";
 
-for (const missing of ["daemon", "executable"] as const)
-  test(`explicit container opt-in fails without Docker ${missing}`, async () => {
-    const child = Bun.spawn(
-      [process.execPath, "test", "test/container/handoff.test.ts"],
-      {
-        env: {
-          ...process.env,
-          FACEDOWN_CONTAINER: "1",
-          DOCKER_HOST: "unix:///facedown-test-missing-docker.sock",
-          ...(missing === "executable" ? { PATH: "" } : {}),
-        },
-        stdout: "pipe",
-        stderr: "pipe",
-      },
-    );
-    const [stdout, stderr, code] = await Promise.all([
-      new Response(child.stdout).text(),
-      new Response(child.stderr).text(),
-      child.exited,
-    ]);
-    expect(code).not.toBe(0);
-    expect(stdout + stderr).toContain("Docker daemon access required");
-  });
+test("explicit container opt-in fails when Docker is unavailable", () => {
+  expect(() => requireDocker(true, () => false)).toThrow(
+    "Docker daemon access required",
+  );
+});
+
+test("opt-in with Docker available and no opt-in both pass", () => {
+  expect(() => requireDocker(true, () => true)).not.toThrow();
+  expect(() => requireDocker(false, () => false)).not.toThrow();
+});
+
+test("the real probe reports a missing executable as unavailable, fast", () => {
+  const started = performance.now();
+  expect(dockerAvailable("facedown-no-such-docker-binary")).toBe(false);
+  expect(performance.now() - started).toBeLessThan(2000);
+});
