@@ -22,6 +22,22 @@ export function liveRecord(id: string): LiveRecord | undefined {
 }
 export function rememberGame(id: string, record: LiveRecord): void {
   try {
-    localStorage.setItem(key(id), JSON.stringify(record));
+    const saved = liveRecord(id);
+    if (saved) {
+      const keep =
+        (saved.seq ?? -1) > (record.seq ?? -1) ||
+        (saved.unbroken &&
+          !record.unbroken &&
+          (saved.seq ?? -1) >= (record.seq ?? -1));
+      if (keep)
+        record = { ...saved, tampered: saved.tampered || record.tampered };
+      else if (saved.tampered)
+        record = { ...record, tampered: true, unbroken: false };
+    }
+    const { commitment, seq, logHash, unbroken, tampered } = record;
+    localStorage.setItem(
+      key(id),
+      JSON.stringify({ commitment, seq, logHash, unbroken, tampered }),
+    );
   } catch {}
 }

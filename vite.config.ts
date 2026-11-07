@@ -6,7 +6,7 @@ export default defineConfig({
   build: { outDir: "../dist/client", emptyOutDir: true },
   server: {
     proxy: {
-      "/api": "http://localhost:8080",
+      "/api": { target: "http://localhost:8080" },
       "/ws": { target: "ws://localhost:8080", ws: true },
     },
   },

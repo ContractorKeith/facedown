@@ -21,7 +21,10 @@ export async function tableFixture(
     bot: false,
     connected: true,
   }));
-  const table = { id, type, status: "open", seats };
+  const table = { id, type, status: "open", seats, host: true, rated: false };
+  await page.route(`**/api/tables/${id}`, (route) =>
+    route.fulfill({ json: table }),
+  );
   await page.route("**/api/tables", (route) =>
     route.fulfill({ json: [table] }),
   );

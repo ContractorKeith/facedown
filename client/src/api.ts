@@ -6,7 +6,9 @@ export type Seat = { name: string; bot: boolean; connected: boolean } | null;
 export type Table = {
   id: string;
   type: GameType;
-  status: "open" | "live";
+  status: "open" | "live" | "finished" | "abandoned";
+  rated: boolean;
+  host: boolean;
   seats: Seat[];
 };
 export type ViewMessage = {
@@ -25,7 +27,7 @@ export type ViewMessage = {
   status: "open" | "live" | "finished" | "unavailable";
   rated: boolean;
 };
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,

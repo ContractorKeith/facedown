@@ -1,0 +1,142 @@
+/* Bidding reserves space for the hand before decorative table space. */
+.game.bidding .casual-banner {
+  font-size: 0.65rem;
+  padding: 4px 8px;
+  margin: 4px 0;
+  line-height: 1.2;
+}
+@media (max-height: 700px) {
+  .game.bidding .casual-banner {
+    display: none;
+  }
+}
+.bids button {
+  overflow-wrap: anywhere;
+}
+.game.bidding .board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  min-height: 132px;
+  height: auto;
+  padding: 6px;
+  border-radius: 18px;
+  gap: 4px;
+}
+.game.bidding .seat {
+  position: static;
+  width: auto;
+  min-width: 0;
+  grid-row: 2;
+}
+.game.bidding .table-center {
+  position: static;
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+.game.bidding .table-mark {
+  font-size: 0;
+}
+.game.bidding .table-mark small {
+  font-size: 0.75rem;
+}
+.game.bidding .avatar {
+  width: 28px;
+  height: 28px;
+}
+.game.bidding .hand {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  min-height: 0;
+  gap: 4px;
+  padding: 8px 0;
+  overflow: visible;
+}
+.game.bidding .piece {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+.game.bidding .card {
+  width: 100%;
+  height: auto;
+}
+.reactions {
+  flex-wrap: wrap;
+}
+.game-heading {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+@media (max-width: 599px) {
+  .game.bidding .hand {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .game.bidding .board {
+    min-height: 110px;
+  }
+}
+@media (max-height: 639px) {
+  .game.bidding {
+    padding-bottom: 260px;
+  }
+  .game.bidding .bids {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    background: #102f29;
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+  }
+  .game.bidding .hand {
+    position: fixed;
+    bottom: 108px;
+    left: 16px;
+    right: 16px;
+    max-width: 688px;
+    margin: auto;
+    background: #102f29;
+    z-index: 4;
+  }
+  .game.bidding .reactions {
+    display: none;
+  }
+}
+@media (max-height: 450px) {
+  .game.bidding .board,
+  .game.bidding .scorebar {
+    display: none;
+  }
+}
+
+.game.bidding .scorebar strong {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+.game.bidding .game-heading h1 {
+  font-size: 1.4rem;
+}
+
+.game.bidding {
+  padding-top: 8px;
+}
+.game.bidding .brand {
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.game.bidding .game-heading {
+  margin-bottom: 4px;
+}
+.game.bidding .board,
+.game.bidding .turn {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.game.bidding .brand a {
+  font-size: clamp(1.2rem, 6vw, 1.65rem);
+}
+.game.bidding .brand .quiet {
+  padding-inline: 10px;
+}

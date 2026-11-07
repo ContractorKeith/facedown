@@ -50,7 +50,10 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         });
     });
 
-  test("keyboard play retains focus in the hand", async ({ page, origin }) => {
+  test("keyboard play focuses a legal card on the next turn", async ({
+    page,
+    origin,
+  }) => {
     await page.setViewportSize({ width: 1100, height: 900 });
     const wire = await tableFixture(page);
     await page.goto(`${origin}/tables/${wire.id}`);
@@ -62,12 +65,10 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(playable).toBeEnabled();
     await playable.focus();
     await page.keyboard.press("Enter");
-    await expect
-      .poll(() =>
-        page.evaluate(() => !!document.activeElement?.closest(".hand")),
-      )
-      .toBe(true);
     await expect(page.locator(".piece")).toHaveCount(12);
+    // Pending moves must not consume restoration before a legal card exists.
+    wire.send(8, { you: wire.record.moves[8]?.seat });
+    await expect(page.locator(".piece:not(:disabled)").first()).toBeFocused();
   });
 
   test("disabled cards do not lift on desktop hover", async ({
