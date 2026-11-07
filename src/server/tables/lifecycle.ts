@@ -1,6 +1,6 @@
 import { hashMove } from "../../engine/core/log-hash";
 import type { Envelope } from "../../engine/core/types";
-import type { Clock, Timing } from "../clock";
+import { type Clock, openHold, type Timing } from "../clock";
 import type { Store } from "../store";
 import {
   Fault,
@@ -12,6 +12,7 @@ import {
 } from "./types";
 
 export class Lifecycle {
+  readonly openHold = openHold();
   closed = false;
   guard: <T>(action: () => T) => T = (action) => action();
   constructor(
@@ -154,24 +155,39 @@ export class Lifecycle {
       !occupant ||
       occupant.bot ||
       occupant.sockets.size ||
-      table.status !== "live"
+      !["open", "live"].includes(table.status)
     )
       return;
     occupant.cancelHold?.();
-    occupant.cancelHold = this.after(table, this.timing.hold, () => {
-      this.guard(() => this.store.setBot(table.id, seat, true));
-      occupant.bot = true;
-      if (table.game.toAct(table.state) === seat) this.schedule(table);
-      this.broadcast(table);
-    });
+    occupant.cancelHold = this.after(
+      table,
+      table.status === "open" ? this.openHold : this.timing.hold,
+      () => {
+        if (table.status === "open") {
+          this.releaseOpen(table, seat);
+          this.broadcast(table);
+          this.changed(table);
+          return;
+        }
+        this.guard(() => this.store.setBot(table.id, seat, true));
+        occupant.bot = true;
+        if (table.game.toAct(table.state) === seat) this.schedule(table);
+        this.broadcast(table);
+      },
+    );
   }
-  leave(table: Table, peer: Peer): void {
+  leave(table: Table, peer: Peer, explicit = true): void {
     const viewer = table.viewers.get(peer);
     table.viewers.delete(peer);
     if (viewer && "seat" in viewer) {
       const occupant = table.seats[viewer.seat];
       occupant?.sockets.delete(peer);
-      if (table.status === "open" && occupant && !occupant.sockets.size) {
+      if (
+        explicit &&
+        table.status === "open" &&
+        occupant &&
+        !occupant.sockets.size
+      ) {
         this.releaseOpen(table, viewer.seat);
       } else this.hold(table, viewer.seat);
     }
@@ -179,6 +195,7 @@ export class Lifecycle {
   releaseOpen(table: Table, seat: number): void {
     const occupant = table.seats[seat];
     if (table.status !== "open" || !occupant) return;
+    occupant.cancelHold?.();
     table.seats[seat] = null;
     if (table.host !== occupant.session) return;
     table.host = "";

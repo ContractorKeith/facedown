@@ -107,3 +107,12 @@ export function versionThree(
     db.close();
   }
 }
+
+export function removeSeat(path: string, id: string): void {
+  const db = new Database(path);
+  try {
+    db.run("DELETE FROM game_seats WHERE game_id=? AND seat=3", [id]);
+  } finally {
+    db.close();
+  }
+}

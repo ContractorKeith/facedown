@@ -1,10 +1,12 @@
 import { Database } from "bun:sqlite";
 import type { Envelope, Outcome, Seat } from "../../engine/core/types";
+import type { Session } from "../http/sessions";
 import { AccountStore } from "./accounts";
 import { GuestStore } from "./guests";
 import { LeaseStore } from "./leases";
 import { migrate } from "./migrate";
 import { RatingStore } from "./ratings";
+import { storedSummary } from "./summary";
 import type { GameRecord, Row } from "./types";
 
 export type { GameRecord, StoredSeat } from "./types";
@@ -172,6 +174,9 @@ export class Store {
       moves,
       outcome: row.outcome_json ? JSON.parse(row.outcome_json) : null,
     };
+  }
+  summary(id: string, session: Session | null) {
+    return storedSummary(this.db, id, session);
   }
   listLiveIds(): string[] {
     return this.db

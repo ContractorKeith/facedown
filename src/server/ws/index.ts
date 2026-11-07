@@ -5,14 +5,19 @@ import { Fault, type Peer, seatNumber } from "../tables/types";
 import { Budget } from "./budget";
 import type { SessionSockets } from "./sessions";
 
-export type SocketData = { session: Session; peer?: Peer; budget?: Budget };
+export type SocketData = {
+  session: Session;
+  ip?: string;
+  peer?: Peer;
+  budget?: Budget;
+};
 export function websocket(
   tables: Tables,
   sessions: SessionResolver,
   sockets: SessionSockets,
 ) {
   return {
-    maxPayloadLength: 8192,
+    maxPayloadLength: 65536,
     open(ws: ServerWebSocket<SocketData>) {
       if (!tables.ready) {
         ws.close(1012, "Service restart");

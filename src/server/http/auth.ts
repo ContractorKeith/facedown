@@ -29,6 +29,10 @@ export class Auth {
     private sessions: SessionResolver,
     private retireSession: (session: Session) => void = () => {},
     private now = () => Date.now(),
+    private transferGuest: (
+      previous: Session,
+      next: Session,
+    ) => void = () => {},
   ) {}
   async handle(
     path: string,
@@ -42,7 +46,7 @@ export class Auth {
       return null;
     const ip = clientIP(request, server),
       now = this.now();
-    if (path === "/api/register") this.limits.register(ip, now);
+
     const previous = this.sessions.resolve(request);
     const body = await request.json();
     if (
@@ -56,8 +60,19 @@ export class Auth {
       password = body.password;
     if (
       path === "/api/register" &&
-      (["bot", "bots", "spectator", "system", "admin"].includes(username) ||
-        username.startsWith("guest"))
+      ([
+        "bot",
+        "bots",
+        "spectator",
+        "system",
+        "admin",
+        "empty_seat",
+        "you",
+        "null",
+        "undefined",
+      ].includes(username) ||
+        username.startsWith("guest") ||
+        /^_*b[o0]ts?_*$/.test(username))
     )
       throw new Fault("reserved");
     if (
@@ -68,6 +83,7 @@ export class Auth {
       throw new Fault("bad_request");
     let account = this.store.accounts.find(username);
     if (path === "/api/register") {
+      this.limits.register(ip, now);
       if (account) throw new Fault("conflict");
       const hash = await Bun.password.hash(password, {
         algorithm: "argon2id",
@@ -93,6 +109,10 @@ export class Auth {
     }
     if (!account || !this.sessions.account) throw new Fault("unavailable");
     const issued = this.sessions.account(account.id);
+    for (const id of issued.revoked ?? [])
+      this.retireSession({ id, name: account.username, accountId: account.id });
+    if (previous && !previous.accountId)
+      this.transferGuest(previous, issued.session);
     if (previous && this.sessions.logout) {
       this.sessions.logout(previous);
       this.retireSession(previous);

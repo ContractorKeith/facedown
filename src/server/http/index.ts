@@ -25,9 +25,9 @@ export function handler(
     sessions,
     (session) => {
       sockets?.revoke(session.id);
-      tables.releaseGuest(session);
     },
     () => tables.lifecycle.clock.now(),
+    (previous, next) => tables.transferGuest(previous, next),
   );
   return async (
     request: Request,
@@ -61,7 +61,7 @@ export function handler(
         !session &&
         !(
           request.method === "GET" &&
-          (path === "/api/tables" ||
+          (path.startsWith("/api/tables") ||
             /^\/api\/(leaderboard|games|players)\//.test(path))
         ) &&
         (path.startsWith("/api/") || path === "/ws") &&
@@ -72,7 +72,12 @@ export function handler(
         if (request.headers.get("origin") !== (origin || url.origin))
           throw new Fault("forbidden");
         if (!session) throw new Fault("unauthorized");
-        if (server.upgrade(request, { data: { session } })) return;
+        if (
+          server.upgrade(request, {
+            data: { session, ip: clientIP(request, server) },
+          })
+        )
+          return;
         throw new Fault("bad_request");
       }
       if (path === "/api/me" && request.method === "GET") {
@@ -108,12 +113,16 @@ export function handler(
         if (request.method === "GET") return json(tables.list());
         if (request.method === "POST") {
           if (!session) throw new Fault("unauthorized");
-          const table = await tables.createFromJSON(session, () =>
-            request.json(),
+          const table = await tables.createFromJSON(
+            { ...session, ip: clientIP(request, server) },
+            () => request.json(),
           );
           return json({ id: table.id, inviteUrl: `/tables/${table.id}` }, 201);
         }
       }
+      const summary = /^\/api\/tables\/([a-z2-7]{10})$/.exec(path);
+      if (summary && request.method === "GET")
+        return json(tables.summary(summary[1] as string, session));
       const mutation = /^\/api\/tables\/([a-z2-7]{10})\/(bots|start)$/.exec(
         path,
       );

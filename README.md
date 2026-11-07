@@ -79,8 +79,12 @@ The image sets `HOST=0.0.0.0` and honors `PORT` (8080 by default).
 It sets `FACEDOWN_TRUST_PROXY=1`: limits use the last `X-Forwarded-For` hop,
 which Caddy appends. Only expose this image behind hoist’s proxy. Outside the
 image, proxy trust is off and limits use the socket address; enable it only
-behind a trusted proxy. Registrations count all attempts (5/IP/hour), guests
-allow 30/IP/hour, and sessions allow 8 sockets. The lobby returns the newest
+behind a trusted proxy. Guests allow 30/IP/hour. Accounts retain at most 10 sessions (oldest revoked); sockets
+are capped at 8/session, 16/account and 32/IP. Open tables are capped at
+3/session, 3/account and 6/IP. Registration counts successes and conflicts only
+(5/IP/hour). Dropped open seats are held for 10 minutes
+(`FACEDOWN_OPEN_HOLD_MS=600000`); moves allow bursts of 10/s per socket.
+The lobby returns the newest
 50 open plus 50 live tables, with at most 200 open tables globally.
 Sockets receive `{t:"ping"}` every 20 seconds (`FACEDOWN_PING_MS`). Back up `/data`, including SQLite WAL
 safely with SQLite-aware tooling. Rollback restores an image and config, not database

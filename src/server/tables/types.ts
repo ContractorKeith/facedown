@@ -23,6 +23,8 @@ export type Table = {
   type: GameType;
   host: string;
   casual: boolean;
+  creatorAccount?: string | null;
+  creatorIP?: string;
   rated?: boolean;
   game: Engine;
   seed: string | null;

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { fixture } from "./helpers";
 
-test("registration budgets use the last trusted hop and count invalid attempts", async () => {
+test("registration budgets use the last trusted hop and count successes and conflicts", async () => {
   const old = process.env.FACEDOWN_TRUST_PROXY;
   process.env.FACEDOWN_TRUST_PROXY = "1";
   const f = fixture();
@@ -15,16 +15,17 @@ test("registration budgets use the last trusted hop and count invalid attempts",
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        username: "invalid-name",
+        username: "valid_name",
         password: "long enough",
       }),
     });
   };
   try {
-    for (let i = 0; i < 5; i++)
-      expect((await register(`spoof-${i}, real-a`)).status).toBe(400);
+    expect((await register("real-a")).status).toBe(201);
+    for (let i = 0; i < 4; i++)
+      expect((await register(`spoof-${i}, real-a`)).status).toBe(409);
     expect((await register("new-spoof, real-a")).status).toBe(429);
-    expect((await register("new-spoof, real-b")).status).toBe(400);
+    expect((await register("new-spoof, real-b")).status).toBe(409);
   } finally {
     if (old === undefined) delete process.env.FACEDOWN_TRUST_PROXY;
     else process.env.FACEDOWN_TRUST_PROXY = old;

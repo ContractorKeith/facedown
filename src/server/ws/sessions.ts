@@ -7,6 +7,18 @@ export class SessionSockets {
   add(ws: ServerWebSocket<SocketData>): boolean {
     const sockets = this.sessions.get(ws.data.session.id) ?? new Set();
     if (sockets.size >= 8) return false;
+    let account = 0,
+      ip = 0;
+    for (const group of this.sessions.values())
+      for (const existing of group) {
+        if (
+          ws.data.session.accountId &&
+          existing.data.session.accountId === ws.data.session.accountId
+        )
+          account++;
+        if (ws.data.ip && existing.data.ip === ws.data.ip) ip++;
+      }
+    if (account >= 16 || ip >= 32) return false;
     sockets.add(ws);
     this.sessions.set(ws.data.session.id, sockets);
     return true;

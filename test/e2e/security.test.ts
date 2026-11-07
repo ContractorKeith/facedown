@@ -127,14 +127,14 @@ test("all-message budget caps join broadcasts and closes a sustained flood", asy
   }
 });
 
-test("per-connection budgets retain five moves/s and reset flood after quiet", () => {
+test("per-connection budgets retain ten moves/s and reset flood after quiet", () => {
   const budget = new Budget();
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     expect(budget.accept(0)).toBe("ok");
     expect(budget.acceptMove(0)).toBe("ok");
   }
   expect(budget.acceptMove(0)).toBe("limited");
-  for (let i = 5; i < 20; i++) expect(budget.accept(0)).toBe("ok");
+  for (let i = 10; i < 20; i++) expect(budget.accept(0)).toBe("ok");
   expect(budget.accept(0)).toBe("limited");
   for (let second = 1; second <= 4; second++) {
     const now = second * 1100;

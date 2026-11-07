@@ -55,11 +55,14 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - `HOST` defaults to `127.0.0.1`; the container sets `HOST=0.0.0.0`.
 - `FACEDOWN_TRUST_PROXY=1` trusts the last X-Forwarded-For hop (Caddy appends it); set in the container behind hoist only. Otherwise limits use the socket IP.
 - `FACEDOWN_PING_MS` sends socket pings every 20000 ms by default.
-- Guests: 30/IP/hour; registrations: 5 attempts/IP/hour; sockets: 8/session.
+- Guests: 30/IP/hour; registrations: 5 successes or conflicts/IP/hour; account sessions: 10 (oldest revoked).
+- Sockets: 8/session, 16/account, 32/IP; moves allow bursts of 10/s per socket.
 - Open tables: 200 globally; lobby: newest 50 open plus newest 50 live.
 - `FACEDOWN_DB` selects the SQLite file (default `./facedown.db`); tests use scratch files.
 - `FACEDOWN_ORIGIN` pins the exact mutation/WS Origin in production; unset uses the request origin.
-- `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms); at most 3 open tables per host and 10 creates per session per 10 min.
+- `FACEDOWN_OPEN_TTL_MS` expires open tables without connected humans (default 1800000 ms).
+- `FACEDOWN_OPEN_HOLD_MS` holds dropped open seats for 600000 ms; explicit leave releases them immediately.
+- Open table creation: at most 3/session, 3/account, 6/IP; 10 creates/session per 10 min after body validation.
 - `FACEDOWN_TURN_MS` / `FACEDOWN_HOLD_MS` / `FACEDOWN_BOT_MS`: 30000 / 180000 / 600 ms.
 - Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
 - Rated games require four distinct accounts at start and no casual flag; bot-held seats at finish score a loss, reclaim clears it.

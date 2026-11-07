@@ -45,7 +45,7 @@ test("cheat attempts reject without changing state or the move log", async () =>
     await unchanged(0, { t: "join", table: g.id, seat: 1 }, "forbidden");
     f.clock.advance(1001);
     const state = structuredClone(table.state);
-    for (let i = 0; i < 6; i++)
+    for (let i = 0; i < 11; i++)
       g.players[0]?.send({ t: "move", table: g.id, seq: 0, move: { bid: 3 } });
     await g.players[0]?.error("rate_limited");
     expect(table.state).toEqual(state);
@@ -83,8 +83,7 @@ test("cheat attempts reject without changing state or the move log", async () =>
       oversized.ws.addEventListener("close", resolve, { once: true }),
     );
     oversized.ws.send("x".repeat(4097));
-    // Bun enforces maxPayloadLength before the message callback.
-    expect([1006, 1009]).toContain((await closed).code);
+    expect((await closed).code).toBe(1009);
     expect(table.state).toEqual(spectatorState);
     checkWire(record, f.clients);
   } finally {

@@ -8,7 +8,7 @@ export class Budget {
     this.moves = this.moves.filter((t) => now - t < 1000);
     if (
       (!move && this.messages.length >= 20) ||
-      (move && this.moves.length >= 5)
+      (move && this.moves.length >= 10)
     ) {
       if (this.lastFlood === undefined || now - this.lastFlood > 1000)
         this.floodSince = now;

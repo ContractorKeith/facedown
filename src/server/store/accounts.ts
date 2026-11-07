@@ -20,14 +20,40 @@ export class AccountStore {
       )
       .get(username);
   }
-  issue(hash: string, account: string, expires: number, now: number): void {
-    this.db
+  issue(hash: string, account: string, expires: number, now: number): string[] {
+    return this.db
       .transaction(() => {
         this.db.run("DELETE FROM sessions WHERE expires_at<=?", [now]);
         this.db.run("INSERT INTO sessions VALUES (?,?,?)", [
           hash,
           account,
           expires,
+        ]);
+        // SQLite rowid preserves issuance order, including equal expiry times.
+        const revoked = this.db
+          .query<{ token_hash: string }, [string]>(
+            "SELECT token_hash FROM sessions WHERE account_id=? ORDER BY rowid DESC LIMIT -1 OFFSET 10",
+          )
+          .all(account);
+        for (const row of revoked) this.revoke(row.token_hash);
+        return revoked.map((row) => row.token_hash);
+      })
+      .immediate();
+  }
+  transferGuest(previous: string, next: Session): void {
+    this.db
+      .transaction(() => {
+        this.db.run(
+          `UPDATE game_seats SET session_hash=?,account_id=?,guest_name=NULL
+        WHERE session_hash=? AND account_id IS NULL AND game_id IN (SELECT id FROM games WHERE status='live')`,
+          [next.id, next.accountId ?? null, previous],
+        );
+        this.db.run(
+          "UPDATE games SET host_session=? WHERE host_session=? AND status='live'",
+          [next.id, previous],
+        );
+        this.db.run("DELETE FROM guest_sessions WHERE token_hash=?", [
+          previous,
         ]);
       })
       .immediate();

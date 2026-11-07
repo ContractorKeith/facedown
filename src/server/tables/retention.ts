@@ -21,6 +21,13 @@ export class Retention {
     this.creates.set(host.id, [...recent, now]);
   }
   checkOpen(host: Session): void {
+    const open = [...this.tables.values()].filter((t) => t.status === "open");
+    if (
+      (host.accountId &&
+        open.filter((t) => t.creatorAccount === host.accountId).length >= 3) ||
+      (host.ip && open.filter((t) => t.creatorIP === host.ip).length >= 6)
+    )
+      throw new Fault("conflict");
     if (
       [...this.tables.values()].filter(
         (t) => t.host === host.id && t.status === "open",

@@ -51,20 +51,27 @@ export class Membership {
     this.lifecycle.broadcast(table);
     this.changed(table);
   }
-  releaseGuest(session: Session): void {
+  transferGuest(previous: Session, next: Session): void {
+    this.lifecycle.guard(() =>
+      this.lifecycle.store.accounts.transferGuest(previous.id, next),
+    );
     for (const table of this.all()) {
-      if (table.status !== "open") continue;
-      table.seats.forEach((occupant, seat) => {
-        if (occupant?.session === session.id && !occupant.accountId)
-          this.lifecycle.releaseOpen(table, seat);
-      });
-      this.lifecycle.broadcast(table);
-      this.changed(table);
+      if (table.status !== "open" && table.status !== "live") continue;
+      for (const occupant of table.seats) {
+        if (occupant?.session !== previous.id || occupant.accountId) continue;
+        occupant.session = next.id;
+        occupant.accountId = next.accountId;
+        occupant.name = next.name;
+      }
+      if (table.host === previous.id) {
+        table.host = next.id;
+        table.creatorAccount = next.accountId;
+      }
     }
   }
   spectate(id: string, peer: Peer): void {
     const table = this.getTable(id);
-    this.lifecycle.leave(table, peer);
+    this.lifecycle.leave(table, peer, false);
     table.viewers.set(peer, { spectator: true });
     this.lifecycle.send(table, peer);
     this.changed(table);
@@ -72,6 +79,11 @@ export class Membership {
   leave(id: string, peer: Peer): void {
     const table = this.getTable(id);
     this.lifecycle.leave(table, peer);
+    if (table.status === "open")
+      table.seats.forEach((s, seat) => {
+        if (s && owns(s, peer.session) && !s.sockets.size)
+          this.lifecycle.releaseOpen(table, seat);
+      });
     this.lifecycle.broadcast(table);
     this.changed(table);
   }
@@ -79,7 +91,7 @@ export class Membership {
     for (const table of this.all()) {
       table.overSent.delete(peer);
       if (!table.viewers.has(peer)) continue;
-      this.lifecycle.leave(table, peer);
+      this.lifecycle.leave(table, peer, false);
       if (table.status !== "unavailable") this.lifecycle.broadcast(table);
       this.changed(table);
     }
