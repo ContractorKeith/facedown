@@ -89,13 +89,15 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       origin,
     }) => {
       const wire = await tableFixture(page);
+      let lobbyReads = 0;
       if (source === "http") {
         await page.route(`**/api/tables/${wire.id}`, (route) =>
           route.fulfill({ status: 404, json: { message: "not_found" } }),
         );
-        await page.route("**/api/tables", (route) =>
-          route.fulfill({ json: [] }),
-        );
+        await page.route("**/api/tables", (route) => {
+          lobbyReads++;
+          return route.fulfill({ json: [] });
+        });
       } else
         await page.routeWebSocket("**/ws", (route) =>
           route.onMessage(() =>
@@ -110,6 +112,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
         );
       await page.goto(`${origin}/tables/${wire.id}`);
       await expect(page.getByRole("alert")).toHaveText("This table is gone");
+      expect(lobbyReads).toBe(0);
       await expect(
         page.getByRole("link", { name: "Back to lobby" }),
       ).toBeVisible();
