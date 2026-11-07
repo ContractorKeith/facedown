@@ -11,7 +11,7 @@ browser — sees a card it shouldn't.
 - Drop out and a bot holds your seat until you come back.
 - Glicko-2 ratings per game, rated on 2v2 results.
 
-Status: M0–M7 merged; skeptic round 1 fixes in progress. See [`docs/PLAN.md`](docs/PLAN.md).
+Status: v1 complete (M0–M7 plus skeptic rounds 1 and 2); deploy-ready through hoist with a persistent volume; not yet live or tagged. See [`docs/PLAN.md`](docs/PLAN.md).
 
 MIT licensed.
 
@@ -46,29 +46,23 @@ Keith performs the first live push. On a hoist server with DNS pointing
 
 ```sh
 export HOIST_HOST=your-server
-hoist apps:create facedown --domain facedown.contractorkeith.com --health-path /healthz
+hoist apps:create facedown --domain facedown.contractorkeith.com --health-path /healthz --volume /data
 hoist config:set facedown FACEDOWN_DB=/data/facedown.db FACEDOWN_ORIGIN=https://facedown.contractorkeith.com PORT=8080
-```
-
-**Persistent storage prerequisite:** current hoist has no volume verb or mount option
-([hoist#40](https://github.com/ContractorKeith/hoist/issues/40)).
-Its Docker adapter does not attach persistent volumes. Before pushing, hoist must
-support mounting one persistent Docker volume at `/data` in every facedown release,
-including restart and rollback, writable by the image's `bun` user (UID 1000).
-A volume must be shared by overlapping releases; keep separate volumes for previews.
-Do not deploy with ephemeral container storage. There is no working hoist volume
-command to paste today; this is the remaining deployment blocker.
-
-Once that mount support is available and configured:
-
-```sh
 git remote add hoist hoist@your-server:facedown.git
 git push hoist main
+hoist apps:info facedown          # shows the volume hoist-facedown-data at /data
 hoist logs facedown -f
 hoist releases facedown --json
 hoist logs facedown --release v1
 hoist rollback facedown v1
 ```
+
+`--volume /data` (hoist ≥ the release with [hoist#40](https://github.com/ContractorKeith/hoist/issues/40))
+gives every production release the same Docker volume, `hoist-facedown-data`, at
+`/data`, so the SQLite game log survives pushes, restarts and rollbacks. Previews get
+no volume, so do not use preview branches for real games. Old and new containers share
+the volume during cutover; facedown's single-writer lease handles that. The image runs
+as the `bun` user (UID 1000) and owns `/data`, which Docker copies into a new volume.
 
 Do not set `FACEDOWN_INSECURE_COOKIE` in production. Hoist health-checks `/healthz`
 before cutover, then stops the old container. The standby returns 503 for table

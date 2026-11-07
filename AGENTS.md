@@ -10,7 +10,7 @@ clean clone, and the app live behind hoist.
 
 ## Status
 
-M0–M7 merged; skeptic round 1 fixes in progress
+v1 complete: M0–M7 plus skeptic rounds 1 (#29, #30) and 2 (#42, #43) merged; deploy-ready via `hoist apps:create … --volume /data` (hoist#40). Not yet live or tagged.
 
 ## Commands
 
