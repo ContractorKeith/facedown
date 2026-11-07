@@ -17,7 +17,8 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: auto 1fr;
-  height: 132px;
+  min-height: 132px;
+  height: auto;
   padding: 6px;
   border-radius: 18px;
   gap: 4px;
@@ -72,7 +73,7 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
   }
   .game.bidding .board {
-    height: 120px;
+    min-height: 110px;
   }
 }
 @media (max-height: 639px) {
@@ -131,4 +132,11 @@
 .game.bidding .turn {
   margin-top: 4px;
   margin-bottom: 4px;
+}
+
+.game.bidding .brand a {
+  font-size: clamp(1.2rem, 6vw, 1.65rem);
+}
+.game.bidding .brand .quiet {
+  padding-inline: 10px;
 }
