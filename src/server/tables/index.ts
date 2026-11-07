@@ -41,9 +41,7 @@ export class Tables {
       (id) => this.get(id),
       () => this.tables.values(),
       (table) => {
-        if (table.status === "open" && !table.seats.some((s) => s?.session))
-          this.retention.remove(table);
-        else this.retention.changed(table);
+        this.retention.changed(table);
       },
     );
     this.lease = new TableLease(
@@ -99,6 +97,27 @@ export class Tables {
       status: t.status,
       seats: publicSeats(t),
     }));
+  }
+  summary(id: string, session: Session | null = null) {
+    this.available();
+    const table = this.tables.get(id);
+    if (table && (table.status === "open" || table.status === "live"))
+      return {
+        id,
+        type: table.type,
+        status: table.status,
+        rated: table.status === "open" ? ratedIfStarted(table) : !!table.rated,
+        seats: publicSeats(table),
+        host:
+          !!session &&
+          (table.host === session.id ||
+            table.seats.some(
+              (s) => s?.session === table.host && owns(s, session),
+            )),
+      };
+    const summary = this.lifecycle.store.summary(id, session);
+    if (!summary) throw new Fault("not_found");
+    return summary;
   }
   create(type: GameType, host: Session, casual = false): Table {
     this.available();
@@ -170,8 +189,8 @@ export class Tables {
     });
     this.lifecycle.broadcast(table);
   }
-  releaseGuest(session: Session): void {
-    this.membership.releaseGuest(session);
+  transferGuest(previous: Session, next: Session): void {
+    this.membership.transferGuest(previous, next);
   }
   join(id: string, seat: Seat, peer: Peer) {
     this.membership.join(id, seat, peer);

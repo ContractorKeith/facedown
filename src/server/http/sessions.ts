@@ -10,11 +10,20 @@ export const randomId = (length: number) =>
     crypto.getRandomValues(new Uint8Array(length)),
     (b) => "abcdefghijklmnopqrstuvwxyz234567"[b % 32],
   ).join("");
-export type Session = { id: string; name: string; accountId?: string | null };
+export type Session = {
+  id: string;
+  name: string;
+  accountId?: string | null;
+  ip?: string;
+};
 export interface SessionResolver {
   resolve(request: Request): Session | null;
   active(session: Session): boolean;
-  account?(accountId: string): { session: Session; cookie: string };
+  account?(accountId: string): {
+    session: Session;
+    cookie: string;
+    revoked?: string[];
+  };
   logout?(session: Session): string;
   headers?(cookie: string): Headers;
   guest(): { session: Session; cookie: string };
@@ -62,7 +71,7 @@ export class GuestSessions implements SessionResolver {
     const token = randomHex(),
       now = this.now(),
       age = 7 * 86400;
-    this.store.accounts.issue(
+    const revoked = this.store.accounts.issue(
       commitment(token),
       accountId,
       now + age * 1000,
@@ -70,7 +79,7 @@ export class GuestSessions implements SessionResolver {
     );
     const session = this.store.accounts.resolve(commitment(token), now);
     if (!session) throw new Error("Missing issued session");
-    return { session, cookie: this.cookie(token, age) };
+    return { session, cookie: this.cookie(token, age), revoked };
   }
   logout(session: Session): string {
     this.store.accounts.revoke(session.id);

@@ -12,7 +12,6 @@ export class Creation {
     private retention: Retention,
   ) {}
   async fromJSON(host: Session, read: () => Promise<unknown>): Promise<Table> {
-    this.retention.attempt(host);
     const body = await read();
     if (!body || typeof body !== "object" || Array.isArray(body))
       throw new Fault("bad_request");
@@ -23,6 +22,7 @@ export class Creation {
       (b.casual !== undefined && typeof b.casual !== "boolean")
     )
       throw new Fault("bad_request");
+    this.retention.attempt(host);
     return this.allocate(b.type, host, b.casual === true);
   }
   create(type: GameType, host: Session, casual = false): Table {
@@ -47,6 +47,8 @@ export class Creation {
       created: this.lifecycle.clock.now(),
       type,
       host: host.id,
+      creatorAccount: host.accountId,
+      creatorIP: host.ip,
       casual,
       overSent: new Set(),
       game,

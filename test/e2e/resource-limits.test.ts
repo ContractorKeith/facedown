@@ -74,7 +74,7 @@ test("unseated sockets receive configured pings; oversized frames get the applic
     const closed = new Promise<CloseEvent>((resolve) =>
       ws?.addEventListener("close", resolve, { once: true }),
     );
-    ws.send("x".repeat(5000));
+    ws.send("x".repeat(16000));
     expect(await closed).toMatchObject({
       code: 1009,
       reason: "Message too large",

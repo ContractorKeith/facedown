@@ -35,6 +35,7 @@ test("three open tables per host; ten creations per ten minutes, even after clos
         peer = { session: f.host, send: () => {} };
       f.tables.join(t.id, 0, peer);
       f.tables.leave(t.id, peer);
+      f.clock.advance(50);
     }
     expect(() => f.tables.create("spades", f.host)).toThrow("rate_limited");
     f.clock.advance(600000);
@@ -59,6 +60,8 @@ test("open TTL ignores spectators; a connected human prevents expiry", () => {
     f.clock.advance(500);
     expect(f.tables.get(next.id)).toBe(next);
     f.tables.disconnect(peer);
+    expect(f.tables.get(next.id).seats[0]?.session).toBe(f.host.id);
+    f.clock.advance(50);
     expect(() => f.tables.get(next.id)).toThrow("not_found");
     expect(f.clock.pending).toBe(0);
   } finally {
@@ -66,7 +69,7 @@ test("open TTL ignores spectators; a connected human prevents expiry", () => {
   }
 });
 
-test("open last-socket release transfers host, permits bot fill, and closes on last human", () => {
+test("open last-socket hold expires before host succession; explicit leave releases", () => {
   const f = setup();
   try {
     const table = f.tables.create("spades", f.host);
@@ -82,11 +85,15 @@ test("open last-socket release transfers host, permits bot fill, and closes on l
     f.tables.disconnect(hostPeer);
     expect(table.seats[0]).not.toBe(null);
     f.tables.disconnect(secondSocket);
+    expect(table.seats[0]?.session).toBe(f.host.id);
+    expect(table.host).toBe(f.host.id);
+    f.clock.advance(600000);
     expect(table.seats[0]).toBe(null);
     expect(table.host).toBe(next.session.id);
     f.tables.fill(table.id, next.session);
     expect(table.seats[0]?.bot).toBe(true);
     f.tables.leave(table.id, next);
+    f.clock.advance(50);
     expect(() => f.tables.get(table.id)).toThrow("not_found");
   } finally {
     f.clean();
@@ -161,6 +168,24 @@ test("host succession follows the next occupied human seat clockwise", () => {
     f.tables.join(table.id, 0, first);
     f.tables.leave(table.id, second);
     expect(table.host).toBe(third.session.id);
+  } finally {
+    f.clean();
+  }
+});
+
+test("spectating holds an open seat; explicit leave releases a held seat", () => {
+  const f = setup();
+  try {
+    const t = f.tables.create("spades", f.host);
+    const peer = { session: f.host, send: () => {} };
+    f.tables.join(t.id, 0, peer);
+    f.tables.spectate(t.id, peer);
+    expect(t.seats[0]?.session).toBe(f.host.id);
+    f.tables.leave(t.id, peer);
+    expect(t.seats[0]).toBe(null);
+    expect(f.tables.get(t.id)).toBe(t);
+    f.clock.advance(50);
+    expect(() => f.tables.get(t.id)).toThrow("not_found");
   } finally {
     f.clean();
   }

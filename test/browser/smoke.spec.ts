@@ -9,7 +9,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       origin,
     }) => {
       // Track the real socket so the test can simulate a dropped connection.
-      await page.addInitScript(() => {
+      const trackSocket = () => {
         const Native = window.WebSocket;
         class Socket extends Native {
           constructor(url: string | URL, protocols?: string | string[]) {
@@ -18,7 +18,8 @@ if (process.env.FACEDOWN_BROWSER === "1") {
           }
         }
         window.WebSocket = Socket;
-      });
+      };
+      await page.addInitScript(trackSocket);
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.goto(origin);
@@ -29,6 +30,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       const invitee = await browser.newPage({
         viewport: { width: 390, height: 844 },
       });
+      await invitee.addInitScript(trackSocket);
       await invitee.goto(page.url());
       await invitee
         .getByRole("button", { name: "Join seat 2", exact: true })
@@ -38,8 +40,16 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       await expect(
         invitee.getByText("Waiting to start", { exact: true }),
       ).toBeVisible();
-      await invitee.close();
+      await invitee.evaluate(() => {
+        (window as unknown as { gameSocket: WebSocket }).gameSocket.send(
+          JSON.stringify({
+            t: "leave",
+            table: location.pathname.split("/").at(-1),
+          }),
+        );
+      });
       await expect(page.locator(".west strong")).toHaveText("Empty seat");
+      await invitee.close();
       await page.getByRole("button", { name: "Fill bots" }).click();
       await page.getByRole("button", { name: "Start game" }).click();
       const spectator = await browser.newPage({

@@ -30,3 +30,12 @@ export const openTTL = () => {
     throw new Error("Invalid FACEDOWN_OPEN_TTL_MS");
   return value;
 };
+
+export function timer(name: string, fallback: number): number {
+  const value = Number(process.env[name]?.trim() || fallback);
+  if (!Number.isSafeInteger(value) || value < 1)
+    throw new Error(`Invalid ${name}`);
+  return value;
+}
+export const openHold = () => timer("FACEDOWN_OPEN_HOLD_MS", 600000);
+export const pingMS = () => timer("FACEDOWN_PING_MS", 20000);

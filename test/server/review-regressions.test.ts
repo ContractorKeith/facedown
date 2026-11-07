@@ -39,7 +39,8 @@ test("last socket leaving an open table frees its seat and transfers host", () =
     tables.leave(table.id, peer);
     expect(table.seats[0]).toBe(null);
     expect(table.host).toBe(next.id);
-    tables.disconnect(other);
+    tables.leave(table.id, other);
+    clock.advance(1800000);
     expect(() => tables.get(table.id)).toThrow("not_found");
   } finally {
     tables.stop();

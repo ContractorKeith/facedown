@@ -29,6 +29,11 @@ function* rebuildSteps(
     try {
       const record = store.loadGame(id);
       if (!record) throw new Error("Missing live game");
+      if (
+        record.seats.length !== 4 ||
+        record.seats.some((s, i) => s.seat !== i)
+      )
+        throw new Error("Invalid seat rows");
       const game = registry.get(record.type);
       if (
         !game ||

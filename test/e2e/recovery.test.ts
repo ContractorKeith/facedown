@@ -65,7 +65,7 @@ test("table creation returns 409 for open-table cap and 429 for ten-minute budge
   }
 });
 
-test("malformed table creation requests also consume the per-session budget", async () => {
+test("malformed table creation requests preserve the per-session budget", async () => {
   const f = fixture();
   try {
     const cookie = await f.guest();
@@ -75,7 +75,7 @@ test("malformed table creation requests also consume the per-session budget", as
       ).toBe(400);
     expect(
       (await f.request("/api/tables", cookie, { type: "spades" })).status,
-    ).toBe(429);
+    ).toBe(201);
   } finally {
     await f.stop();
   }

@@ -81,7 +81,7 @@ test("any live session of an account reclaims its seat, including after restart"
   expect(f.app.tables.get(id).seats[0]?.bot).toBe(false);
 });
 for (const method of ["register", "login"] as const)
-  test(`${method} retires guest cookies and releases open seats`, async () => {
+  test(`${method} retires guest cookies and transfers open seats`, async () => {
     f = fixture();
     if (method === "login") await register();
     const guest = await f.guest(),
@@ -98,11 +98,11 @@ for (const method of ["register", "login"] as const)
     expect(response.status).toBe(method === "register" ? 201 : 200);
     expect((await closed).code).toBe(1008);
     expect(f.app.store.guests.find(old.id, f.clock.now())).toBe(null);
-    expect(f.app.tables.list().some((t) => t.id === id)).toBe(false);
+    expect(f.app.tables.list().some((t) => t.id === id)).toBe(true);
     const fresh = cookieOf(response);
     expect((await f.request("/api/me", fresh)).status).toBe(200);
   });
-test("guest promotion leaves live guest seats guest-owned and casual", async () => {
+test("guest promotion transfers live seats while preserving casual status", async () => {
   f = fixture();
   const guest = await f.guest(),
     old = session(guest),
@@ -115,7 +115,10 @@ test("guest promotion leaves live guest seats guest-owned and casual", async () 
     password: "correct horse",
   });
   const t = f.app.tables.get(id);
-  expect(t.seats[0]).toMatchObject({ session: old.id, accountId: undefined });
+  expect(t.seats[0]).toMatchObject({
+    session: session(cookieOf(response)).id,
+    accountId: session(cookieOf(response)).accountId,
+  });
   expect(t.rated).toBe(false);
   expect(f.app.store.guests.find(old.id, f.clock.now())).toBe(null);
   const spectator = await f.connect(
@@ -124,7 +127,7 @@ test("guest promotion leaves live guest seats guest-owned and casual", async () 
     id,
   );
   spectator.send({ t: "join", table: id, seat: 0 });
-  await spectator.error("forbidden");
+  await spectator.next((m) => m.t === "view" && m.you === 0);
   f.clock.advance(40000);
   expect(f.app.store.ratings.changes(id)).toEqual([]);
 });
@@ -154,7 +157,7 @@ test("a second account session cannot take another open seat and may host from i
     200,
   );
 });
-test("guest promotion releases a reserved open seat even without a socket", async () => {
+test("guest promotion transfers a reserved open seat even without a socket", async () => {
   f = fixture();
   const guest = await f.guest(),
     old = session(guest),
@@ -165,7 +168,7 @@ test("guest promotion releases a reserved open seat even without a socket", asyn
   });
   expect(response.status).toBe(201);
   expect(f.app.store.guests.find(old.id, f.clock.now())).toBe(null);
-  expect(f.app.tables.list().some((t) => t.id === id)).toBe(false);
+  expect(f.app.tables.list().some((t) => t.id === id)).toBe(true);
   const cookies = response.headers.getSetCookie();
   expect(cookies[0]).toStartWith("fd=");
   expect(cookies[1]).toStartWith("__Host-fd=;");

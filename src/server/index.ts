@@ -1,4 +1,4 @@
-import { type Clock, clock, type Timing, timing } from "./clock";
+import { type Clock, clock, pingMS, type Timing, timing } from "./clock";
 import { handler } from "./http";
 import { GuestSessions, type SessionResolver } from "./http/sessions";
 import { Store } from "./store";
@@ -26,6 +26,7 @@ export type ServerOptions = {
   exit?: (code: number) => void;
 };
 export function startServer(options: ServerOptions = {}) {
+  const pingDelay = pingMS();
   const store = new Store(options.db);
   let tables: Tables;
   let failed = false;
@@ -95,10 +96,7 @@ export function startServer(options: ServerOptions = {}) {
     store.close();
     throw error;
   }
-  const ping = setInterval(
-    () => sockets.ping(),
-    Number(process.env.FACEDOWN_PING_MS || 20000),
-  );
+  const ping = setInterval(() => sockets.ping(), pingDelay);
   ping.unref();
   return {
     server,
