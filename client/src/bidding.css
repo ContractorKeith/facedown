@@ -116,3 +116,19 @@
 .game.bidding .game-heading h1 {
   font-size: 1.4rem;
 }
+
+.game.bidding {
+  padding-top: 8px;
+}
+.game.bidding .brand {
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.game.bidding .game-heading {
+  margin-bottom: 4px;
+}
+.game.bidding .board,
+.game.bidding .turn {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}

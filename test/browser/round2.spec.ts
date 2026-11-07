@@ -2,57 +2,62 @@ import { expect, test } from "./fixture";
 import { tableFixture } from "./table-fixture";
 
 if (process.env.FACEDOWN_BROWSER === "1") {
-  for (const [width, height, scale] of [
-    [1280, 800, 1],
-    [390, 844, 1],
-    [390, 844, 1.5],
-    [390, 844, 2],
-    [360, 640, 1],
-    [320, 568, 1],
-    [844, 390, 1],
-  ] as const)
-    test(`bidding fits ${width}x${height} at ${scale * 100}% text`, async ({
-      page,
-      origin,
-    }, info) => {
-      await page.setViewportSize({ width, height });
-      const wire = await tableFixture(page);
-      await page.goto(`${origin}/tables/${wire.id}`);
-      await expect(
-        page.getByText("Waiting to start", { exact: true }),
-      ).toBeVisible();
-      await page.addStyleTag({
-        content: `:root { font-size: ${16 * scale}px; }`,
-      });
-      wire.send(0, { you: wire.record.moves[0]?.seat });
-      await expect(page.locator(".piece")).toHaveCount(13);
-      await expect(page.locator(".bids button")).toHaveCount(14);
-      if (scale <= 1.5)
-        for (const item of await page.locator(".piece, .bids button").all())
-          await expect(item).toBeInViewport({ ratio: 1 });
-      if (height < 640) {
-        const hand = await page.locator(".hand").boundingBox();
-        const bids = await page.locator(".bids").boundingBox();
-        expect(hand && bids && hand.y + hand.height <= bids.y).toBe(true);
-        await expect(page.locator(".bids")).toHaveCSS("position", "fixed");
-      }
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-      ).toBe(true);
-      const you = await page.locator(".south .avatar").boundingBox();
-      const prompt = await page
-        .getByText("Place your bids", { exact: true })
-        .boundingBox();
-      if (you && prompt)
-        expect(prompt.y + prompt.height).toBeLessThanOrEqual(you.y);
-      if ((width === 1280 || width === 360) && scale === 1)
-        await page.screenshot({
-          path: `docs/screenshots/bidding-${info.project.name}-${width}x${height}.png`,
-          animations: "disabled",
+  for (const font of ["system-ui", "sans-serif"])
+    for (const [width, height, scale] of [
+      [1280, 800, 1],
+      [390, 844, 1],
+      [390, 844, 1.5],
+      [390, 844, 2],
+      [360, 640, 1],
+      [320, 568, 1],
+      [844, 390, 1],
+    ] as const)
+      test(`bidding fits ${width}x${height} at ${scale * 100}% text (${font})`, async ({
+        page,
+        origin,
+      }, info) => {
+        await page.setViewportSize({ width, height });
+        const wire = await tableFixture(page);
+        await page.goto(`${origin}/tables/${wire.id}`);
+        await expect(
+          page.getByText("Waiting to start", { exact: true }),
+        ).toBeVisible();
+        await page.addStyleTag({
+          content: `:root { font-size: ${16 * scale}px; font-family: ${font}; }`,
         });
-    });
+        wire.send(0, { you: wire.record.moves[0]?.seat });
+        await expect(page.locator(".piece")).toHaveCount(13);
+        await expect(page.locator(".bids button")).toHaveCount(14);
+        if (scale <= 1.5)
+          for (const item of await page.locator(".piece, .bids button").all())
+            await expect(item).toBeInViewport({ ratio: 1 });
+        if (height < 640) {
+          const hand = await page.locator(".hand").boundingBox();
+          const bids = await page.locator(".bids").boundingBox();
+          expect(hand && bids && hand.y + hand.height <= bids.y).toBe(true);
+          await expect(page.locator(".bids")).toHaveCSS("position", "fixed");
+        }
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+        const you = await page.locator(".south .avatar").boundingBox();
+        const prompt = await page
+          .getByText("Place your bids", { exact: true })
+          .boundingBox();
+        if (you && prompt)
+          expect(prompt.y + prompt.height).toBeLessThanOrEqual(you.y);
+        if (
+          (width === 1280 || width === 360) &&
+          scale === 1 &&
+          font === "system-ui"
+        )
+          await page.screenshot({
+            path: `docs/screenshots/bidding-${info.project.name}-${width}x${height}.png`,
+            animations: "disabled",
+          });
+      });
 
   test("direct lookup loads an invite outside the newest 50 and a finished Dominoes reload", async ({
     page,
