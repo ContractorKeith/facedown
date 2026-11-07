@@ -64,3 +64,18 @@ test("a reload cannot replace an anchor at the same sequence with a different ha
       .unbroken,
   ).toBe(false);
 });
+
+test("identical earlier frames leave the latest verified chain intact", () => {
+  const zero = checkChain(undefined, start);
+  const one = checkChain(zero, { ...start, seq: 1, logHash: hash, lastMove });
+  expect(checkChain(one, start)).toEqual(one);
+});
+
+test("rewritten earlier frames are tampered without lowering the anchor", () => {
+  const zero = checkChain(undefined, start);
+  const one = checkChain(zero, { ...start, seq: 1, logHash: hash, lastMove });
+  const bad = checkChain(one, { ...start, logHash: hash });
+  expect(bad.tampered).toBe(true);
+  expect(bad.seq).toBe(1);
+  expect(bad.logHash).toBe(hash);
+});

@@ -28,7 +28,7 @@ async function copy() {
   <button class="quiet" onclick={copy}>{copied ? "Link copied" : "Copy invite"}</button>
 </header>
 <div class="game-heading">
-  <h1>{type === "dominoes" ? "Dominoes" : "Spades"}</h1>
+  <h1>{type === "dominoes" ? "Dominoes" : type === "spades" ? "Spades" : "Table"}</h1>
   <small>{rated ? "Rated" : "Casual"} · {id}</small>
 </div>
 {#if error}<p role="alert">{error}</p>{/if}

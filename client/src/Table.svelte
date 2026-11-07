@@ -1,13 +1,13 @@
 <script lang="ts">
-import { onMount } from "svelte";
-import { api, type Table, type ViewMessage } from "./api";
+import { onMount, tick } from "svelte";
+import { ApiError, type Table, type ViewMessage } from "./api";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
-import { type Chain, checkChain } from "./chain";
-import { liveRecord, rememberGame } from "./game-records";
+import { type Chain, rememberFrame } from "./chain";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Hand from "./Hand.svelte";
 import { legalMovesFromView } from "./legal";
+import { loadTable } from "./load-table";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import OpenTable from "./OpenTable.svelte";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
@@ -17,6 +17,8 @@ import Scorebar from "./Scorebar.svelte";
 import { connect } from "./socket";
 // biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import TableHeader from "./TableHeader.svelte";
+// biome-ignore lint/correctness/noUnusedImports: Referenced in markup.
+import TableNotices from "./TableNotices.svelte";
 
 // biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { id, navigate, refreshSession } = $props<{
@@ -31,9 +33,24 @@ let seat = $state<number | null>(null);
 let up = $state(false);
 let error = $state("");
 let pending = $state(false);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
 let notice = $state("");
 let over = $state(false);
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
+let gone = $state(false);
+let controls: HTMLElement;
+let ownsFocus = false;
+// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
+let finalScores = $state<number[]>();
+$effect(() => {
+  if (moves.some((m) => "play" in m) && ownsFocus)
+    tick().then(() => {
+      if (ownsFocus)
+        controls
+          ?.querySelector<HTMLButtonElement>(".piece:not(:disabled)")
+          ?.focus();
+    });
+});
 let now = $state(Date.now());
 let bubbles = $state<Record<number, string>>({});
 let connection: ReturnType<typeof connect> | undefined;
@@ -71,18 +88,7 @@ function subscribe(next: number | null) {
         message = incoming as unknown as ViewMessage;
         seat = message.you;
         if (seat !== null) sessionStorage.setItem(`seat:${id}`, String(seat));
-        if (message.commitment && message.logHash) {
-          chain = checkChain(
-            chain,
-            {
-              ...message,
-              commitment: message.commitment,
-              logHash: message.logHash,
-            },
-            liveRecord(id),
-          );
-          rememberGame(id, chain);
-        }
+        chain = rememberFrame(id, chain, message);
         over = message.status === "finished";
         error = "";
       }
@@ -91,6 +97,7 @@ function subscribe(next: number | null) {
       }
       if (incoming.t === "error" && incoming.code !== "stale_seq") {
         pending = false;
+        if (incoming.code === "not_found") gone = true;
         error = String(incoming.message).replaceAll("_", " ");
       }
       if (incoming.t === "reaction") {
@@ -117,20 +124,20 @@ function subscribe(next: number | null) {
 // biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 function play(move: Record<string, unknown>) {
   if (up && !pending && message && moves.includes(move)) {
+    ownsFocus = controls?.contains(document.activeElement) ?? false;
     pending = true;
     connection?.send({ t: "move", seq: message.seq, move });
   }
 }
 onMount(() => {
   let alive = true;
-  api<Table[]>("/tables")
-    .then((tables) => {
+  loadTable(id)
+    .then(({ table: found, scores }) => {
       if (!alive) return;
-      table = tables.find((t) => t.id === id);
-      if (!table) {
-        error = "Table not found";
-        return;
-      }
+      table = found;
+      finalScores = scores;
+      over = found.status === "finished";
+      if (over) return;
       const saved = sessionStorage.getItem(`seat:${id}`);
       subscribe(
         location.search === "?watch=1"
@@ -140,7 +147,11 @@ onMount(() => {
             : null,
       );
     })
-    .catch((e) => (error = e.message));
+    .catch((e) => {
+      if (!alive) return;
+      gone = e instanceof ApiError && e.status === 404;
+      error = e.message;
+    });
   const tick = setInterval(() => (now = Date.now()), 250);
   return () => {
     alive = false;
@@ -150,19 +161,16 @@ onMount(() => {
   };
 });
 </script>
-<main class="game">
-  <TableHeader {id} type={table?.type} rated={message?.rated ?? false} {navigate} />
-  {#if !up && table}
+<svelte:document onfocusin={event => { ownsFocus = controls?.contains(event.target as Node) && !!(event.target as Element).closest(".hand, .bids, .draw, .end-picker"); }} />
+<main class="game" class:bidding={view && "phase" in view && view.phase === "bidding"} bind:this={controls}>
+  <TableHeader {id} type={table?.type} rated={message?.rated ?? table?.rated ?? false} {navigate} />
+  {#if !up && table && !gone && !over}
     <p class="banner" role="status">Reconnecting…</p>
   {/if}
-  {#if notice}<p class="banner" role="status">{notice}</p>{/if}
-  {#if error}
-    <p role="alert">{error}</p>
-  {/if}
-  {#if chain?.tampered}<p role="alert">This game's move log changed unexpectedly</p>{/if}
-  {#if message}
+  <TableNotices {gone} {error} {notice} tampered={chain?.tampered} scores={finalScores} {id} />
+  {#if message && !gone && !finalScores}
     {#if view}
-    {#if !message.rated}<p class="banner">Casual · Ratings stay unchanged; guests or bots make a table casual.</p>{/if}
+    {#if !message.rated}<p class="banner casual-banner">Casual · Ratings stay unchanged; guests or bots make a table casual.</p>{/if}
     <Scorebar {view} />
     {/if}
     <Board {message} {seat} {bubbles} />
