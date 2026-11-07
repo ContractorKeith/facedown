@@ -214,6 +214,7 @@ POST /api/logout                           → 204
 POST /api/guest                            → 200 guest session (casual only)
 GET  /api/me                               → account or guest
 GET  /api/tables                           → open and live tables (lobby)
+GET  /api/tables/:id                       → one table {id,type,status open|live|finished|abandoned,rated,seats,host}; 404 if unknown
 POST /api/tables {type, casual?}           → 201 {id, inviteUrl}
 POST /api/tables/:id/bots                  → fill empty seats with bots (host only)
 POST /api/tables/:id/start                 → host only, 4 seats filled
@@ -243,6 +244,11 @@ Server → client:
 {t:"over", table, outcome, seed}                                     seed revealed here
 {t:"error", code, message}   codes: stale_seq, illegal_move, not_your_turn, rate_limited, not_found, forbidden, bad_request
 ```
+
+A socket that drops on an open table keeps its seat for `FACEDOWN_OPEN_HOLD_MS` (default
+10 min); only an explicit `leave` frees it, and the table lives until the open TTL. Signing in
+or registering from a browser that holds a guest seat moves that seat to the new session.
+Limits apply per account and per client IP as well as per session.
 
 While a table is open nothing is dealt: the server draws the seed and deals at `start`, and
 open-table view messages carry `view: null`, `commitment: null`, `logHash: null`. `you` is the
