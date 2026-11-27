@@ -76,7 +76,6 @@ for (const mode of ["rated", "casual", "guest"] as const)
 for (const reclaim of [false, true])
   test(`winning account bot-held at finish scores ${reclaim ? "normally after reclaim" : "a loss"}`, async () => {
     const g = await setup();
-    // Find the terminal move through normal client play, stopping immediately before it.
     await f.play(g.id, g.players, () => {
       const t = f.app.tables.get(g.id),
         seat = t.game.toAct(t.state);
@@ -107,7 +106,6 @@ for (const reclaim of [false, true])
         m.t === "view" &&
         (m.seats as { connected: boolean }[])[leaver]?.connected === false,
     );
-    // Delay the next turn while the disconnect hold expires.
     f.app.tables.lifecycle.timing.turn = 100000;
     f.app.tables.lifecycle.timing.bot = 100000;
     f.app.tables.lifecycle.schedule(t);

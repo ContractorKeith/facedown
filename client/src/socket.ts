@@ -1,6 +1,5 @@
 import { session } from "./api";
 
-// Own the subscription, backoff, and session recovery for one table.
 export function connect(
   table: string,
   initialSeat: number | null,

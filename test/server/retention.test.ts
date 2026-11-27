@@ -114,7 +114,7 @@ test("finished table evicts on last viewer or ten minutes; over is once per subs
     f.tables.spectate(table.id, watcher);
     f.tables.fill(table.id, f.host);
     f.tables.start(table.id, f.host);
-    f.clock.advance(100); // Host becomes bot; zero-delay bots finish.
+    f.clock.advance(100);
     expect(table.status).toBe("finished");
     const count = () =>
       messages.filter((m) => (m as { t: string }).t === "over").length;

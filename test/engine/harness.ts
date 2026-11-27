@@ -8,7 +8,6 @@ import { canonical } from "./canonical";
 import type { GameEntry } from "./invariants";
 import { checkView } from "./view-check";
 
-// Full-log refolds are quadratic in game length; retain intermediate and final checks.
 export const REFOLD_INTERVAL = 256;
 function assertSame(actual: unknown, expected: unknown, message: string): void {
   if (!Bun.deepEquals(actual, expected, true))
@@ -41,7 +40,6 @@ export function playout<S, M, V, R, K extends string>(
       new Set(pieces).size === pieces.length,
       "conservation: duplicate declared piece",
     );
-    // These sanity checks constrain locate; its classifications are otherwise trusted.
     const initial = entry.locate(state);
     for (const seat of seats)
       ok(
@@ -82,7 +80,6 @@ export function playout<S, M, V, R, K extends string>(
       ok(moves.length < entry.maxMoves, "termination: move bound exceeded");
       const seat = entry.toAct(state);
       ok(seat !== null);
-      // Engine states are JSON data; round-trip cloning keeps long playouts cheap.
       const before = JSON.parse(JSON.stringify(state)) as S;
       const legal = entry.legalMoves(state, seat);
       const move = entry.bot(entry.view(state, { seat }), legal);

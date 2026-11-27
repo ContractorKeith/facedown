@@ -17,7 +17,7 @@ v1 complete: M0–M7 plus skeptic rounds 1 (#29, #30) and 2 (#42, #43) merged; d
 ```bash
 bun install
 bun run typecheck         # tsc --noEmit
-bun run lint              # Biome
+bun run lint              # Biome + comment ratchet (scripts/lint-comments.ts)
 bun test                  # unit, purity, goldens, 200 playouts per game
 bun run start             # server, PORT defaults to 8080
 bun run dev               # server with watch and insecure cookie for localhost HTTP
@@ -36,7 +36,9 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
   API/protocol, milestones, testing.
 - `CONTEXT.md` — glossary. Use its words in code, issues and PRs (Deal, not round; Hand is
   what a seat holds).
-- `docs/adr/0001` — seed + move log is the record, with a seed commitment; `0002` — move-log hash chain.
+- `docs/adr/` — `0001` seed + move log is the record; `0002` move-log hash chain; `0003` engine
+  PRNG and hashing; `0004` browser anchors and public views; `0005` lease, fencing, shutdown;
+  `0006` request hardening; `0007` test games and playout harness.
 - Session logs: `~/Projects/worklog/projects/facedown.md` (not in this repo).
 
 ## Conventions & Gotchas
@@ -67,6 +69,8 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
 - Local plain HTTP needs `FACEDOWN_INSECURE_COOKIE=1`: cookie `fd`, without Secure; production uses `__Host-fd`.
 - Rated games require four distinct accounts at start and no casual flag; bot-held seats at finish score a loss, reclaim clears it.
 - Browser smoke needs `bunx playwright install chromium` (CI adds `--with-deps`).
+- No code comments. Decisions go in `docs/adr/`, workarounds in an issue. `scripts/comment-baseline.json`
+  only shrinks; `/delete-comment` (`.agents/skills/delete-comment`) runs a sweep.
 - Tooling is Bun, `tsc --noEmit`, Biome. No ESLint, Prettier, Vitest or ORM.
 - Commits: `<type>: <description>`, author @ContractorKeith only.
 

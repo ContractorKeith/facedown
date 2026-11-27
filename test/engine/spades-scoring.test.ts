@@ -57,7 +57,6 @@ test("multiple bag penalties can apply on the same deal", () => {
   state.bags = [9, 0];
   expect(scoreDeal(state)).toMatchObject({ scores: [-387, -20], bags: [2, 0] });
 });
-// A legal final play closes the constructed deal and exercises score-to-next-deal transitions.
 function finish(scores: State["scores"], bids: State["bids"] = [3, 3, 2, 2]) {
   const state = scoring(bids, [3, 3, 3, 3]);
   Object.assign(state, {

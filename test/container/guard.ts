@@ -1,4 +1,3 @@
-// Docker probe: a missing or hung daemon must fail fast, never stall the suite.
 export function dockerAvailable(command = "docker"): boolean {
   try {
     return (

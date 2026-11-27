@@ -20,7 +20,6 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(page.locator(".north small")).toContainText("Partner");
     await expect(page.locator(".hand .piece")).toHaveCount(13);
     expect(wire.sent.some((m) => m.t === "join" && m.seat === 0)).toBe(true);
-    // The active bidder from the view must override the requested seat 0.
     await expect(page.locator(".bids button")).toHaveCount(14);
   });
 
@@ -60,13 +59,12 @@ if (process.env.FACEDOWN_BROWSER === "1") {
     await expect(
       page.getByText("Waiting to start", { exact: true }),
     ).toBeVisible();
-    wire.send(4, { you: wire.record.moves[4]?.seat }); // All four bids are in the fixture.
+    wire.send(4, { you: wire.record.moves[4]?.seat });
     const playable = page.locator(".piece:not(:disabled)").first();
     await expect(playable).toBeEnabled();
     await playable.focus();
     await page.keyboard.press("Enter");
     await expect(page.locator(".piece")).toHaveCount(12);
-    // Pending moves must not consume restoration before a legal card exists.
     wire.send(8, { you: wire.record.moves[8]?.seat });
     await expect(page.locator(".piece:not(:disabled)").first()).toBeFocused();
   });
@@ -125,7 +123,6 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       }
       for (let seq = 1; seq <= wire.record.moves.length; seq++) {
         wire.send(seq);
-        // Wait for the client to save each frame rather than filling the socket queue.
         await expect
           .poll(() =>
             page.evaluate(

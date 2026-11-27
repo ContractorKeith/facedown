@@ -1,6 +1,5 @@
 import { ends, type Move, pips, type View } from "./state";
 
-// Final ties keep legal-move order (hand order, then left before right).
 export function bot(view: View, legal: Move[]): Move {
   const support = (move: Move): number => {
     if (!("play" in move) || !view.openEnds) return 0;

@@ -25,7 +25,6 @@ export const dominoesInvariants: GameInvariants<State, Move> = {
       return { draw: true };
     return state.boneyard.length ? { pass: true } : { draw: true };
   },
-  // At most 28 plays, 8 draws, and three passes per play plus the final block.
   maxMoves: 50 * 128,
   checkOutcome(state) {
     const result = dominoes.outcome(state);

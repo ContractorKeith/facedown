@@ -77,13 +77,13 @@ test("70 logins cannot multiply account limits or deny another IP a table", asyn
     const recent = cookies.slice(-10);
     for (const cookie of recent.slice(0, 2))
       for (let i = 0; i < 8; i++) await open(cookie, "attacker", true);
-    await open(recent[2] as string, "different-ip", false); // Account cap, independent of IP.
+    await open(recent[2] as string, "different-ip", false);
     const guests: string[] = [];
     for (let i = 0; i < 5; i++)
       guests.push(cookieOf(await request("/api/guest", "", {})));
     for (const cookie of guests.slice(0, 2))
       for (let i = 0; i < 8; i++) await open(cookie, "attacker", true);
-    await open(guests[2] as string, "attacker", false); // IP cap across identities.
+    await open(guests[2] as string, "attacker", false);
     for (const cookie of guests.slice(0, 3))
       expect(
         (await request("/api/tables", cookie, { type: "spades" })).status,
@@ -98,7 +98,6 @@ test("70 logins cannot multiply account limits or deny another IP a table", asyn
         .status,
     ).toBe(201);
     await open(friend, "friend", true);
-    // Oldest session eviction also revokes its already-open sockets.
     const evicted = sockets[0] as WebSocket;
     const closed = new Promise<CloseEvent>((resolve) =>
       evicted.addEventListener("close", resolve, { once: true }),

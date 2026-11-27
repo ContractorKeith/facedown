@@ -24,7 +24,7 @@ test("host rules, last-socket hold, timeout, takeover, reclaim, and cancellation
     tables.join(table.id, 0, second);
     tables.start(table.id, host);
     tables.disconnect(peer);
-    clock.advance(3); // Three bots bid, then the human is up.
+    clock.advance(3);
     expect(table.game.toAct(table.state)).toBe(0);
     clock.advance(10);
     expect(store.loadGame(table.id)?.moves.some((e) => "timeout" in e)).toBe(

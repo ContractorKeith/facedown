@@ -1,0 +1,3 @@
+# Request handling resists probing and cheap abuse
+
+Login for an unknown username still verifies against a fixed hash made at the same cost as real accounts, so response time does not reveal which usernames exist. The session cookie parser accepts only the configured name (`__Host-fd` or `fd`) and only its first occurrence, so an injected duplicate cannot override it. Every WebSocket message is charged to the rate limiter before it is parsed, invalid JSON included, so malformed floods cost the sender the same as valid ones. Static serving resolves only to files inside the built client; API misses never fall through to it. Session eviction orders by SQLite rowid, which preserves issuance order even when expiry times are equal, so "oldest session revoked" is exact.

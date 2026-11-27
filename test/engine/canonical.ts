@@ -1,4 +1,3 @@
-// JSON state has no undefined values; sort object keys recursively for stable hashes.
 export function canonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
   if (value !== null && typeof value === "object") {

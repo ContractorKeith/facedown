@@ -1,6 +1,5 @@
 import { expect, test } from "./fixture";
 
-// Bun also discovers this file; only the browser command registers the suite.
 if (process.env.FACEDOWN_BROWSER === "1") {
   for (const type of ["Spades", "Dominoes"] as const) {
     test(`${type}: a phone plays a deal, reacts and reconnects`, async ({
@@ -8,7 +7,6 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       browser,
       origin,
     }) => {
-      // Track the real socket so the test can simulate a dropped connection.
       const trackSocket = () => {
         const Native = window.WebSocket;
         class Socket extends Native {
@@ -78,7 +76,6 @@ if (process.env.FACEDOWN_BROWSER === "1") {
       let captured = false;
       const scoring = page.getByTestId("deal-result");
       const deadline = Date.now() + 65000;
-      // Dominoes may finish a deal before this seat draws; continue until a draw too.
       while (
         Date.now() < deadline &&
         (!(await scoring.count()) || (type === "Dominoes" && draws === 0))
@@ -119,7 +116,7 @@ if (process.env.FACEDOWN_BROWSER === "1") {
           });
           captured = true;
         }
-        await page.waitForTimeout(230); // Respect the server's real move rate limit.
+        await page.waitForTimeout(230);
       }
       if (!captured)
         await page.screenshot({

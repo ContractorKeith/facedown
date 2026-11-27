@@ -17,7 +17,6 @@ import type { GameRecord } from "../../src/server/store";
 import { checkView } from "../engine/view-check";
 import type { Client } from "./helpers";
 
-// Compare each captured view with the canonical fold at its own sequence.
 export function checkWire(record: GameRecord, clients: Client[]) {
   const game = registry.get(record.type) as Game<
     unknown,
@@ -63,8 +62,6 @@ export function checkWire(record: GameRecord, clients: Client[]) {
           record.type === dominoes.type
             ? locateDominoes(state as DominoesState)
             : locateSpades(state as SpadesState);
-        // lastMove is an exact public action; at a Deal boundary its piece
-        // may already be in a newly shuffled private Hand. Check it separately.
         const { lastMove: _lastMove, ...current } = message;
         checkView(current, client.viewer as Viewer, locations);
         expect(message.you).toBe(

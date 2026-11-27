@@ -36,7 +36,6 @@ export class GuestSessions implements SessionResolver {
     private now = () => Date.now(),
   ) {}
   resolve(request: Request): Session | null {
-    // Accept only the configured name, and only its first occurrence.
     const name = this.insecure ? "fd" : "__Host-fd";
     const token = (request.headers.get("cookie") ?? "")
       .split(";")

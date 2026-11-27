@@ -3,7 +3,6 @@ import { moveLogHash } from "../../src/engine/core/log-hash";
 import { registry } from "../../src/engine/registry";
 import { replayFixture } from "./replay-fixture";
 
-// Drive real client subscriptions with deterministic protocol frames.
 export async function tableFixture(
   page: Page,
   type: "spades" | "dominoes" = "spades",

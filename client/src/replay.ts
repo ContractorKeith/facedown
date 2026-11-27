@@ -13,7 +13,6 @@ export type Frame = {
   hands: string[][];
   toAct: Seat | null;
 };
-// Fold every move before exposing any frames: an invalid log is never a valid replay.
 export function verifyReplay(value: unknown, local?: LiveRecord) {
   const record = parseReplay(value);
   const failures: string[] = [];

@@ -8,7 +8,6 @@ import type {
   View as SpadesView,
 } from "../../src/engine/spades";
 
-// Client rules use only the received hand and public fields.
 export function legalMovesFromView(type: GameType, value: unknown): unknown[] {
   if (type === "spades") {
     const view = value as SpadesView;

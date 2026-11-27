@@ -11,7 +11,6 @@ for (const corruption of ["null", "illegal", "gap"] as const)
         good = await f.game("dominoes");
       const table = f.app.tables.get(bad.id);
       f.app.tables.lifecycle.apply(table, { seat: 1, timeout: true });
-      // Damage the actual SQLite file before a new server instance loads it.
       corruptMove(f.db, bad.id, corruption);
       await f.restart();
       expect(warn).toHaveBeenCalledTimes(1);

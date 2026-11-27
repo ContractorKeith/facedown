@@ -2,7 +2,6 @@ import { isPlainObject } from "./envelope";
 import { sha256 } from "./sha256";
 import type { Envelope } from "./types";
 
-// Sort object keys recursively; array order and JSON scalar values remain significant.
 export function canonicalJSON(value: unknown): string {
   if (
     value === null ||

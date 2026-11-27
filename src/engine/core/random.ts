@@ -1,12 +1,10 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: Digest validation and shuffle loop bounds guarantee the indexed entries. */
 import { sha256 } from "./sha256";
 
-// sfc32: four 32-bit words; output is an unsigned 32-bit integer.
 export type Rng = () => number;
 export function rngFromDigest(digest: string): Rng {
   if (!/^[0-9a-f]{64}$/i.test(digest))
     throw new Error("Expected a 256-bit hex digest");
-  // Fold all eight digest words into the four-word state.
   const words = Array.from({ length: 8 }, (_, i) =>
     Number.parseInt(digest.slice(i * 8, i * 8 + 8), 16),
   );
@@ -27,7 +25,6 @@ export function rngFromDigest(digest: string): Rng {
   return next;
 }
 
-// Rejection sampling avoids bias when the bound does not divide 2^32.
 export function below(bound: number, rng: Rng): number {
   if (!Number.isInteger(bound) || bound < 1 || bound > 0x100000000)
     throw new Error("Invalid random bound");

@@ -21,7 +21,6 @@ export class Lifecycle {
     readonly timing: Timing,
     readonly changed: (table: Table) => void = () => {},
   ) {}
-  // Every scheduled callback isolates failure to its table.
   after(table: Table, ms: number, callback: () => void): () => void {
     return this.clock.after(ms, () => {
       if (this.closed || table.status === "unavailable") return;

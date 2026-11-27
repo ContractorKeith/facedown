@@ -35,7 +35,6 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
   legalMoves(state, seat) {
     if (state.turn !== seat) return [];
     const hand = state.hands[seat];
-    // An opening tile always uses left; it exposes both printed ends.
     if (!state.line.length) {
       const opening = state.deal === 0 ? [firstTile(state.hands)] : hand;
       return opening.map((play) => ({ play, end: "left" }));
@@ -67,7 +66,6 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
       "timeout" in envelope
         ? bot(dominoes.view(state, { seat: envelope.seat }), legal)
         : envelope.move;
-    // Match the full move shape, rejecting extra fields and malformed values.
     const candidate = legal.find(
       (item) =>
         isPlainObject(move) &&
@@ -89,7 +87,6 @@ export const dominoes: Game<State, Move, View, DominoesRuleset> = {
       const tile = next.boneyard.shift();
       if (tile === undefined) throw new Error("Empty boneyard");
       next.hands[seat].push(tile);
-      // Passes require an empty boneyard, so a draw cannot follow a pass.
       return { ok: true, state: next };
     }
     next.turn = nextSeat(seat);

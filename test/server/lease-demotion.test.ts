@@ -23,7 +23,7 @@ test("a SIGSTOP-style stall demotes, closes every socket with 1012, fails health
           });
         }),
     );
-    wall = 30000; // Wall time advances while JS callbacks were suspended.
+    wall = 30000;
     time.advance(5000);
     expect((await f.request("/healthz")).status).toBe(503);
     expect(await Promise.all(closed)).toEqual([1012, 1012, 1012, 1012, 1012]);

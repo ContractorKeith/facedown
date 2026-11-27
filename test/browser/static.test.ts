@@ -54,7 +54,6 @@ test("symlinks cannot expose files outside the client root", async () => {
     expect((await staticFile("/assets/leak.js", root)).status).toBe(404);
     symlinkSync(outside, join(root, "linked"));
     expect((await staticFile("/linked/secret.html", root)).status).toBe(404);
-    // The SPA fallback must validate index.html too.
     const fallback = join(root, "fallback");
     mkdirSync(fallback);
     symlinkSync(join(outside, "secret.html"), join(fallback, "index.html"));

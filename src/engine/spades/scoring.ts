@@ -1,7 +1,6 @@
 import type { Team } from "../core/types";
 import type { State } from "./state";
 
-// Nil tricks are bags, never credit toward the partner's contract.
 export function scoreDeal(state: State): {
   scores: [number, number];
   bags: [number, number];
@@ -38,7 +37,6 @@ export function scoreDeal(state: State): {
   }
   return { scores, bags, earnedBags };
 }
-// Called only at deal boundaries; the deal index is zero-based.
 export function winningTeam(state: State): Team | null {
   const { scores, ruleset } = state;
   const mercy = scores.some((score) => score <= ruleset.mercyScore);
