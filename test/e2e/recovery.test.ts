@@ -1,5 +1,5 @@
 import { expect, spyOn, test } from "bun:test";
-import { corruptMove } from "../../src/server/store/testing";
+import { corruptMove } from "../server/store-fixtures";
 import { fixture } from "./helpers";
 
 for (const corruption of ["null", "illegal", "gap"] as const)

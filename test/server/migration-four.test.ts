@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { commitment } from "../../src/engine/core/random";
 import { spades } from "../../src/engine/spades";
 import { Store } from "../../src/server/store";
-import { versionThree } from "../../src/server/store/testing";
 import { Tables } from "../../src/server/tables";
 import { FakeClock, scratch } from "./helpers";
+import { versionThree } from "./store-fixtures";
 
 test("v3 schema from c4be160 migrates bot flags and rebuild accepts reordered ruleset keys", () => {
   const temp = scratch(),

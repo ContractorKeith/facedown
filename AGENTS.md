@@ -50,7 +50,7 @@ bash scripts/accept.sh    # full gate, 2000 playouts per game
   from a seat's view and legal moves, never from full state.
 - State is always `fold(init(seed), moves)`; in-memory state and snapshots are caches.
 - The seed is never returned by any API while a game is live.
-- Only `src/server/store` touches SQLite.
+- In `src`, only `src/server/store` touches SQLite; test fixtures (`test/server/store-fixtures.ts`) may open scratch databases.
 - Containers run as bun, with writable persistent data mounted at `/data`; image default is `/data/facedown.db`.
 - `/healthz` is healthy during standby. The `tables` SQLite lease gates table traffic and rebuild (5 s heartbeat, 20 s expiry, 250 ms poll).
 - SIGTERM rejects moves with `unavailable`, drains writes, closes WS with 1012 and releases the lease; exit deadline is 9 s. Confirmed lease loss closes sockets, fails health, and exits 1 for replacement.
