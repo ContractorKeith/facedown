@@ -1,17 +1,14 @@
 import { expect, test } from "bun:test";
 import { Budget } from "../../src/server/ws/budget";
+import { bunWebSocket } from "../bun-websocket";
 import { fixture } from "./helpers";
 
-const Socket = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 async function rejectedSocket(
   origin: string,
   cookie: string,
   headerOrigin = origin,
 ) {
-  const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+  const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
     headers: { cookie, origin: headerOrigin },
   });
   let opened = false;
@@ -38,7 +35,7 @@ test("unknown/expired guest tokens return 401 and cannot open or retain a socket
     ).toBe(401);
     await rejectedSocket(origin, unknown);
     const cookie = await f.guest();
-    const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { cookie, origin },
     });
     await new Promise<void>((resolve) =>

@@ -1,11 +1,8 @@
 import { expect, test } from "bun:test";
+import { bunWebSocket } from "../bun-websocket";
 import { sessionHashes } from "../server/store-fixtures";
 import { fixture } from "./helpers";
 
-const Socket = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 const cookieOf = (response: Response) =>
   response.headers.get("set-cookie")?.split(";")[0] as string;
 
@@ -50,7 +47,7 @@ test("70 logins cannot multiply account limits or deny another IP a table", asyn
     for (const cookie of cookies.slice(0, -10))
       expect((await f.request("/api/me", cookie)).status).toBe(401);
     const open = async (cookie: string, ip: string, accepted: boolean) => {
-      const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+      const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
         headers: { cookie, origin, "x-forwarded-for": ip },
       });
       sockets.push(ws);

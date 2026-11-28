@@ -1,10 +1,6 @@
 import { expect, test } from "bun:test";
+import { bunWebSocket } from "../bun-websocket";
 import { fixture } from "./helpers";
-
-const Socket = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 
 test("guest creation allows 30 attempts per IP per hour", async () => {
   const f = fixture();
@@ -31,7 +27,7 @@ test("ninth session socket closes 1008 and freeing a socket restores capacity", 
     for (let i = 0; i < 8; i++)
       clients.push(await f.connect(cookie, { seat: 0 }, id));
     const origin = `http://127.0.0.1:${f.app.server.port}`;
-    const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { cookie, origin },
     });
     extra.push(ws);
@@ -60,7 +56,7 @@ test("unseated sockets receive configured pings; oversized frames get the applic
   try {
     const cookie = await f.guest(),
       origin = `http://127.0.0.1:${f.app.server.port}`;
-    ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+    ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { cookie, origin },
     });
     const ping = await new Promise<unknown>((resolve) =>
