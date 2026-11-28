@@ -1,5 +1,5 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: Fixed vectors and bounded test loops guarantee these fixture entries. */
 import { expect, test } from "bun:test";
+import { at } from "../../src/engine/core/at";
 import { fold } from "../../src/engine/core/fold";
 import {
   below,
@@ -41,8 +41,8 @@ test("SHA-256 NIST vectors", () => {
       "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
       "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
     ],
-  ])
-    expect(sha256(input!)).toBe(expected!);
+  ] satisfies [string, string][])
+    expect(sha256(input)).toBe(expected);
 });
 test("SHA-256 agrees with Bun on 200 randomized UTF-16 strings", () => {
   const rng = dealRng("hash verification", 0);
@@ -72,7 +72,8 @@ test("shuffle positions are roughly uniform over 4000 seeded shuffles", () => {
   for (let i = 0; i < 4000; i++) {
     shuffle([0, 1, 2, 3], dealRng("uniformity", i)).forEach(
       (item, position) => {
-        counts[item]![position]!++;
+        const row = at(counts, item);
+        row[position] = at(row, position) + 1;
       },
     );
   }
@@ -87,7 +88,7 @@ test("shuffle positions are roughly uniform over 4000 seeded shuffles", () => {
 });
 test("bounded randomness rejects the biased tail", () => {
   const words = [0xffffffff, 5];
-  expect(below(3, () => words.shift()!)).toBe(2);
+  expect(below(3, () => words.shift() ?? 0)).toBe(2);
   expect(words).toEqual([]);
   expect(() => below(0, () => 0)).toThrow();
 });

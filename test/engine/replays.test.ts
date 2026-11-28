@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: The checked-in highcard golden supplies the required moves. */
 import { expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { at } from "../../src/engine/core/at";
 import { fold } from "../../src/engine/core/fold";
 import type { Envelope } from "../../src/engine/core/types";
 import { canonical } from "./canonical";
@@ -24,7 +24,7 @@ test("a different legal golden move reaches the hash mismatch path", () => {
   const moves = replay.moves as Envelope<Move>[];
   const prefix = fold(highcard, replay.seed, moves.slice(0, 13));
   if (!prefix.ok) throw new Error("Invalid golden prefix");
-  const seat = moves[13]!.seat;
+  const seat = at(moves, 13).seat;
   const move = { card: "TD" };
   expect(highcard.legalMoves(prefix.state, seat)).toContainEqual(move);
   moves[13] = { seat, move };

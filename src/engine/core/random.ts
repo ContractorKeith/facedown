@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: Digest validation and shuffle loop bounds guarantee the indexed entries. */
+import { at } from "./at";
 import { sha256 } from "./sha256";
 
 export type Rng = () => number;
@@ -8,10 +8,10 @@ export function rngFromDigest(digest: string): Rng {
   const words = Array.from({ length: 8 }, (_, i) =>
     Number.parseInt(digest.slice(i * 8, i * 8 + 8), 16),
   );
-  let a = words[0]! ^ words[4]!;
-  let b = words[1]! ^ words[5]!;
-  let c = words[2]! ^ words[6]!;
-  let d = words[3]! ^ words[7]!;
+  let a = at(words, 0) ^ at(words, 4);
+  let b = at(words, 1) ^ at(words, 5);
+  let c = at(words, 2) ^ at(words, 6);
+  let d = at(words, 3) ^ at(words, 7);
   const next = () => {
     const t = (((a + b) | 0) + d) | 0;
     d = (d + 1) | 0;
@@ -39,7 +39,7 @@ export function shuffle<T>(items: readonly T[], rng: Rng): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
     const j = below(i + 1, rng);
-    [result[i], result[j]] = [result[j]!, result[i]!];
+    [result[i], result[j]] = [at(result, j), at(result, i)];
   }
   return result;
 }
