@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { startServer } from "../../src/server";
+import { bunWebSocket } from "../bun-websocket";
 import { scratch } from "../server/helpers";
 import { Client } from "./helpers";
 import { checkWire } from "./wire";
@@ -23,11 +24,7 @@ test("real clock schedules turn timeout and disconnected-seat takeover", async (
     app.tables.join(table.id, 0, hostPeer);
     const spectator = sessions.guest(),
       origin = `http://127.0.0.1:${app.server.port}`;
-    const Socket = WebSocket as unknown as new (
-      url: string,
-      options: Bun.WebSocketOptions,
-    ) => WebSocket;
-    const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { origin, cookie: spectator.cookie.split(";")[0] as string },
     });
     client = new Client(ws, { spectator: true });

@@ -1,6 +1,7 @@
 import { expect } from "bun:test";
 import type { GameType, Seat, Viewer } from "../../src/engine/core/types";
 import { type ServerOptions, startServer } from "../../src/server";
+import { bunWebSocket } from "../bun-websocket";
 import { FakeClock, scratch } from "../server/helpers";
 import { legalMovesFromView } from "./client-moves";
 
@@ -119,11 +120,7 @@ export function fixture(overrides: Partial<ServerOptions> = {}) {
     table: string,
     wsOrigin = origin(),
   ) {
-    const Socket = WebSocket as unknown as new (
-      url: string,
-      options: Bun.WebSocketOptions,
-    ) => WebSocket;
-    const ws = new Socket(`${origin().replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin().replace("http:", "ws:")}/ws`, {
       headers: { cookie, origin: wsOrigin },
     });
     const client = new Client(ws, viewer);

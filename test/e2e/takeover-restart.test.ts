@@ -1,11 +1,7 @@
 import { expect, test } from "bun:test";
+import { bunWebSocket } from "../bun-websocket";
 import { scratch } from "../server/helpers";
 import { Client } from "./helpers";
-
-const Socket = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 
 test("SIGTERM preserves a bot takeover through restart with a long hold and records leaver", async () => {
   const temp = scratch();
@@ -52,7 +48,7 @@ test("SIGTERM preserves a bot takeover through restart with a long hold and reco
     table: string,
     seat?: number,
   ) => {
-    const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { origin, cookie },
     });
     const c = new Client(ws, { spectator: true });
@@ -87,7 +83,7 @@ test("SIGTERM preserves a bot takeover through restart with a long hold and reco
     a.child.kill("SIGTERM");
     expect(await a.child.exited).toBe(0);
     const b = await launch(600000);
-    const ws = new Socket(`${b.origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${b.origin.replace("http:", "ws:")}/ws`, {
       headers: { origin: b.origin, cookie },
     });
     const resumed = new Client(ws, { spectator: true });

@@ -1,13 +1,9 @@
 import { expect, test } from "bun:test";
 import { createConnection, type Socket } from "node:net";
 import { Store } from "../../src/server/store";
+import { bunWebSocket } from "../bun-websocket";
 import { Client, fixture } from "../e2e/helpers";
 import { scratch } from "./helpers";
-
-const SocketClient = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 
 test("reentrant stop callers await the same drain promise", async () => {
   const f = fixture();
@@ -56,7 +52,7 @@ test("two SIGTERMs 100ms apart wait for in-flight HTTP, close 1012 and release t
       body: JSON.stringify({ type: "spades" }),
     });
     const { id } = (await response.json()) as { id: string };
-    const ws = new SocketClient(`${origin.replace("http:", "ws:")}/ws`, {
+    const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
       headers: { origin, cookie },
     });
     client = new Client(ws, { seat: 0 });

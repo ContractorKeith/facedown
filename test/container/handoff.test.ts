@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { bunWebSocket } from "../bun-websocket";
 import { Client } from "../e2e/helpers";
 import { requireDocker } from "./guard";
 
@@ -13,10 +14,6 @@ const docker = async (...args: string[]) => {
   if (await child.exited) throw new Error(`docker ${args[0]} failed`);
   return output.trim();
 };
-const Socket = WebSocket as unknown as new (
-  url: string,
-  options: Bun.WebSocketOptions,
-) => WebSocket;
 test.skipIf(!enabled)(
   "container SIGTERM hands the persisted game to a healthy standby",
   async () => {
@@ -42,7 +39,7 @@ test.skipIf(!enabled)(
       table: string,
       seat?: number,
     ) => {
-      const ws = new Socket(`${origin.replace("http:", "ws:")}/ws`, {
+      const ws = bunWebSocket(`${origin.replace("http:", "ws:")}/ws`, {
         headers: { origin, cookie },
       });
       const client = new Client(ws, { spectator: true });
