@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { sha256 } from "../../src/engine/core/sha256";
-import { seats } from "../../src/engine/core/types";
+import { seats, type Viewer } from "../../src/engine/core/types";
 import { playout } from "./harness";
-import type { GameEntry } from "./invariants";
+import type { GameEntry, Place } from "./invariants";
 
 const numeric: GameEntry<null, never, unknown, null, "numeric"> = {
   type: "numeric",
@@ -69,4 +69,33 @@ test("the declared piece set is checked at initialization", () => {
       sha256("missing piece"),
     ),
   ).toThrow("conservation: piece set changed");
+});
+test("a locate that calls a private piece public fails the view cross-check", () => {
+  const seed = sha256("mislabelled public");
+  const entry = {
+    ...numeric,
+    pieces: [...numeric.pieces, "11"],
+    view: (_state: null, viewer: Viewer) =>
+      "seat" in viewer
+        ? [String(viewer.seat + 7), ...(viewer.seat === 0 ? ["11"] : [])]
+        : [],
+    locate: () =>
+      new Map<string, Place[]>([
+        ...seats.map((seat): [string, Place[]] => [
+          String(seat + 7),
+          seat === 0 ? [{ public: true }] : [{ seat }],
+        ]),
+        ["11", [{ seat: 0 }]],
+      ]),
+  };
+  expect(() => playout(entry, seed)).toThrow(
+    new RegExp(`seed=${seed} moves=0.*locate: public 7`),
+  );
+});
+test("a locate that puts a piece in a Hand its owner cannot see fails", () => {
+  const seed = sha256("unseen hand");
+  const entry = { ...numeric, view: () => [] };
+  expect(() => playout(entry, seed)).toThrow(
+    new RegExp(`seed=${seed} moves=0.*not in its owner's view`),
+  );
 });

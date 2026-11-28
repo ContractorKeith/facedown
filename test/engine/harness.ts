@@ -6,9 +6,10 @@ import type { Envelope, Viewer } from "../../src/engine/core/types";
 import { seats } from "../../src/engine/core/types";
 import { canonical } from "./canonical";
 import type { GameEntry } from "./invariants";
-import { checkView } from "./view-check";
+import { checkLocate, checkView } from "./view-check";
 
 export const REFOLD_INTERVAL = 256;
+export const LOCATE_INTERVAL = 8;
 function assertSame(actual: unknown, expected: unknown, message: string): void {
   if (!Bun.deepEquals(actual, expected, true))
     deepStrictEqual(actual, expected, message);
@@ -67,8 +68,14 @@ export function playout<S, M, V, R, K extends string>(
       );
       for (const places of locations.values())
         ok(places.length === 1, "conservation: duplicate or missing piece");
-      for (const viewer of viewers)
-        checkView(entry.view(state, viewer), viewer, locations, plainJson);
+      const seen = new Map(
+        viewers.map((viewer) => [
+          viewer,
+          checkView(entry.view(state, viewer), viewer, locations, plainJson),
+        ]),
+      );
+      if (plainJson || moves.length % LOCATE_INTERVAL === 0)
+        checkLocate(locations, seen);
       if (moves.length % REFOLD_INTERVAL === 0 || entry.toAct(state) === null) {
         const replay = fold(entry, seed, moves);
         ok(replay.ok, "determinism: replay rejected a move");
