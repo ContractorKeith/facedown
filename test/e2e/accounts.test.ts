@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { seedRating } from "../../src/server/store/testing";
+import { seedRating } from "../server/store-fixtures";
 import { fixture } from "./helpers";
 
 let f: ReturnType<typeof fixture>;

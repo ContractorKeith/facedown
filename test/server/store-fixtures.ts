@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { migrations } from "./migrations";
+import { migrations } from "../../src/server/store/migrations";
 export function corruptMove(
   path: string,
   id: string,

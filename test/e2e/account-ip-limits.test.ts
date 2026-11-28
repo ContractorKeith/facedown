@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { sessionHashes } from "../../src/server/store/testing";
+import { sessionHashes } from "../server/store-fixtures";
 import { fixture } from "./helpers";
 
 const Socket = WebSocket as unknown as new (

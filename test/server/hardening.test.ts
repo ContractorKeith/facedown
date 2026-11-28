@@ -2,10 +2,10 @@ import { expect, test } from "bun:test";
 import { startServer } from "../../src/server";
 import { openHold, pingMS } from "../../src/server/clock";
 import { Store } from "../../src/server/store";
-import { removeSeat } from "../../src/server/store/testing";
 import { Tables } from "../../src/server/tables";
 import { Budget } from "../../src/server/ws/budget";
 import { FakeClock, scratch } from "./helpers";
+import { removeSeat } from "./store-fixtures";
 
 for (const [name, read, fallback] of [
   ["FACEDOWN_PING_MS", pingMS, 20000],

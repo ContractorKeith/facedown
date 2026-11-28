@@ -2,12 +2,8 @@ import { expect, test } from "bun:test";
 import { commitment } from "../../src/engine/core/random";
 import { GuestSessions } from "../../src/server/http/sessions";
 import { Store } from "../../src/server/store";
-import {
-  seedRating,
-  sessionHashes,
-  versionOne,
-} from "../../src/server/store/testing";
 import { scratch } from "./helpers";
+import { seedRating, sessionHashes, versionOne } from "./store-fixtures";
 
 test("migration two preserves version-one live, finished, abandoned games and guests", () => {
   const temp = scratch();

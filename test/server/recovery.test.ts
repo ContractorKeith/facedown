@@ -1,10 +1,10 @@
 import { expect, spyOn, test } from "bun:test";
 import { clock } from "../../src/server/clock";
 import { Store } from "../../src/server/store";
-import { corruptMove } from "../../src/server/store/testing";
 import { Tables } from "../../src/server/tables";
 import type { Peer } from "../../src/server/tables/types";
 import { FakeClock, scratch } from "./helpers";
+import { corruptMove } from "./store-fixtures";
 
 for (const corruption of ["null", "illegal", "gap", "json"] as const)
   test(`boot abandons ${corruption} log and keeps another game playable`, () => {
