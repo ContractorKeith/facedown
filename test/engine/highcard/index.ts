@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: Legal moves and a completed four-card trick guarantee these entries. */
+import { at } from "../../../src/engine/core/at";
 import {
   type Game,
   nextSeat,
@@ -71,11 +71,12 @@ export const highcard: Game<State, Move, View, Ruleset, "highcard"> = {
       turn: nextSeat(envelope.seat),
     };
     if (next.trick.length === 4) {
-      const lead = next.trick[0]!;
+      const lead = at(next.trick, 0);
       const winner = next.trick
         .filter((play) => play.card[1] === lead.card[1])
         .reduce((best, play) =>
-          "9TJQKA".indexOf(play.card[0]!) > "9TJQKA".indexOf(best.card[0]!)
+          "9TJQKA".indexOf(play.card.charAt(0)) >
+          "9TJQKA".indexOf(best.card.charAt(0))
             ? play
             : best,
         );
@@ -129,7 +130,7 @@ export const highcardEntry: GameEntry<State, Move, View, Ruleset, "highcard"> =
       const outcome = highcard.outcome(state);
       if (
         outcome?.scores[outcome.winner] !== 2 ||
-        outcome.scores[1 - outcome.winner]! >= 2 ||
+        at(outcome.scores, 1 - outcome.winner) >= 2 ||
         state.tricks[outcome.winner] !== 2 ||
         state.scores[0] + state.scores[1] !== state.deal + 1
       )

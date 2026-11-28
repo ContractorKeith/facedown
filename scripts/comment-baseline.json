@@ -1,10 +1,5 @@
 {
   "client/src/board.css": 2,
-  "src/engine/core/random.ts": 1,
-  "src/engine/core/sha256.ts": 1,
   "test/browser/fixture.ts": 1,
-  "test/engine/core.test.ts": 1,
-  "test/engine/highcard/index.ts": 1,
-  "test/engine/purity.test.ts": 1,
-  "test/engine/replays.test.ts": 1
+  "test/engine/purity.test.ts": 1
 }

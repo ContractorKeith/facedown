@@ -1,4 +1,5 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: Every indexed byte and word is initialized before its bounded compression loop. */
+import { at } from "./at";
+
 const constants = [
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
   0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -17,7 +18,7 @@ const rotate = (x: number, n: number) => (x >>> n) | (x << (32 - n));
 function utf8(input: string): number[] {
   const bytes: number[] = [];
   for (const character of input) {
-    let point = character.codePointAt(0)!;
+    let point = character.codePointAt(0) ?? 0xfffd;
     if (point >= 0xd800 && point <= 0xdfff) point = 0xfffd;
     if (point < 0x80) bytes.push(point);
     else if (point < 0x800)
@@ -59,18 +60,18 @@ export function sha256(input: string): string {
     for (let i = 0; i < 16; i++) {
       const p = offset + i * 4;
       words[i] =
-        (bytes[p]! << 24) |
-        (bytes[p + 1]! << 16) |
-        (bytes[p + 2]! << 8) |
-        bytes[p + 3]!;
+        (at(bytes, p) << 24) |
+        (at(bytes, p + 1) << 16) |
+        (at(bytes, p + 2) << 8) |
+        at(bytes, p + 3);
     }
     for (let i = 16; i < 64; i++) {
-      const x = words[i - 15]!;
-      const y = words[i - 2]!;
+      const x = at(words, i - 15);
+      const y = at(words, i - 2);
       words[i] =
-        (words[i - 16]! +
+        (at(words, i - 16) +
           (rotate(x, 7) ^ rotate(x, 18) ^ (x >>> 3)) +
-          words[i - 7]! +
+          at(words, i - 7) +
           (rotate(y, 17) ^ rotate(y, 19) ^ (y >>> 10))) |
         0;
     }
@@ -89,8 +90,8 @@ export function sha256(input: string): string {
         (h +
           (rotate(e, 6) ^ rotate(e, 11) ^ rotate(e, 25)) +
           ((e & f) ^ (~e & g)) +
-          constants[i]! +
-          words[i]!) |
+          at(constants, i) +
+          at(words, i)) |
         0;
       const t2 =
         ((rotate(a, 2) ^ rotate(a, 13) ^ rotate(a, 22)) +
@@ -106,7 +107,7 @@ export function sha256(input: string): string {
       a = (t1 + t2) | 0;
     }
     for (const [i, word] of [a, b, c, d, e, f, g, h].entries())
-      hash[i] = (hash[i]! + word) | 0;
+      hash[i] = (at(hash, i) + word) | 0;
   }
   return hash
     .map((word) => (word >>> 0).toString(16).padStart(8, "0"))
