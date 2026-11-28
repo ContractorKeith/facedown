@@ -1,15 +1,12 @@
 <script lang="ts">
 import { api, type ViewMessage } from "./api";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { message, seat, join } = $props<{
   message: ViewMessage;
   seat: number | null;
   join: (seat: number) => void;
 }>();
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let error = $state("");
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function control(action: string) {
   try {
     error = "";

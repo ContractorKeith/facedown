@@ -1,16 +1,12 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { id, type, rated, navigate } = $props<{
   id: string;
   type?: "spades" | "dominoes";
   rated: boolean;
   navigate: (path: string) => void;
 }>();
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let copied = $state(false);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let error = $state("");
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function copy() {
   try {
     error = "";

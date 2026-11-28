@@ -2,18 +2,14 @@
 import { onMount } from "svelte";
 import { api, type GameType, type Table } from "./api";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { name, guest, navigate } = $props<{
   name: string;
   guest: boolean;
   navigate: (path: string) => void;
 }>();
 let casual = $state(true);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let tables = $state<Table[]>([]);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let error = $state("");
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let busy = $state(false);
 async function refresh() {
   try {
@@ -22,7 +18,6 @@ async function refresh() {
     error = (e as Error).message;
   }
 }
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function create(type: GameType) {
   busy = true;
   try {

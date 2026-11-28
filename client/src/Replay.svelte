@@ -1,28 +1,22 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import { api, type ViewMessage } from "./api";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Card from "./art/Card.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Tile from "./art/Tile.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
 import { liveRecord } from "./game-records";
 import { parseReplay } from "./records";
 import { type Frame, type ReplayRecord, verifyReplay } from "./replay";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Scorebar from "./Scorebar.svelte";
 
 let { id } = $props<{ id: string }>();
 let record = $state<ReplayRecord>();
 let frames = $state<Frame[]>([]);
 let failures = $state<string[]>([]);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let verified = $state(false);
 let loaded = $state(false);
 let step = $state(0);
 const frame = $derived(frames[step]);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const message = $derived(
   frame && record
     ? ({
@@ -38,7 +32,6 @@ const message = $derived(
       } as ViewMessage)
     : undefined,
 );
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const deals = $derived(
   frames.filter(
     (frame, index) =>

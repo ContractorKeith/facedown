@@ -1,10 +1,7 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import { tileName } from "../pieces";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { tile } = $props<{ tile: string }>();
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const layouts = [
   [],
   [[0, 0]],

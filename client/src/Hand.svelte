@@ -1,9 +1,6 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Card from "./art/Card.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Tile from "./art/Tile.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import { cardName, sortHand, tileName } from "./pieces";
 
 let { hand, moves, dominoes, play } = $props<{
@@ -13,11 +10,8 @@ let { hand, moves, dominoes, play } = $props<{
   play: (move: Record<string, unknown>) => void;
 }>();
 let selected = $state<string | null>(null);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const ordered = $derived(sortHand(hand, dominoes));
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const options = $derived(moves.filter((m) => m.play === selected));
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 function choose(item: string) {
   const matches = moves.filter((m) => m.play === item);
   if (matches.length === 1 && matches[0]) {

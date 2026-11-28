@@ -4,9 +4,7 @@ import { onMount } from "svelte";
 let { up, send } = $props<{ up: boolean; send: (message: object) => void }>();
 let cooling = $state(false);
 let timer: ReturnType<typeof setTimeout>;
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const reactions = ["nice", "oops", "gg", "hurry", "thanks", "wow"];
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 function react(id: string) {
   if (!up || cooling) return;
   cooling = true;
