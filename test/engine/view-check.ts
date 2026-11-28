@@ -23,7 +23,7 @@ export function checkView(
   viewer: Viewer,
   locations: ReadonlyMap<string, readonly Place[]>,
   plainJson = true,
-): void {
+): readonly string[] {
   if (plainJson)
     deepStrictEqual(
       JSON.parse(JSON.stringify(view)),
@@ -44,4 +44,28 @@ export function checkView(
       `no leak: ${id}`,
     );
   }
+  return ids;
+}
+export function checkLocate(
+  locations: ReadonlyMap<string, readonly Place[]>,
+  views: ReadonlyMap<Viewer, readonly string[]>,
+): void {
+  const seen = new Map(
+    [...views].map(([viewer, ids]) => [viewer, new Set(ids)]),
+  );
+  for (const [id, places] of locations)
+    for (const place of places) {
+      if ("seat" in place)
+        for (const [viewer, ids] of seen)
+          if ("seat" in viewer && viewer.seat === place.seat)
+            ok(ids.has(id), `locate: ${id} not in its owner's view`);
+      if ("public" in place) {
+        let count = 0;
+        for (const ids of seen.values()) if (ids.has(id)) count++;
+        ok(
+          count === 0 || count === seen.size,
+          `locate: public ${id} is visible to only some viewers`,
+        );
+      }
+    }
 }
