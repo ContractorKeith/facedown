@@ -1,5 +1,4 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { name, guest, navigate, logout } = $props<{
   name: string;
   guest: boolean;

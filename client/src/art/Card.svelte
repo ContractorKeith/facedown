@@ -1,10 +1,7 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import { cardName } from "../pieces";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { card } = $props<{ card: string }>();
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const suits: Record<string, string> = { C: "♣", D: "♦", H: "♥", S: "♠" };
 </script>
 <svg viewBox="0 0 56 80" aria-label={cardName(card)} role="img" class="card" style:color={/[DH]/.test(card) ? "#a82d37" : "#172e29"}>

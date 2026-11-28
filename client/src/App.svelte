@@ -1,22 +1,14 @@
 <script lang="ts">
 import { onMount } from "svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Auth from "./Auth.svelte";
 import { api, session } from "./api";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Leaderboard from "./Leaderboard.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Lobby from "./Lobby.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Navigation from "./Navigation.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Player from "./Player.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Replay from "./Replay.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Table from "./Table.svelte";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let guest = $state(true);
 let name = $state("");
 let error = $state("");
@@ -43,7 +35,6 @@ onMount(() => {
   window.addEventListener("popstate", pop);
   return () => window.removeEventListener("popstate", pop);
 });
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function logout() {
   try {
     await api("/logout", {});

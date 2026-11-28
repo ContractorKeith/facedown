@@ -1,5 +1,4 @@
 <script lang="ts">
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
 let { gone, error, notice, tampered, scores, id } = $props<{
   gone: boolean;
   error: string;

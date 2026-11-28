@@ -8,11 +8,8 @@ let { register, navigate, refreshSession } = $props<{
 }>();
 let username = $state("");
 let password = $state("");
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let error = $state("");
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let busy = $state(false);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 async function submit(e: SubmitEvent) {
   e.preventDefault();
   busy = true;

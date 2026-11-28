@@ -1,26 +1,18 @@
 <script lang="ts">
 import { onMount, tick } from "svelte";
 import { ApiError, type Table, type ViewMessage } from "./api";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Board from "./Board.svelte";
 import { type Chain, rememberFrame } from "./chain";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Hand from "./Hand.svelte";
 import { legalMovesFromView } from "./legal";
 import { loadTable } from "./load-table";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import OpenTable from "./OpenTable.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Reactions from "./Reactions.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import Scorebar from "./Scorebar.svelte";
 import { connect } from "./socket";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup (Biome checks scripts only).
 import TableHeader from "./TableHeader.svelte";
-// biome-ignore lint/correctness/noUnusedImports: Referenced in markup.
 import TableNotices from "./TableNotices.svelte";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { id, navigate, refreshSession } = $props<{
   id: string;
   navigate: (path: string) => void;
@@ -33,14 +25,11 @@ let seat = $state<number | null>(null);
 let up = $state(false);
 let error = $state("");
 let pending = $state(false);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
 let notice = $state("");
 let over = $state(false);
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
 let gone = $state(false);
 let controls: HTMLElement;
 let ownsFocus = false;
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup.
 let finalScores = $state<number[]>();
 $effect(() => {
   if (moves.some((m) => "play" in m) && ownsFocus)
@@ -55,7 +44,6 @@ let now = $state(Date.now());
 let bubbles = $state<Record<number, string>>({});
 let connection: ReturnType<typeof connect> | undefined;
 const timers = new Set<ReturnType<typeof setTimeout>>();
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 const view = $derived(message?.view);
 const moves = $derived(
   (up &&
@@ -121,7 +109,6 @@ function subscribe(next: number | null) {
           []),
   );
 }
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 function play(move: Record<string, unknown>) {
   if (up && !pending && message && moves.includes(move)) {
     ownsFocus = controls?.contains(document.activeElement) ?? false;

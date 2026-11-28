@@ -1,7 +1,6 @@
 <script lang="ts">
 import type { ViewMessage } from "./api";
 
-// biome-ignore lint/correctness/noUnusedVariables: Referenced in markup (Biome checks scripts only).
 let { view } = $props<{ view: ViewMessage["view"] }>();
 </script>
 <div class="scorebar">
