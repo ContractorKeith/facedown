@@ -1,4 +1,9 @@
-import type { Envelope, Outcome } from "../../src/engine/core/types";
+import type {
+  Envelope,
+  Outcome,
+  Seat,
+  Team,
+} from "../../src/engine/core/types";
 
 export type Replay = {
   type: string;
@@ -10,49 +15,68 @@ export type Replay = {
 };
 const object = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
-export function validateReplay(value: unknown, file: string): Replay {
-  const fail = (field: string): never => {
-    throw new Error(`${file}: invalid or missing field ${field}`);
-  };
-  if (!object(value)) fail("replay");
-  const replay = value as Record<string, unknown>;
-  if (typeof replay.type !== "string" || !replay.type) fail("type");
-  if (!("ruleset" in replay) || replay.ruleset === undefined) fail("ruleset");
-  if (typeof replay.seed !== "string" || !/^[0-9a-f]{64}$/.test(replay.seed))
-    fail("seed");
-  if (!Array.isArray(replay.moves)) fail("moves");
-  for (const [index, item] of (replay.moves as unknown[]).entries()) {
-    const field = `moves[${index}]`;
-    if (!object(item)) fail(field);
-    const envelope = item as Record<string, unknown>;
-    if (![0, 1, 2, 3].includes(envelope.seat as number)) fail(`${field}.seat`);
-    if ("timeout" in envelope) {
-      if (envelope.timeout !== true || "move" in envelope)
-        fail(`${field}.timeout`);
-    } else if (
-      !("move" in envelope) ||
-      envelope.move === undefined ||
-      envelope.move === null
-    )
-      fail(`${field}.move`);
+const isSeat = (value: unknown): value is Seat =>
+  value === 0 || value === 1 || value === 2 || value === 3;
+const isTeam = (value: unknown): value is Team => value === 0 || value === 1;
+const isHash = (value: unknown): value is string =>
+  typeof value === "string" && /^[0-9a-f]{64}$/.test(value);
+
+function fail(file: string, field: string): never {
+  throw new Error(`${file}: invalid or missing field ${field}`);
+}
+
+function envelopeOf(
+  item: unknown,
+  field: string,
+  file: string,
+): Envelope<unknown> {
+  if (!object(item)) fail(file, field);
+  const seat = item.seat;
+  if (!isSeat(seat)) fail(file, `${field}.seat`);
+  if ("timeout" in item) {
+    if (item.timeout !== true || "move" in item) fail(file, `${field}.timeout`);
+    return { seat, timeout: true };
   }
-  const outcome = replay.expectedOutcome;
-  if (!object(outcome)) fail("expectedOutcome");
-  const checked = outcome as Record<string, unknown>;
-  if (checked.winner !== 0 && checked.winner !== 1)
-    fail("expectedOutcome.winner");
+  if (item.move === undefined || item.move === null)
+    fail(file, `${field}.move`);
+  return { seat, move: item.move };
+}
+
+function outcomeOf(value: unknown, file: string): Outcome {
+  if (!object(value)) fail(file, "expectedOutcome");
+  const { winner, scores } = value;
+  if (!isTeam(winner)) fail(file, "expectedOutcome.winner");
+  if (!Array.isArray(scores) || scores.length !== 2)
+    fail(file, "expectedOutcome.scores");
+  const [us, them]: unknown[] = scores;
   if (
-    !Array.isArray(checked.scores) ||
-    checked.scores.length !== 2 ||
-    !checked.scores.every(
-      (score) => typeof score === "number" && Number.isFinite(score),
-    )
+    typeof us !== "number" ||
+    typeof them !== "number" ||
+    !Number.isFinite(us) ||
+    !Number.isFinite(them)
   )
-    fail("expectedOutcome.scores");
-  if (
-    typeof replay.expectedFinalStateHash !== "string" ||
-    !/^[0-9a-f]{64}$/.test(replay.expectedFinalStateHash)
-  )
-    fail("expectedFinalStateHash");
-  return replay as Replay;
+    fail(file, "expectedOutcome.scores");
+  return { scores: [us, them], winner };
+}
+
+export function validateReplay(value: unknown, file: string): Replay {
+  if (!object(value)) fail(file, "replay");
+  const { type, ruleset, seed, moves, expectedFinalStateHash } = value;
+  if (typeof type !== "string" || !type) fail(file, "type");
+  if (ruleset === undefined) fail(file, "ruleset");
+  if (!isHash(seed)) fail(file, "seed");
+  if (!Array.isArray(moves)) fail(file, "moves");
+  const envelopes = moves.map((item: unknown, index) =>
+    envelopeOf(item, `moves[${index}]`, file),
+  );
+  const expectedOutcome = outcomeOf(value.expectedOutcome, file);
+  if (!isHash(expectedFinalStateHash)) fail(file, "expectedFinalStateHash");
+  return {
+    type,
+    ruleset,
+    seed,
+    moves: envelopes,
+    expectedOutcome,
+    expectedFinalStateHash,
+  };
 }
