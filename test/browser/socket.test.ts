@@ -124,7 +124,6 @@ test("ping renews the 45-second silence deadline and silence reconnects with bac
     const silent = current();
     retry(45000);
     expect(current().readyState).toBe(3);
-    // A silent transport may never complete its close handshake.
     retry(500);
     expect(Socket.all).toHaveLength(2);
     current().open();

@@ -50,7 +50,6 @@ test("deal 50 ends below target with the higher score winning", () => {
   expect(spades.outcome(state)).toEqual({ scores: [60, 70], winner: 1 });
 });
 test("a deal-50 score tie goes to the last scoring deal winner", () => {
-  // Team 1 wins this deal 70–60, bringing the total to 70–70.
   expect(spades.outcome(finalPlay([10, 0], 49))).toEqual({
     scores: [70, 70],
     winner: 1,
@@ -105,7 +104,6 @@ test("deliberate overbidding terminates independently of normal bot bidding", ()
       );
     },
     apply(state: State, envelope: Parameters<typeof spades.apply>[1]) {
-      // Resolve timeouts through this test bot as well, without changing production policy.
       if ("timeout" in envelope)
         return spades.apply(state, {
           seat: envelope.seat,

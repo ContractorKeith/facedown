@@ -9,7 +9,6 @@ export const initial: Readonly<Rating> = {
 type Result = { rating: number; rd: number; score: number };
 const scale = 173.7178;
 
-// Glickman's Glicko-2, including the Illinois volatility iteration.
 export function update(player: Rating, results: Result[]): Rating {
   if (!results.length) return { ...player };
   const mu = (player.rating - 1500) / scale,

@@ -24,7 +24,6 @@ export type DealSummary = {
   bids: State["bids"];
   tricks: State["tricks"];
   points: [number, number];
-  // Bags earned in this deal, before any ten-bag deduction.
   bags: [number, number];
 };
 export type Move = { bid: number } | { play: CardId };

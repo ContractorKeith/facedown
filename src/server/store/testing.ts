@@ -1,6 +1,5 @@
 import { Database } from "bun:sqlite";
 import { migrations } from "./migrations";
-// Intentional disk damage for boot regression tests. Never imported by the server.
 export function corruptMove(
   path: string,
   id: string,
@@ -24,7 +23,6 @@ export function corruptMove(
   }
 }
 
-// Build an actual version-one database before testing the additive migration.
 export function versionOne(path: string): void {
   const db = new Database(path);
   try {
@@ -82,7 +80,6 @@ export function sessionHashes(path: string): string[] {
   }
 }
 
-// Immutable v3 schema used by c4be160, before bot_now existed.
 export function versionThree(
   path: string,
   game: { ruleset: unknown; seed: string; commitment: string },

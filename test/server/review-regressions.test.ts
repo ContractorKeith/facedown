@@ -5,7 +5,6 @@ import { Tables } from "../../src/server/tables";
 import { FakeClock, scratch } from "./helpers";
 
 test("unissued guest bearer tokens are rejected", () => {
-  // The resolver must consult issued sessions, rather than trusting token shape.
   const temp = scratch(),
     store = new Store(temp.db),
     sessions = new GuestSessions(store, true);

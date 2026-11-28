@@ -23,7 +23,6 @@ test("disconnect holds seat, records timeouts, takes over with a bot, then recla
     f.clock.advance(20000);
     expect(table.seats[1]?.bot).toBe(true);
     expect(f.app.store.loadGame(g.id)?.seats[1]?.botNow).toBe(true);
-    // Play seat 0; the held seat's bot must now make a persisted move.
     const seq = table.seq,
       client = g.players[0];
     if (!client) throw new Error("Missing player");

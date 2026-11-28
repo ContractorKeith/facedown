@@ -86,7 +86,7 @@ test("two SIGTERMs 100ms apart wait for in-flight HTTP, close 1012 and release t
     await Bun.sleep(100);
     child.kill("SIGTERM");
     await Bun.sleep(100);
-    expect(child.exitCode).toBe(null); // The second signal must not bypass the drain.
+    expect(child.exitCode).toBe(null);
     raw.write(body.slice(1));
     expect(await closed).toBe(1012);
     expect(await child.exited).toBe(0);

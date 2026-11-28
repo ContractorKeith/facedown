@@ -19,7 +19,6 @@ export function clientIP(request: Request, server: Server<SocketData>): string {
       : undefined;
   return forwarded || server.requestIP(request)?.address || "unknown";
 }
-// A fixed hash uses the same cost as real accounts for unknown usernames.
 const dummyHash =
   "$argon2id$v=19$m=19456,t=2,p=1$fXeJfJOjW02UaAsc2i9SS14StxPbveT8RF+Ezc+BX2g$px3D/odeLzb0hdIQXaT/wyf5TfpsELhO2GP4FJ1wX3g";
 export class Auth {

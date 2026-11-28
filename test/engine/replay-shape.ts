@@ -15,7 +15,6 @@ export function validateReplay(value: unknown, file: string): Replay {
     throw new Error(`${file}: invalid or missing field ${field}`);
   };
   if (!object(value)) fail("replay");
-  // Explicit casts below follow checks so malformed input never reaches game.apply.
   const replay = value as Record<string, unknown>;
   if (typeof replay.type !== "string" || !replay.type) fail("type");
   if (!("ruleset" in replay) || replay.ruleset === undefined) fail("ruleset");

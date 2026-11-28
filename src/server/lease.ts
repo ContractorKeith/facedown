@@ -3,7 +3,6 @@ import type { Store } from "./store";
 import { Fault } from "./tables/types";
 
 export type LeaseGuard = <T>(action: () => T) => T;
-// A unique token fences even a resumed process after its heartbeat expires.
 export class TableLease {
   private holder = crypto.randomUUID();
   private active = false;
@@ -54,7 +53,6 @@ export class TableLease {
       this.active = true;
       this.cancelHeartbeat = time.after(5000, beat);
       try {
-        // Replay never holds the lease transaction; only its writes are fenced.
         const result = acquired((action) => this.run(action));
         if (result) void result.then(complete).catch(failed);
         else complete();

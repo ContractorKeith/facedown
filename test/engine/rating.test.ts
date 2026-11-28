@@ -7,7 +7,6 @@ test("Glickman's published worked example", () => {
     { rating: 1550, rd: 100, score: 0 },
     { rating: 1700, rd: 300, score: 0 },
   ]);
-  // The paper rounds intermediate values; the unrounded result is 1464.05067.
   expect(Math.abs(result.rating - 1464.06)).toBeLessThan(0.02);
   expect(result.rd).toBeCloseTo(151.52, 2);
   expect(Math.abs(result.volatility - 0.05999)).toBeLessThan(0.00001);

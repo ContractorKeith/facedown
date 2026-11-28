@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# scripts/accept.sh — the acceptance for facedown. Worker, reviewer and CI run this exact
-# script; the orchestrator never retypes it. Keep it under three minutes.
 set -eu
 
 cd "$(dirname "$0")/.."

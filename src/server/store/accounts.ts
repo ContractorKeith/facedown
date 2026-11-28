@@ -29,7 +29,6 @@ export class AccountStore {
           account,
           expires,
         ]);
-        // SQLite rowid preserves issuance order, including equal expiry times.
         const revoked = this.db
           .query<{ token_hash: string }, [string]>(
             "SELECT token_hash FROM sessions WHERE account_id=? ORDER BY rowid DESC LIMIT -1 OFFSET 10",

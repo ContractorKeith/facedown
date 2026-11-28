@@ -5,7 +5,6 @@ import { highcardEntry } from "./highcard";
 import type { GameEntry, GameInvariants } from "./invariants";
 import { spadesInvariants } from "./spades-invariants";
 
-// M1/M2 add their game-specific checks here, separate from the shipped registry.
 const invariants = new Map<GameType, GameInvariants>([
   ["spades", spadesInvariants],
   ["dominoes", dominoesInvariants],

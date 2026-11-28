@@ -1,7 +1,6 @@
 import { type Seat, type Team, teamOf } from "../core/types";
 import { type DealSummary, deal, pips, ruleset, type State } from "./state";
 
-// The cap resolves a tied score by the last deal that awarded positive points.
 export function gameWinner(state: State): Team {
   if (state.scores[0] !== state.scores[1])
     return state.scores[0] > state.scores[1] ? 0 : 1;
@@ -18,7 +17,6 @@ export function summaryView(summary: DealSummary | null): DealSummary | null {
       };
 }
 
-// Score before replacing the hands; retain only public numbers across deals.
 export function finishDeal(state: State, seat: Seat): State {
   const remaining = state.hands.map((hand) =>
     hand.reduce((sum, tile) => sum + pips(tile), 0),
@@ -48,7 +46,6 @@ export function finishDeal(state: State, seat: Seat): State {
     pips: remaining,
     points,
   };
-  // Only one team scores per deal, so both cannot reach 100 together.
   if (
     scores.some((score) => score >= ruleset.target) ||
     state.deal + 1 >= ruleset.maxDeals

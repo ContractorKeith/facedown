@@ -4,7 +4,6 @@ import type { LeaseGuard } from "../lease";
 import type { Store } from "../store";
 import type { Table } from "./types";
 
-// Small logs finish synchronously; large replays yield so heartbeats and health run.
 export function rebuild(
   store: Store,
   tables: Map<string, Table>,

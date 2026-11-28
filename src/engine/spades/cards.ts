@@ -8,7 +8,6 @@ export const deck = [..."CDHS"].flatMap((suit) =>
 );
 export const rank = (card: CardId): number => ranks.indexOf(card[0] ?? "");
 export type Play = { seat: Seat; card: CardId };
-// A trump beats every side suit; otherwise only the led suit can win.
 export function beats(card: CardId, best: CardId): boolean {
   return card[1] === best[1] ? rank(card) > rank(best) : card[1] === "S";
 }

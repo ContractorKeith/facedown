@@ -45,6 +45,5 @@ test("600 moves refold at fixed intervals and once at game end", () => {
     checkOutcome() {},
   };
   expect(playout(entry, sha256("long game")).moves).toHaveLength(600);
-  // One live init, the empty-log check, interval checks, and the final check.
   expect(initializations).toBe(2 + Math.floor(600 / REFOLD_INTERVAL) + 1);
 });

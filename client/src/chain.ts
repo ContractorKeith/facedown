@@ -15,7 +15,6 @@ type Update = {
   logHash: string;
   lastMove?: unknown;
 };
-// Only an in-memory chain can establish continuity; saved anchors detect changes.
 export function checkChain(
   previous: Chain | undefined,
   next: Update,
@@ -62,7 +61,6 @@ export function checkChain(
   };
 }
 
-// Keep live validation and its persistent replay anchor together.
 export function rememberFrame(
   id: string,
   previous: Chain | undefined,

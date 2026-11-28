@@ -71,7 +71,6 @@ export class Store {
       })
       .immediate();
   }
-  // A terminal move and its outcome commit together, including leaver flags.
   appendMove(
     id: string,
     seq: number,

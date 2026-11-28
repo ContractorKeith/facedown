@@ -61,7 +61,6 @@ export function websocket(
         });
         if (result === "close") ws.close(1008, "Sustained flooding");
       };
-      // Charge every message before parsing, including invalid JSON.
       const total = budget.accept(now);
       if (total !== "ok") {
         reject(total);

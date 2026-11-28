@@ -119,7 +119,6 @@ export function fixture(overrides: Partial<ServerOptions> = {}) {
     table: string,
     wsOrigin = origin(),
   ) {
-    // DOM typings omit Bun’s authenticated-client options.
     const Socket = WebSocket as unknown as new (
       url: string,
       options: Bun.WebSocketOptions,
@@ -178,7 +177,7 @@ export function fixture(overrides: Partial<ServerOptions> = {}) {
         message.view,
         legalMovesFromView(table.type, message.view),
       );
-      clock.advance(201); // Keep real per-connection rate limits enabled.
+      clock.advance(201);
       client.send({ t: "move", table: id, seq: table.seq, move });
       await client.view(table.seq + 1, true);
     }

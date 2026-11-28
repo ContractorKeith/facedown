@@ -33,10 +33,8 @@ export function startServer(options: ServerOptions = {}) {
   let exitTimer: ReturnType<typeof setTimeout> | undefined;
   const demote = () => {
     failed = true;
-    // Queue initialization failures too; the server and socket hub exist by then.
     queueMicrotask(() => {
       sockets.closeAll();
-      // Allow the 1012 frames to flush before terminating this fenced process.
       exitTimer = setTimeout(() => (options.exit ?? process.exit)(1), 100);
     });
   };
@@ -113,7 +111,6 @@ export function startServer(options: ServerOptions = {}) {
         sockets.closeAll();
         tables.stop();
         await server.stop(true);
-        // Closing sockets can invoke disconnect handlers; cancel their holds too.
         tables.stop();
         clearTimeout(exitTimer);
         store.close();

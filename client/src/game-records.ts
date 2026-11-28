@@ -6,7 +6,6 @@ export type LiveRecord = {
   tampered?: boolean;
 };
 const key = (id: string) => `fd:game:${id}`;
-// Storage can be disabled or full; a browser without saved anchors gets Consistent only.
 export function liveRecord(id: string): LiveRecord | undefined {
   try {
     const value = JSON.parse(localStorage.getItem(key(id)) ?? "null");

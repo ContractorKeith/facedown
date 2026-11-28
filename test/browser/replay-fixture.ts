@@ -43,7 +43,6 @@ export function replayFixture(
     rating_changes: [],
   };
 }
-// Find a changed legal move whose suffix still folds to the exact same outcome.
 export function legalTamper(record: ReplayRecord): ReplayRecord {
   const game = registry.get(record.type);
   if (!game) throw new Error("Missing game");

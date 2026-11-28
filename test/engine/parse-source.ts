@@ -2,7 +2,6 @@ import type { SourceFile } from "typescript/unstable/ast";
 import { API } from "typescript/unstable/async";
 import { createVirtualFileSystem } from "typescript/unstable/fs";
 
-// TS7 parses through its native API server; virtual files keep fixtures off disk.
 export async function parseSource(source: string): Promise<SourceFile> {
   const file = "/facedown-purity/source.ts";
   const config = "/facedown-purity/tsconfig.json";

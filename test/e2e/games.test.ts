@@ -24,8 +24,8 @@ for (const type of ["spades", "dominoes"] as const)
       });
       expect(JSON.stringify(replay)).not.toContain("session");
       checkWire(record, f.clients);
-      expect(f.clock.pending).toBe(1); // Finished table retention deadline.
-      f.clock.advance(600000); // Evicts even while viewers stay connected.
+      expect(f.clock.pending).toBe(1);
+      f.clock.advance(600000);
       expect(() => f.app.tables.get(g.id)).toThrow("not_found");
       expect(f.clock.pending).toBe(0);
     } finally {

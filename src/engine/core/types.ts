@@ -11,7 +11,6 @@ export type MoveError = {
 };
 export type Outcome = { scores: [number, number]; winner: Team };
 
-// K lets test-only games implement the contract without joining the production types.
 export interface Game<S, M, V, R, K extends string = GameType> {
   type: K;
   ruleset: R;

@@ -5,7 +5,6 @@ export async function checkBiddingLayout(
   scale: number,
   height: number,
 ) {
-  // Include geometry in failures so different platform fonts can be diagnosed.
   const geometry = await page
     .locator(
       ".account-nav, .brand, .game-heading, .scorebar, .board, .turn, .bids, .hand",

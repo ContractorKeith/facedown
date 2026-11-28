@@ -8,7 +8,6 @@ export function isPlainObject(
   return prototype === Object.prototype || prototype === null;
 }
 
-// Validate the shared wire shape before a game reads any envelope fields.
 export function checkEnvelope(value: unknown): MoveError | null {
   const invalid: MoveError = {
     code: "illegal_move",

@@ -14,7 +14,6 @@ const constants = [
 ];
 const rotate = (x: number, n: number) => (x >>> n) | (x << (32 - n));
 
-// Encode UTF-8 explicitly, including replacement of unpaired UTF-16 surrogates.
 function utf8(input: string): number[] {
   const bytes: number[] = [];
   for (const character of input) {

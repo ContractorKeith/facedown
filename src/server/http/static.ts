@@ -2,7 +2,6 @@ import { realpath, stat } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import { Fault } from "../tables/types";
 
-// Only files inside the built client are public; API misses never reach this route.
 export async function staticFile(path: string, root = resolve("dist/client")) {
   let decoded: string;
   try {

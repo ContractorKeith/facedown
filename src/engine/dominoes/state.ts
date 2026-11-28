@@ -60,7 +60,6 @@ export type View = {
   consecutivePasses: number;
 };
 
-// Doubles outrank all other tiles; remaining ties use the higher end.
 export function firstTile(hands: readonly (readonly TileId[])[]): TileId {
   const tile = hands.flat().sort((a, b) => {
     const double = (id: TileId) => Number(id[0] === id[2]);
@@ -104,7 +103,6 @@ export function deal(
   };
 }
 
-// Structural locations keep this production module independent of test code.
 export type Place = { seat: Seat } | { public: true } | { hidden: true };
 export function locate(state: State): ReadonlyMap<string, readonly Place[]> {
   const result = new Map<string, Place[]>();
